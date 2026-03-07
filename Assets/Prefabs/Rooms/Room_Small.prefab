@@ -44,6 +44,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6271587262845146212}
+  - component: {fileID: 8382661024381034318}
   m_Layer: 0
   m_Name: DoorSocket_4
   m_TagString: Untagged
@@ -66,6 +67,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8267295541235957242}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &8382661024381034318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1585203295593872522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df4eed6e5b8ddc408382bd1c4d3da62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
+  IsConnected: 0
 --- !u!1 &1692528526617082960
 GameObject:
   m_ObjectHideFlags: 0
@@ -77,6 +91,7 @@ GameObject:
   - component: {fileID: 5350481568907536428}
   - component: {fileID: 8290292212820386202}
   - component: {fileID: 3603593494051718164}
+  - component: {fileID: 97393004552021929}
   m_Layer: 0
   m_Name: Room_Small
   m_TagString: Untagged
@@ -157,6 +172,19 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &97393004552021929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692528526617082960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 907c991087fff2043a025a4d5f80d3b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Room
+  Doors: []
 --- !u!1 &1821645546947902927
 GameObject:
   m_ObjectHideFlags: 0
@@ -166,6 +194,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6734312904823718733}
+  - component: {fileID: 7316845108847502769}
   m_Layer: 0
   m_Name: DoorSocket_3
   m_TagString: Untagged
@@ -188,6 +217,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8267295541235957242}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!114 &7316845108847502769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1821645546947902927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df4eed6e5b8ddc408382bd1c4d3da62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
+  IsConnected: 0
 --- !u!1 &5156189539343321076
 GameObject:
   m_ObjectHideFlags: 0
@@ -197,6 +239,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1701364277778902831}
+  - component: {fileID: 8255854030397635616}
   m_Layer: 0
   m_Name: DoorSocket_1
   m_TagString: Untagged
@@ -219,6 +262,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8267295541235957242}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &8255854030397635616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5156189539343321076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df4eed6e5b8ddc408382bd1c4d3da62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
+  IsConnected: 0
 --- !u!1 &6236986927586499794
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,6 +284,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4308355796740747012}
+  - component: {fileID: 2183110002322184628}
   m_Layer: 0
   m_Name: DoorSocket_2
   m_TagString: Untagged
@@ -250,3 +307,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8267295541235957242}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2183110002322184628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6236986927586499794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df4eed6e5b8ddc408382bd1c4d3da62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
+  IsConnected: 0
