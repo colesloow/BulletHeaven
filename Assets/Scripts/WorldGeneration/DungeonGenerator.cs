@@ -5,57 +5,93 @@ public class DungeonGenerator : MonoBehaviour
 {
     [SerializeField] private Room startRoom;
     [SerializeField] private Room[] roomPrefabs;
+    [SerializeField] private int roomCount = 10;
 
-    private List<DoorSocket> openDoors = new List<DoorSocket>(); // available door sockets
+    // List of door sockets that are currently available for attaching new rooms
+    private List<DoorSocket> openDoors = new List<DoorSocket>();
 
     private void Start()
     {
         // Instantiate the starting room at world origin
         Room firstRoom = Instantiate(startRoom, Vector3.zero, Quaternion.identity);
 
-        // Register all door sockets of the starting room as available connection points
+        // Register all door sockets of the starting room
         foreach (DoorSocket door in firstRoom.Doors)
         {
             openDoors.Add(door);
         }
 
-        // Test: attach a new room to the first available door
-        AttachRoom(openDoors[0]);
+        // Generate additional rooms
+        for (int i = 0; i < roomCount; i++)
+        {
+            if (openDoors.Count == 0)
+                break;
+
+            int randomIndex = Random.Range(0, openDoors.Count);
+            DoorSocket targetDoor = openDoors[randomIndex];
+
+            openDoors.RemoveAt(randomIndex);
+
+            AttachRoom(targetDoor);
+        }
     }
 
     private void AttachRoom(DoorSocket targetDoor)
     {
-        // Pick a random room prefab from the available set
+        // Select a random room prefab
         Room prefab = roomPrefabs[Random.Range(0, roomPrefabs.Length)];
 
+        // Instantiate the room
         Room newRoom = Instantiate(prefab);
 
-        // Pick a random door from the newly created room
+        // Select a random door from the new room
         DoorSocket newDoor = newRoom.Doors[Random.Range(0, newRoom.Doors.Length)];
 
-        // Calculate rotation: align forward direction of the new door with the opposite direction of the target door
-        // (ensures both doors face each other)
-        Quaternion rotation = Quaternion.FromToRotation(newDoor.transform.forward, -targetDoor.transform.forward);
+        // Rotate the room so both doors face each other
+        RotateRoomToMatchDoors(newRoom, newDoor, targetDoor);
 
-        newRoom.transform.rotation = rotation * newRoom.transform.rotation;
+        // Move the room so both door sockets overlap
+        AlignRoomPosition(newRoom, newDoor, targetDoor);
 
-        // After rotating the room, compute the positional offset
-        // between the new door and the room's root transform
-        Vector3 offset = newDoor.transform.position - newRoom.transform.position;
-
-        // Move the room so that the new door perfectly overlaps the target door
-        newRoom.transform.position = targetDoor.transform.position - offset;
-
-        // Mark both doors as connected so they are not reused
+        // Mark doors as connected
         targetDoor.IsConnected = true;
         newDoor.IsConnected = true;
 
-        // Register all remaining unconnected doors of the new room
-        // as potential attachment points for future rooms
+        // Register remaining doors as available connection points
         foreach (DoorSocket door in newRoom.Doors)
         {
             if (!door.IsConnected)
+            {
                 openDoors.Add(door);
+            }
         }
+    }
+
+    private void RotateRoomToMatchDoors(Room room, DoorSocket newDoor, DoorSocket targetDoor)
+    {
+        // Get forward directions and flatten them on the horizontal plane
+        Vector3 targetForward = targetDoor.transform.forward;
+        Vector3 newForward = newDoor.transform.forward;
+
+        targetForward.y = 0f;
+        newForward.y = 0f;
+
+        targetForward.Normalize();
+        newForward.Normalize();
+
+        // Compute signed angle around the Y axis
+        float angle = Vector3.SignedAngle(newForward, -targetForward, Vector3.up);
+
+        // Apply rotation only around Y axis
+        room.transform.Rotate(0f, angle, 0f);
+    }
+
+    private void AlignRoomPosition(Room room, DoorSocket newDoor, DoorSocket targetDoor)
+    {
+        // Compute the positional offset between the new door and the room root
+        Vector3 offset = newDoor.transform.position - room.transform.position;
+
+        // Move the room so both doors perfectly overlap
+        room.transform.position = targetDoor.transform.position - offset;
     }
 }
