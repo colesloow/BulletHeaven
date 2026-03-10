@@ -265,6 +265,8 @@ MonoBehaviour:
   - {fileID: 6174675991414460970, guid: e64c1b42bb5ca0b44a543d3cff9ef38c, type: 3}
   - {fileID: 5915138271125960190, guid: 0fde6c6e73ba6f345a82ef1f9d60378e, type: 3}
   roomCount: 10
+  overlapTolerance: 0.2
+  wallPrefab: {fileID: 2440417887079945734, guid: 5530e936e2fa75a43bfc9dc6e819f2fe, type: 3}
 --- !u!1 &377606305
 GameObject:
   m_ObjectHideFlags: 0

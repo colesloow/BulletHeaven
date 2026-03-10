@@ -11,13 +11,21 @@ public class DungeonGenerator : MonoBehaviour
     // so that rooms sharing a wall do not incorrectly trigger a collision.
     [SerializeField] private float overlapTolerance = 0.2f;
 
+    // Prefab used to seal door openings that were not connected to any room
+    [SerializeField] private GameObject wallPrefab;
+
     private readonly List<DoorSocket> openDoors = new(); // available door sockets
     private readonly List<Room> placedRooms = new();
 
+    // Parent transform that groups all generated rooms in the hierarchy
+    private Transform dungeonRoot;
+
     private void Start()
     {
+        dungeonRoot = new GameObject("Dungeon").transform;
+
         // Instantiate the starting room at the world origin
-        Room firstRoom = Instantiate(startRoom, Vector3.zero, Quaternion.identity);
+        Room firstRoom = Instantiate(startRoom, Vector3.zero, Quaternion.identity, dungeonRoot);
         placedRooms.Add(firstRoom);
 
         foreach (DoorSocket door in firstRoom.Doors)
@@ -35,6 +43,9 @@ public class DungeonGenerator : MonoBehaviour
 
             AttachRoom(targetDoor);
         }
+
+        // Close all door openings that remain unconnected after generation
+        SealOpenDoors();
     }
 
     private void AttachRoom(DoorSocket targetDoor)
@@ -44,7 +55,7 @@ public class DungeonGenerator : MonoBehaviour
 
         foreach (int i in prefabOrder)
         {
-            Room newRoom = Instantiate(roomPrefabs[i]);
+            Room newRoom = Instantiate(roomPrefabs[i], dungeonRoot);
 
             // Try each door of the new room as the connection point
             int[] doorOrder = RandomOrder(newRoom.Doors.Length);
@@ -83,6 +94,23 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         // No prefab could be placed at this door: the door remains permanently closed
+    }
+
+    // Instantiates a wall prefab at every door socket that was not connected to another room.
+    // Each wall is parented to its room to keep the hierarchy clean.
+    private void SealOpenDoors()
+    {
+        if (wallPrefab == null) return;
+
+        foreach (Room room in placedRooms)
+        {
+            foreach (DoorSocket socket in room.Doors)
+            {
+                if (socket.IsConnected) continue;
+
+                Instantiate(wallPrefab, socket.transform.position, socket.transform.rotation, room.transform);
+            }
+        }
     }
 
     // Returns true if the candidate room overlaps any already placed room.
