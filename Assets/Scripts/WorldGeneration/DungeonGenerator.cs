@@ -7,21 +7,23 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] private Room[] roomPrefabs;
     [SerializeField] private int roomCount = 10;
 
-    // List of door sockets that are currently available for attaching new rooms
-    private List<DoorSocket> openDoors = new List<DoorSocket>();
+    // Amount by which room bounds are shrunk before overlap testing,
+    // so that rooms sharing a wall do not incorrectly trigger a collision.
+    [SerializeField] private float overlapTolerance = 0.2f;
+
+    private readonly List<DoorSocket> openDoors = new(); // available door sockets
+    private readonly List<Room> placedRooms = new();
 
     private void Start()
     {
-        // Instantiate the starting room at world origin
+        // Instantiate the starting room at the world origin
         Room firstRoom = Instantiate(startRoom, Vector3.zero, Quaternion.identity);
+        placedRooms.Add(firstRoom);
 
-        // Register all door sockets of the starting room
         foreach (DoorSocket door in firstRoom.Doors)
-        {
             openDoors.Add(door);
-        }
 
-        // Generate additional rooms
+        // Generate additional rooms one by one
         for (int i = 0; i < roomCount; i++)
         {
             if (openDoors.Count == 0)
@@ -29,7 +31,6 @@ public class DungeonGenerator : MonoBehaviour
 
             int randomIndex = Random.Range(0, openDoors.Count);
             DoorSocket targetDoor = openDoors[randomIndex];
-
             openDoors.RemoveAt(randomIndex);
 
             AttachRoom(targetDoor);
@@ -38,38 +39,86 @@ public class DungeonGenerator : MonoBehaviour
 
     private void AttachRoom(DoorSocket targetDoor)
     {
-        // Select a random room prefab
-        Room prefab = roomPrefabs[Random.Range(0, roomPrefabs.Length)];
+        // Try each room prefab in a random order
+        int[] prefabOrder = RandomOrder(roomPrefabs.Length);
 
-        // Instantiate the room
-        Room newRoom = Instantiate(prefab);
-
-        // Select a random door from the new room
-        DoorSocket newDoor = newRoom.Doors[Random.Range(0, newRoom.Doors.Length)];
-
-        // Rotate the room so both doors face each other
-        RotateRoomToMatchDoors(newRoom, newDoor, targetDoor);
-
-        // Move the room so both door sockets overlap
-        AlignRoomPosition(newRoom, newDoor, targetDoor);
-
-        // Mark doors as connected
-        targetDoor.IsConnected = true;
-        newDoor.IsConnected = true;
-
-        // Register remaining doors as available connection points
-        foreach (DoorSocket door in newRoom.Doors)
+        foreach (int i in prefabOrder)
         {
-            if (!door.IsConnected)
+            Room newRoom = Instantiate(roomPrefabs[i]);
+
+            // Try each door of the new room as the connection point
+            int[] doorOrder = RandomOrder(newRoom.Doors.Length);
+            bool placed = false;
+
+            foreach (int j in doorOrder)
             {
-                openDoors.Add(door);
+                DoorSocket newDoor = newRoom.Doors[j];
+
+                RotateRoomToMatchDoors(newRoom, newDoor, targetDoor);
+                AlignRoomPosition(newRoom, newDoor, targetDoor);
+
+                // Only validate placement if the room does not overlap any existing room
+                if (!OverlapsAnyRoom(newRoom))
+                {
+                    targetDoor.IsConnected = true;
+                    newDoor.IsConnected = true;
+
+                    // Register the remaining doors of the new room as available connection points
+                    foreach (DoorSocket door in newRoom.Doors)
+                    {
+                        if (!door.IsConnected)
+                            openDoors.Add(door);
+                    }
+
+                    placedRooms.Add(newRoom);
+                    placed = true;
+                    break;
+                }
             }
+
+            if (placed) return;
+
+            // This prefab could not be placed without overlapping ; discard it and try the next
+            Destroy(newRoom.gameObject);
         }
+
+        // No prefab could be placed at this door: the door remains permanently closed
+    }
+
+    // Returns true if the candidate room overlaps any already placed room.
+    // Bounds are slightly shrunk by overlapTolerance so that touching walls are allowed.
+    private bool OverlapsAnyRoom(Room candidate)
+    {
+        Bounds candidateBounds = candidate.GetBounds();
+        candidateBounds.Expand(-overlapTolerance);
+
+        foreach (Room placed in placedRooms)
+        {
+            if (candidateBounds.Intersects(placed.GetBounds()))
+                return true;
+        }
+
+        return false;
+    }
+
+    // Returns an array of indices from 0 to count-1 in a random order (Fisher-Yates shuffle).
+    private int[] RandomOrder(int count)
+    {
+        int[] indices = new int[count];
+        for (int i = 0; i < count; i++)
+            indices[i] = i;
+
+        for (int i = count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (indices[i], indices[j]) = (indices[j], indices[i]);
+        }
+
+        return indices;
     }
 
     private void RotateRoomToMatchDoors(Room room, DoorSocket newDoor, DoorSocket targetDoor)
     {
-        // Get forward directions and flatten them on the horizontal plane
         Vector3 targetForward = targetDoor.transform.forward;
         Vector3 newForward = newDoor.transform.forward;
 
@@ -79,19 +128,15 @@ public class DungeonGenerator : MonoBehaviour
         targetForward.Normalize();
         newForward.Normalize();
 
-        // Compute signed angle around the Y axis
+        // Compute the signed angle around Y so the new door faces the target door
         float angle = Vector3.SignedAngle(newForward, -targetForward, Vector3.up);
-
-        // Apply rotation only around Y axis
         room.transform.Rotate(0f, angle, 0f);
     }
 
     private void AlignRoomPosition(Room room, DoorSocket newDoor, DoorSocket targetDoor)
     {
-        // Compute the positional offset between the new door and the room root
+        // Move the room so the two door sockets perfectly overlap
         Vector3 offset = newDoor.transform.position - room.transform.position;
-
-        // Move the room so both doors perfectly overlap
         room.transform.position = targetDoor.transform.position - offset;
     }
 }
