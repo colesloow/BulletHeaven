@@ -5,7 +5,9 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float _speed = 5f;
+    [SerializeField] private float _radius = 0.5f;
     [SerializeField] private InputActionReference _moveAction;
+    [SerializeField] private Transform _bodyMesh;
 
     private Rigidbody _rigidbody;
     private Vector3 _moveDirection;
@@ -32,8 +34,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (_moveDirection.sqrMagnitude > 0.01f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(_moveDirection, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            // Rolling: angle = distance / radius, axis perpendicular to movement direction
+            float distance = _speed * Time.deltaTime;
+            float angle = distance / _radius * Mathf.Rad2Deg;
+            Vector3 rollAxis = Vector3.Cross(Vector3.up, _moveDirection);
+            _bodyMesh.Rotate(rollAxis, angle, Space.World);
         }
     }
 
