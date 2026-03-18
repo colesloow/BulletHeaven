@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8996206262208804938}
   - component: {fileID: 2342123120875093496}
   - component: {fileID: 3148299075758353193}
+  - component: {fileID: -1187241479660304678}
   m_Layer: 0
   m_Name: Room_Large_2
   m_TagString: Untagged
@@ -105,6 +106,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room
   Doors: []
+--- !u!64 &-1187241479660304678
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374043949671738045}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -7734872149420092958, guid: ad7da61b081878c40be03f3091c857ec, type: 3}
 --- !u!1 &1898906683641201787
 GameObject:
   m_ObjectHideFlags: 0

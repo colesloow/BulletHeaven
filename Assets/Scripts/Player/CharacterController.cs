@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// Not used anymore, kept for reference
 public class CharacterController : MonoBehaviour
 {
     [Header("Movement Settings")]
