@@ -1,7 +1,17 @@
 using UnityEngine;
 
+public enum RoomType
+{
+    Normal,
+    Treasure,
+    Arena,   // doors lock on entry, must clear enemies to proceed
+    Trap,
+    Event    // for special events?
+}
+
 public class Room : MonoBehaviour
 {
+    public RoomType Type { get; set; }
     public DoorSocket[] Doors;
 
     void Awake()
