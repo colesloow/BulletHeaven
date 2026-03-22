@@ -14,7 +14,7 @@ public class DungeonGenerator : MonoBehaviour
     // Prefab used to seal door openings that were not connected to any room
     [SerializeField] private GameObject wallPrefab;
 
-    private readonly List<DoorSocket> openDoors = new();
+    private readonly List<(DoorSocket door, int depth)> openDoors = new();
     private readonly List<Room> placedRooms = new();
     private readonly Dictionary<RoomType, int> roomCounts = new();
 
@@ -31,7 +31,7 @@ public class DungeonGenerator : MonoBehaviour
         placedRooms.Add(firstRoom);
 
         foreach (DoorSocket door in firstRoom.Doors)
-            openDoors.Add(door);
+            openDoors.Add((door, 1));
 
         // Generate additional rooms one by one
         for (int i = 0; i < roomCount; i++)
@@ -40,10 +40,10 @@ public class DungeonGenerator : MonoBehaviour
                 break;
 
             int randomIndex = Random.Range(0, openDoors.Count);
-            DoorSocket targetDoor = openDoors[randomIndex];
+            (DoorSocket targetDoor, int depth) = openDoors[randomIndex];
             openDoors.RemoveAt(randomIndex);
 
-            AttachRoom(targetDoor);
+            AttachRoom(targetDoor, depth);
         }
 
         // Close all door openings that remain unconnected after generation
@@ -72,7 +72,7 @@ public class DungeonGenerator : MonoBehaviour
         return candidates;
     }
 
-    private void AttachRoom(DoorSocket targetDoor)
+    private void AttachRoom(DoorSocket targetDoor, int depth)
     {
         var candidates = GetCandidates();
         if (candidates.Count == 0) return;
@@ -102,11 +102,17 @@ public class DungeonGenerator : MonoBehaviour
                     targetDoor.IsConnected = true;
                     newDoor.IsConnected = true;
 
-                    // Register the remaining doors of the new room as available connection points
+                    // Register free doors as available connection points, respecting depth and bifurcation rules
+                    bool firstFreeDoor = true;
                     foreach (DoorSocket door in newRoom.Doors)
                     {
-                        if (!door.IsConnected)
-                            openDoors.Add(door);
+                        if (door.IsConnected) continue;
+                        if (depth >= rules.MaxBranchDepth) continue;
+
+                        if (firstFreeDoor || Random.value < rules.BifurcationProbability)
+                            openDoors.Add((door, depth + 1));
+
+                        firstFreeDoor = false;
                     }
 
                     newRoom.Type = assignedType;
