@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class DungeonGenerator : MonoBehaviour
 {
     [SerializeField] private Room startRoom;
-    [SerializeField] private Room[] roomPrefabs;
+    [SerializeField] private DungeonRules rules;
     [SerializeField] private int roomCount = 10;
 
     // Amount by which room bounds are shrunk before overlap testing,
@@ -14,8 +14,9 @@ public class DungeonGenerator : MonoBehaviour
     // Prefab used to seal door openings that were not connected to any room
     [SerializeField] private GameObject wallPrefab;
 
-    private readonly List<DoorSocket> openDoors = new(); // available door sockets
+    private readonly List<DoorSocket> openDoors = new();
     private readonly List<Room> placedRooms = new();
+    private readonly Dictionary<RoomType, int> roomCounts = new();
 
     // Parent transform that groups all generated rooms in the hierarchy
     private Transform dungeonRoot;
@@ -23,9 +24,10 @@ public class DungeonGenerator : MonoBehaviour
     private void Start()
     {
         dungeonRoot = new GameObject("Dungeon").transform;
+        dungeonRoot.SetParent(transform);
 
         // Instantiate the starting room at the world origin
-        Room firstRoom = Instantiate(startRoom, Vector3.zero, Quaternion.identity, dungeonRoot);
+        Room firstRoom = Instantiate(startRoom, Vector3.zero, startRoom.transform.rotation, dungeonRoot);
         placedRooms.Add(firstRoom);
 
         foreach (DoorSocket door in firstRoom.Doors)
@@ -48,14 +50,40 @@ public class DungeonGenerator : MonoBehaviour
         SealOpenDoors();
     }
 
+    // Returns a flat list of (prefab, type) pairs weighted by rule weights and filtered by max counts.
+    private List<(Room prefab, RoomType type)> GetCandidates()
+    {
+        var candidates = new List<(Room, RoomType)>();
+
+        foreach (RoomRule rule in rules.RoomRules)
+        {
+            if (rule.MaxCount > 0 && roomCounts.TryGetValue(rule.Type, out int count) && count >= rule.MaxCount)
+                continue;
+
+            if (rule.Weight <= 0f || rule.Prefabs == null || rule.Prefabs.Length == 0)
+                continue;
+
+            int slots = Mathf.Max(1, Mathf.RoundToInt(rule.Weight * 10f));
+            for (int i = 0; i < slots; i++)
+                foreach (Room prefab in rule.Prefabs)
+                    candidates.Add((prefab, rule.Type));
+        }
+
+        return candidates;
+    }
+
     private void AttachRoom(DoorSocket targetDoor)
     {
-        // Try each room prefab in a random order
-        int[] prefabOrder = RandomOrder(roomPrefabs.Length);
+        var candidates = GetCandidates();
+        if (candidates.Count == 0) return;
 
-        foreach (int i in prefabOrder)
+        // Try each candidate in a random order
+        int[] order = RandomOrder(candidates.Count);
+
+        foreach (int i in order)
         {
-            Room newRoom = Instantiate(roomPrefabs[i], dungeonRoot);
+            (Room prefab, RoomType assignedType) = candidates[i];
+            Room newRoom = Instantiate(prefab, dungeonRoot);
 
             // Try each door of the new room as the connection point
             int[] doorOrder = RandomOrder(newRoom.Doors.Length);
@@ -81,7 +109,10 @@ public class DungeonGenerator : MonoBehaviour
                             openDoors.Add(door);
                     }
 
+                    newRoom.Type = assignedType;
                     placedRooms.Add(newRoom);
+                    roomCounts.TryGetValue(assignedType, out int current);
+                    roomCounts[assignedType] = current + 1;
                     placed = true;
                     break;
                 }
