@@ -30,7 +30,10 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         Vector2 input = _moveAction.action.ReadValue<Vector2>();
-        _moveDirection = new Vector3(input.x, 0f, input.y).normalized;
+
+        Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up).normalized;
+        Vector3 camRight = Vector3.ProjectOnPlane(Camera.main.transform.right, Vector3.up).normalized;
+        _moveDirection = (camForward * input.y + camRight * input.x).normalized;
 
         if (_moveDirection.sqrMagnitude > 0.01f)
         {

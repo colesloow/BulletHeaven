@@ -164,14 +164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
   startRoom: {fileID: 5093581059593610874, guid: feb4177181e90084fa1ac35f410b2cd9, type: 3}
-  roomPrefabs:
-  - {fileID: 4232227226640502030, guid: 3bb7aca42b78b3d40a78440fc375c3e2, type: 3}
-  - {fileID: 5093581059593610874, guid: feb4177181e90084fa1ac35f410b2cd9, type: 3}
-  - {fileID: 3148299075758353193, guid: 05369d5315f2bcf42879fc414683633e, type: 3}
-  - {fileID: 97393004552021929, guid: 474f9dea23426814daeefebeb8fd8817, type: 3}
-  - {fileID: 9112470848611711378, guid: 4aad4956e00115b4287b6ca840f9dafa, type: 3}
-  - {fileID: 6174675991414460970, guid: e64c1b42bb5ca0b44a543d3cff9ef38c, type: 3}
-  - {fileID: 5915138271125960190, guid: 0fde6c6e73ba6f345a82ef1f9d60378e, type: 3}
+  roomPrefabs: []
   roomCount: 10
   overlapTolerance: 0.2
   wallPrefab: {fileID: 2440417887079945734, guid: 5530e936e2fa75a43bfc9dc6e819f2fe, type: 3}
@@ -763,13 +756,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 723869043}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.23911765, y: 0.3696438, z: -0.09904577, w: 0.89239913}
+  m_LocalRotation: {x: 0.31598538, y: 0.3596048, z: -0.13088542, w: 0.8681629}
   m_LocalPosition: {x: 0, y: 1.4000001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 40, y: 45, z: 0}
 --- !u!114 &723869046
 MonoBehaviour:
   m_ObjectHideFlags: 0
