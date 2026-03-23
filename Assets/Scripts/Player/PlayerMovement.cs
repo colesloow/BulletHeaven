@@ -13,6 +13,8 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody _rigidbody;
     private Vector3 _moveDirection;
 
+    public void AddSpeed(float amount) => _speed += amount;
+
     private void OnEnable()
     {
         _moveAction.action.Enable();

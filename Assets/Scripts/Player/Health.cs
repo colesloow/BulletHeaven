@@ -11,14 +11,14 @@ public class Health : MonoBehaviour
     private int _level;
 
     private Animator _animator;
-    private SatelliteManager _satelliteManager;
+    private WeaponManager _weaponManager;
 
     public bool IsDead = false;
 
     private void Start()
     {
         _animator = GetComponent<Animator>();
-        _satelliteManager = GetComponent<SatelliteManager>();
+        _weaponManager = GetComponent<WeaponManager>();
         _currentHealth = _maxHealth;
 
         // if game object is the player, synchronize health
@@ -99,14 +99,14 @@ public class Health : MonoBehaviour
     {
         IsDead = true;
         _animator.SetBool("IsDying", IsDead);
-        _satelliteManager.StopSatellites(); // make satellite fall using gravity
+        if (_weaponManager != null) _weaponManager.OnPlayerDeath();
         SoundManager.PlaySound(SoundType.DEATH); // play death sound
 
-        CharacterController playerController = GetComponent<CharacterController>();
-        if (playerController != null)
-        {
-            playerController.DisableMovement();
-        }
+        // CharacterController playerController = GetComponent<CharacterController>();
+        // if (playerController != null)
+        // {
+        //     playerController.DisableMovement();
+        // }
 
         yield return new WaitForSeconds(1.5f);
 

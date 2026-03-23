@@ -5,24 +5,19 @@ using UnityEngine.VFX;
 public class HitOtherOnCollision : MonoBehaviour
 {
     [Header("Damage and Push Settings")]
-    [SerializeField]
-    private int _damage;
-    [SerializeField]
-    private float _pushForce = 5f;
-    [SerializeField]
-    private float _pushDuration = 0.2f;
+    [SerializeField] private float _damage;
+    public void AddDamage(float amount) => _damage += amount;
+
+    [SerializeField] private float _pushForce = 5f;
+    [SerializeField] private float _pushDuration = 0.2f;
 
     [Header("Behavior Settings")]
-    [SerializeField]
-    private bool _destroyItself = false;
-    [SerializeField]
-    private bool _isEnemy = true;
-    [SerializeField]
-    private float _damageInterval = 1f;
+    [SerializeField] private bool _destroyItself = false;
+    [SerializeField] private bool _isEnemy = true;
+    [SerializeField] private float _damageInterval = 1f;
 
     [Header("Visual Effects")]
-    [SerializeField]
-    private VisualEffect _impactEffect;
+    [SerializeField] private VisualEffect _impactEffect;
 
     private float _timeSinceLastDamage = 0f;
 

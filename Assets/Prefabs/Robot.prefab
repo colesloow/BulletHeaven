@@ -1443,8 +1443,6 @@ GameObject:
   - component: {fileID: 7450327261797010771}
   - component: {fileID: 7312917107244783673}
   - component: {fileID: 7615684062514063424}
-  - component: {fileID: 9107150254066782717}
-  - component: {fileID: 1613378965928439190}
   - component: {fileID: 8425662775498329419}
   m_Layer: 0
   m_Name: Robot
@@ -1540,39 +1538,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &9107150254066782717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9139489664419784910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1191362ff548f064191bc468cd138017, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _movementSpeed: 6
-  _moveActionReference: {fileID: 6800092525090821347, guid: b60ed40318ad0bb41b96b9609ca0ed14, type: 3}
-  _boostSpeed: 3
-  _boostActionReference: {fileID: -6117572893210435004, guid: b60ed40318ad0bb41b96b9609ca0ed14, type: 3}
---- !u!114 &1613378965928439190
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9139489664419784910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e26a8ada2e97344e9f899cb802ffecb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _satelliteCount: 1
-  _satellitePrefab: {fileID: 8118963732262246295, guid: 5a267822f4bdd3345a43681f6d08cafb, type: 3}
-  _satellitesParent: {fileID: 0}
-  _maxSatellites: 10
-  _orbitRadius: 2
 --- !u!114 &8425662775498329419
 MonoBehaviour:
   m_ObjectHideFlags: 0

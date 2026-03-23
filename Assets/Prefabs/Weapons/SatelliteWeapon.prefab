@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8427126442506776698}
-  - component: {fileID: -8949233181189002028}
+  - component: {fileID: 2655966751848423194}
   m_Layer: 0
-  m_Name: Satellites
+  m_Name: SatelliteWeapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-8949233181189002028
+--- !u!114 &2655966751848423194
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,8 +41,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 3174512953542081813}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2532eaeb5162dd143b1463cf3fd9e6cd, type: 3}
+  m_Script: {fileID: 11500000, guid: c04aab22196dbeb479cc78570718eb8d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  _rotationSpeed: 100
-  _player: {fileID: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::SatelliteWeapon
+  _satellitePrefab: {fileID: 8118963732262246295, guid: 5a267822f4bdd3345a43681f6d08cafb, type: 3}
+  _orbitRadius: 2
+  _orbitSpeed: 100
+  _satelliteCount: 1
+  _maxSatellites: 10
