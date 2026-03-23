@@ -6,7 +6,6 @@ public enum UpgradeType
     SatelliteRadius,
     SatelliteSpeed,
     SatelliteDamage,
-    LaserUnlock,
     LaserInterval,
     LaserDuration,
     LaserLength,

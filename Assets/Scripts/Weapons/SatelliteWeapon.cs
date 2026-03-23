@@ -46,9 +46,20 @@ public class SatelliteWeapon : Weapon
                 foreach (var sat in _satellites)
                     sat.GetComponent<HitOtherOnCollision>()?.AddDamage(upgrade.Value);
                 break;
-            case UpgradeType.LaserUnlock:
-                UnlockLaser();
-                break;
+        }
+    }
+
+    public void UnlockLasers()
+    {
+        _laserUnlocked = true;
+        foreach (var sat in _satellites)
+            sat.GetComponent<LaserBeamController>()?.Unlock();
+    }
+
+    public void ApplyLaserUpgrade(WeaponUpgrade upgrade)
+    {
+        switch (upgrade.Type)
+        {
             case UpgradeType.LaserInterval:
                 foreach (var sat in _satellites)
                     sat.GetComponent<LaserBeamController>()?.ModifyInterval(upgrade.Value);
@@ -78,13 +89,6 @@ public class SatelliteWeapon : Weapon
 
         // Detach orbit from player so satellites fly off naturally
         _orbitParent.SetParent(null);
-    }
-
-    private void UnlockLaser()
-    {
-        _laserUnlocked = true;
-        foreach (var sat in _satellites)
-            sat.GetComponent<LaserBeamController>()?.Unlock();
     }
 
     private void SpawnSatellites()

@@ -16,4 +16,13 @@ MonoBehaviour:
   Prefab: {fileID: 3174512953542081813, guid: 4f2416cf975c2c64baf1f4200c154daf, type: 3}
   Prerequisite: {fileID: 0}
   AvailableUpgrades:
-  - {fileID: 11400000, guid: 33d2984b36b3a104eb51d9ba6b515272, type: 2}
+  - {fileID: 11400000, guid: 3d46b0a0c7148e143b05caf168db36a5, type: 2}
+  - {fileID: 11400000, guid: adc8ae41e8d303a4ba9530e1fe371742, type: 2}
+  - {fileID: 11400000, guid: 6b6843bf21fbe134880430e2cf530a32, type: 2}
+  - {fileID: 11400000, guid: a31bb54ff582d9b41bf2163f912a83b6, type: 2}
+  - {fileID: 11400000, guid: 09c405a1e5735134e8b7800098039691, type: 2}
+  - {fileID: 11400000, guid: 741f71699915d5e4eb05c81917cf38a9, type: 2}
+  - {fileID: 11400000, guid: 83964f1a2e6b57547b69068989071a6e, type: 2}
+  - {fileID: 11400000, guid: 39e8c500c24cbc44fad8504d7ae17698, type: 2}
+  - {fileID: 11400000, guid: 0ab6fc58df7acd44d971367f05bc9a62, type: 2}
+  - {fileID: 11400000, guid: 7787074372dc3df4c942749a9ac104e1, type: 2}
