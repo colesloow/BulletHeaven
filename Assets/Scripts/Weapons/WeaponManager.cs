@@ -5,7 +5,9 @@ using UnityEngine;
 public class WeaponManager : MonoBehaviour
 {
     [SerializeField] private WeaponData _startingWeapon;
-    [SerializeField] private int _upgradeChoices = 3;
+    [SerializeField] private int _upgradeChoices = 2;
+
+    public void AddUpgradeChoice() => _upgradeChoices++;
 
     private readonly List<Weapon> _activeWeapons = new();
 
@@ -97,7 +99,8 @@ public class WeaponManager : MonoBehaviour
     private void OnLevelUp(int level)
     {
         var choices = GetUpgradeChoices();
-        // TODO: pass choices to UI for player selection
-        Debug.Log($"Level {level} — {choices.Count} upgrade(s) available.");
+        if (choices.Count == 0) return;
+
+        UIManager.Instance.ShowUpgradePanel(choices, ApplyUpgrade);
     }
 }

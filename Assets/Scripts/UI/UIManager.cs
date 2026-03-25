@@ -6,18 +6,13 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
-    [SerializeField]
-    private GameObject _gameOverPanel;
-    [SerializeField]
-    private Image _healthSlider;
-    [SerializeField]
-    private Image _xpSlider;
-    [SerializeField]
-    private TextMeshProUGUI _level;
-    [SerializeField]
-    private TextMeshProUGUI _score;
-    [SerializeField]
-    private SceneLoader _sceneLoader;
+    [SerializeField] private GameObject _gameOverPanel;
+    [SerializeField] private UpgradeUI _upgradeUI;
+    [SerializeField] private Image _healthSlider;
+    [SerializeField] private Image _xpSlider;
+    [SerializeField] private TextMeshProUGUI _level;
+    [SerializeField] private TextMeshProUGUI _score;
+    [SerializeField] private SceneLoader _sceneLoader;
 
     private void Awake()
     {
@@ -76,6 +71,11 @@ public class UIManager : MonoBehaviour
     private void UpdateLevel(int level)
     {
         _level.text = "Level " + level;
+    }
+
+    public void ShowUpgradePanel(System.Collections.Generic.List<WeaponUpgrade> choices, System.Action<WeaponUpgrade> onPicked)
+    {
+        _upgradeUI.Show(choices, onPicked);
     }
 
     public void ShowGameOver()
