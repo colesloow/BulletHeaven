@@ -3,11 +3,17 @@ using UnityEngine;
 public class SatelliteWeapon : Weapon
 {
     [SerializeField] private GameObject _satellitePrefab;
-    [SerializeField] private float _orbitRadius = 2f;
+    [SerializeField] private float _orbitRadius = 1.5f;
     [SerializeField] private float _orbitSpeed = 100f;
     [SerializeField] private int _satelliteCount = 1;
-    [SerializeField] private int _maxSatellites = 10;
 
+    [Header("Caps")]
+    [SerializeField] private int _maxSatellites = 10;
+    [SerializeField] private float _maxOrbitRadius = 3f;
+    [SerializeField] private float _maxOrbitSpeed = 300f;
+    [SerializeField] private float _maxDamageBonus = 50f;
+
+    private float _damageBonus = 0f;
     private Transform _orbitParent;
     private GameObject[] _satellites;
     private bool _laserUnlocked = false;
@@ -27,6 +33,18 @@ public class SatelliteWeapon : Weapon
             _orbitParent.Rotate(0, _orbitSpeed * Time.deltaTime, 0);
     }
 
+    public override bool IsUpgradeAvailable(WeaponUpgrade upgrade)
+    {
+        return upgrade.Type switch
+        {
+            UpgradeType.SatelliteCount  => _satelliteCount < _maxSatellites,
+            UpgradeType.SatelliteRadius => _orbitRadius < _maxOrbitRadius,
+            UpgradeType.SatelliteSpeed  => _orbitSpeed < _maxOrbitSpeed,
+            UpgradeType.SatelliteDamage => _damageBonus < _maxDamageBonus,
+            _                           => true,
+        };
+    }
+
     public override void ApplyUpgrade(WeaponUpgrade upgrade)
     {
         switch (upgrade.Type)
@@ -43,6 +61,7 @@ public class SatelliteWeapon : Weapon
                 _orbitSpeed += upgrade.Value;
                 break;
             case UpgradeType.SatelliteDamage:
+                _damageBonus = Mathf.Min(_damageBonus + upgrade.Value, _maxDamageBonus);
                 foreach (var sat in _satellites)
                     sat.GetComponent<HitOtherOnCollision>()?.AddDamage(upgrade.Value);
                 break;
@@ -112,7 +131,9 @@ public class SatelliteWeapon : Weapon
             sat.transform.localPosition = localPos;
             sat.transform.localRotation = Quaternion.Euler(0, -angle, 0) * Quaternion.Euler(90, 90, 0);
 
-            // Restore laser state if already unlocked before a respawn
+            if (_damageBonus > 0f && sat.TryGetComponent(out HitOtherOnCollision hit))
+                hit.AddDamage(_damageBonus);
+
             if (_laserUnlocked)
                 sat.GetComponent<LaserBeamController>()?.Unlock();
 

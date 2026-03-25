@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6e7e53b12f89d446b6f96b458922bfa, type: 3}
   m_Name: Upgrade_Satellite_Radius_S
   m_EditorClassIdentifier: Assembly-CSharp::WeaponUpgrade
-  UpgradeName: +0.5 Orbit Radius
-  Description: +0.5 Orbit Radius
+  UpgradeName: +0.3 Orbit Radius
+  Description: +0.3 Orbit Radius
   TargetWeapon: {fileID: 11400000, guid: b8799ff0c9ef2044da84ba09d60f0965, type: 2}
   Type: 1
-  Value: 0.5
+  Value: 0.3
   Rarity: 0

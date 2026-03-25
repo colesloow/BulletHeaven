@@ -63,7 +63,7 @@ public class WeaponManager : MonoBehaviour
     {
         var pool = _activeWeapons
             .Where(w => w.Data.AvailableUpgrades != null)
-            .SelectMany(w => w.Data.AvailableUpgrades)
+            .SelectMany(w => w.Data.AvailableUpgrades.Where(u => w.IsUpgradeAvailable(u)))
             .ToList();
 
         // Build weighted list: each entry appears N times proportional to its weight

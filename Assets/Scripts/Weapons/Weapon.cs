@@ -12,5 +12,6 @@ public abstract class Weapon : MonoBehaviour
 
     protected abstract void OnInitialize();
     public abstract void ApplyUpgrade(WeaponUpgrade upgrade);
+    public virtual bool IsUpgradeAvailable(WeaponUpgrade upgrade) => true;
     public virtual void OnPlayerDeath() { }
 }
