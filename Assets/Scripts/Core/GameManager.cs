@@ -7,26 +7,19 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [Header("Health & Score")]
-    [SerializeField]
-    private int _totalScore;
-    [SerializeField]
-    private float _playerHealth;
+    [SerializeField] private int _totalScore;
+    [SerializeField] private float _playerHealth;
 
     [Header("Levels & XP")]
-    [SerializeField]
-    private float _playerXP;
-    [SerializeField]
-    private int _level = 1;
-    [SerializeField]
-    private float _xpThreshold = 100f;
+    [SerializeField] private float _playerXP;
+    [SerializeField] private int _level = 1;
+    [SerializeField] private float _xpThreshold = 100f;
 
     [Header("Enemies")]
-    [SerializeField]
-    private float _enemyHealthMultiplier = 1.5f;
+    [SerializeField] private float _enemyHealthMultiplier = 1.5f;
     [SerializeField]
     private float _enemyDamageMultiplier = 1.2f;
-    [SerializeField]
-    private int _maxEnemies;
+    [SerializeField] private int _maxEnemies;
     public int MaxEnemies { get => _maxEnemies; }
 
     public event Action<int> OnScoreChanged;
