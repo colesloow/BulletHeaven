@@ -139,6 +139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room
   Doors: []
+  NavFloorMesh: {fileID: -4151157193068977440, guid: 610606bf4189c5c4a828e4e5e5a55a5c, type: 3}
 --- !u!64 &3664331781896411337
 MeshCollider:
   m_ObjectHideFlags: 0

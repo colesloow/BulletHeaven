@@ -14,6 +14,9 @@ public class Room : MonoBehaviour
     public RoomType Type { get; set; }
     public DoorSocket[] Doors;
 
+    // Floor mesh used as NavMesh source. Assign the matching floor FBX in each prefab.
+    [SerializeField] public Mesh NavFloorMesh;
+
     void Awake()
     {
         Doors = GetComponentsInChildren<DoorSocket>();
@@ -33,5 +36,16 @@ public class Room : MonoBehaviour
             bounds.Encapsulate(renderers[i].bounds);
 
         return bounds;
+    }
+
+    // Returns a flat box at floor level (Y=0) covering the XZ footprint of this room.
+    // Used to build NavMesh sources without relying on mesh colliders.
+    public Bounds GetFloorBounds()
+    {
+        Bounds b = GetBounds();
+        return new Bounds(
+            new Vector3(b.center.x, 0f, b.center.z),
+            new Vector3(b.size.x, 0.2f, b.size.z)
+        );
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using System.Collections.Generic;
 
 public class DungeonGenerator : MonoBehaviour
@@ -20,6 +21,8 @@ public class DungeonGenerator : MonoBehaviour
 
     // Parent transform that groups all generated rooms in the hierarchy
     private Transform dungeonRoot;
+
+    private NavMeshDataInstance _navMeshInstance;
 
     private void Start()
     {
@@ -48,6 +51,13 @@ public class DungeonGenerator : MonoBehaviour
 
         // Close all door openings that remain unconnected after generation
         SealOpenDoors();
+
+        BuildNavMesh();
+    }
+
+    private void OnDestroy()
+    {
+        NavMesh.RemoveNavMeshData(_navMeshInstance);
     }
 
     // Returns a flat list of (prefab, type) pairs weighted by rule weights and filtered by max counts.
@@ -180,6 +190,66 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         return indices;
+    }
+
+    // Builds a NavMesh at runtime from flat box sources derived from each room's floor footprint.
+    // This avoids relying on mesh collider quality or FBX normals.
+    private void BuildNavMesh()
+    {
+        var sources = new List<NavMeshBuildSource>();
+        bool first = true;
+        Bounds totalBounds = default;
+
+        foreach (Room room in placedRooms)
+        {
+            Mesh floorMesh = room.NavFloorMesh;
+
+            // Fall back to bounding box if no floor mesh is assigned
+            if (floorMesh == null)
+            {
+                Bounds floor = room.GetFloorBounds();
+                sources.Add(new NavMeshBuildSource
+                {
+                    shape     = NavMeshBuildSourceShape.Box,
+                    size      = floor.size,
+                    transform = Matrix4x4.TRS(floor.center, Quaternion.identity, Vector3.one),
+                    area      = 0
+                });
+
+                if (first) { totalBounds = floor; first = false; }
+                else totalBounds.Encapsulate(floor);
+                continue;
+            }
+
+            sources.Add(new NavMeshBuildSource
+            {
+                shape        = NavMeshBuildSourceShape.Mesh,
+                sourceObject = floorMesh,
+                transform    = Matrix4x4.TRS(room.transform.position, room.transform.rotation, Vector3.one),
+                area         = 0 // Walkable
+            });
+
+            Bounds meshBounds = new(
+                room.transform.TransformPoint(floorMesh.bounds.center),
+                floorMesh.bounds.size
+            );
+
+            if (first) { totalBounds = meshBounds; first = false; }
+            else totalBounds.Encapsulate(meshBounds);
+        }
+
+        if (sources.Count == 0) return;
+
+        NavMeshData data = NavMeshBuilder.BuildNavMeshData(
+            NavMesh.GetSettingsByID(0),
+            sources,
+            totalBounds,
+            Vector3.zero,
+            Quaternion.identity
+        );
+
+        if (data != null)
+            _navMeshInstance = NavMesh.AddNavMeshData(data);
     }
 
     private void RotateRoomToMatchDoors(Room room, DoorSocket newDoor, DoorSocket targetDoor)
