@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PoolManager
   _defaultInitialSize: 10
-  _defaultMaxSize: 50
+  _defaultMaxSize: 100
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -2326,14 +2326,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd223e59631daa443a1a42edb8cb3789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  _enemyDamageEnabled: 1
+  _enemyDamageEnabled: 0
   _baseSpawnInterval: 2
   _initialMaxEnemies: 10
   _maxEnemiesIncreasePerMinute: 5
-  _waves: []
-  _waveSpawnStagger: 0.2
-  _enemyHealthMultiplier: 1.5
-  _enemyDamageMultiplier: 1.2
+  _waves:
+  - {fileID: 11400000, guid: 0a0b514caa3928b46a51ca1eb687bfd4, type: 2}
+  - {fileID: 11400000, guid: eff764b42a597c243bbeb11a6e0ee327, type: 2}
+  - {fileID: 11400000, guid: f4982ff973ee5ee42b922e51c8f951b1, type: 2}
+  - {fileID: 11400000, guid: 7c27605012ccb6f4e87d0204a6072dc9, type: 2}
+  - {fileID: 11400000, guid: 14d8e952fc988f94ab52d3f1a5748a41, type: 2}
+  - {fileID: 11400000, guid: 5e9c0385533e5d843843d84aa4bca2cb, type: 2}
+  - {fileID: 11400000, guid: 4d3b98c437481204092e602c3b9e33d5, type: 2}
+  - {fileID: 11400000, guid: 748b028cd89e3b344b91b5091edf0f8b, type: 2}
+  - {fileID: 11400000, guid: 9d0d9a05323ebe341841d7579f4d3630, type: 2}
+  _enemyHealthMultiplier: 1.1
+  _enemyDamageMultiplier: 1.1
 --- !u!1 &1154541803
 GameObject:
   m_ObjectHideFlags: 0

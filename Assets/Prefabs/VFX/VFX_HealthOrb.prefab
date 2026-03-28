@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5601070474593534744}
   - component: {fileID: 1109815901431714442}
   - component: {fileID: 6410871862105406757}
+  - component: {fileID: -9101035455516748862}
   m_Layer: 0
   m_Name: VFX_HealthOrb
   m_TagString: Untagged
@@ -97,6 +98,8 @@ VFXRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_StaticBatchInfo:
@@ -116,9 +119,11 @@ VFXRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
 --- !u!135 &1109815901431714442
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -152,6 +157,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e68c7b3274d6c40a2fd4307b9ecf69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _type: 0
   _value: 10
-  _isXp: 0
-  _isHealth: 1
+--- !u!114 &-9101035455516748862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4510951735512833629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94746d07687f6c8468e50901a6b55077, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PooledObject

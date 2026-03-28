@@ -16,7 +16,6 @@ public class WaveManager : MonoBehaviour
 
     [Header("Test")]
     [SerializeField] private bool _enemyDamageEnabled = true;
-    // Set to false in the Inspector to disable enemy contact damage during testing.
     public bool EnemyDamageEnabled => _enemyDamageEnabled;
 
     [Header("Base Spawn Rate")]
@@ -31,15 +30,15 @@ public class WaveManager : MonoBehaviour
     public int MaxEnemies => Mathf.RoundToInt(_initialMaxEnemies + (_elapsedTime / 60f) * _maxEnemiesIncreasePerMinute);
 
     [Header("Waves")]
-    // List of WaveConfig assets sorted by TriggerTime at Start.
-    // Add WaveConfig assets here via the Generate Waves editor tool or manually.
     [SerializeField] private List<WaveConfig> _waves;
 
     [Header("Enemy Scaling")]
-    // Multipliers applied to all active enemies each time the player levels up.
-    [SerializeField] private float _enemyHealthMultiplier = 1.5f;
-    [SerializeField] private float _enemyDamageMultiplier = 1.2f;
-    public event Action<float, float> OnEnemiesLevelUp;
+    // Linear scaling per player level. Formula: base * (1 + (level - 1) * scalingPerLevel)
+    // Example at 0.15: level 5 = x1.6, level 10 = x2.35
+    [SerializeField] private float _enemyHealthScalingPerLevel = 0.15f;
+    [SerializeField] private float _enemyDamageScalingPerLevel = 0.1f;
+    // Passes (healthScaling, damageScaling, playerLevel) to subscribers.
+    public event Action<float, float, int> OnEnemiesLevelUp;
 
     private EnemySpawner _enemySpawner;
     private float _elapsedTime;
@@ -107,6 +106,6 @@ public class WaveManager : MonoBehaviour
     // When the player levels up, all active enemies get stronger.
     private void OnPlayerLevelUp(int level)
     {
-        OnEnemiesLevelUp?.Invoke(_enemyHealthMultiplier, _enemyDamageMultiplier);
+        OnEnemiesLevelUp?.Invoke(_enemyHealthScalingPerLevel, _enemyDamageScalingPerLevel, level);
     }
 }

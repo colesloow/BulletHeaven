@@ -1,25 +1,42 @@
 using UnityEngine;
 
+public enum CollectableType { XP, Health, Scrap }
+
 public class Collectable : MonoBehaviour
 {
-    [SerializeField]
-    private float _value = 10f;
-    [SerializeField]
-    private bool _isXp = true;
-    [SerializeField]
-    private bool _isHealth = false;
+    [SerializeField] private CollectableType _type;
+    [SerializeField] private float _value = 10f;
+
+    private PooledObject _pooledObject;
+
+    private void Start()
+    {
+        _pooledObject = GetComponent<PooledObject>();
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player")) return;
+
+        switch (_type)
         {
-            if (_isXp) GameManager.Instance.PlayerXP += _value;
-            if (_isHealth) GameManager.Instance.PlayerHealth += _value;
+            case CollectableType.XP:
+                if (GameManager.Instance != null)
+                    GameManager.Instance.PlayerXP += _value;
+                break;
 
-            // Play collect sound
-            SoundManager.PlaySound(SoundType.COLLECT);
+            case CollectableType.Health:
+                other.GetComponent<Health>()?.GainHealth(_value);
+                break;
 
-            Destroy(gameObject); // destroy collectable once collected
+            case CollectableType.Scrap:
+                // TODO: add scrap currency to GameManager
+                break;
         }
+
+        SoundManager.PlaySound(SoundType.COLLECT);
+
+        if (_pooledObject != null) _pooledObject.Release();
+        else Destroy(gameObject);
     }
 }

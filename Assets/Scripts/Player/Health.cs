@@ -13,6 +13,7 @@ public class Health : MonoBehaviour
     [SerializeField]
     private int _level;
 
+    private float _baseMaxHealth;
     private Animator _animator;
     private WeaponManager _weaponManager;
     private PooledObject _pooledObject;
@@ -34,6 +35,7 @@ public class Health : MonoBehaviour
         _animator = GetComponent<Animator>();
         _weaponManager = GetComponent<WeaponManager>();
         _pooledObject = GetComponent<PooledObject>();
+        _baseMaxHealth = _maxHealth;
         _currentHealth = _maxHealth;
 
         // if game object is the player, synchronize health
@@ -47,12 +49,12 @@ public class Health : MonoBehaviour
         }
     }
 
-    private void ScaleHealth(float healthMultiplier, float damageMultiplier)
+    private void ScaleHealth(float healthScalingPerLevel, float damageScalingPerLevel, int level)
     {
         if (gameObject.CompareTag("Enemy"))
         {
-            _maxHealth *= healthMultiplier;
-            _currentHealth = _maxHealth; // reset life to max
+            _maxHealth = _baseMaxHealth * (1f + (level - 1) * healthScalingPerLevel);
+            _currentHealth = _maxHealth;
         }
     }
 
@@ -135,6 +137,8 @@ public class Health : MonoBehaviour
     private IEnumerator EnemyDeathSequence()
     {
         IsDead = true;
+
+        GetComponent<EnemyRewards>()?.GrantRewards(transform.position);
 
         var meshes = GetComponentsInChildren<MeshRenderer>();
         foreach (var mesh in meshes)

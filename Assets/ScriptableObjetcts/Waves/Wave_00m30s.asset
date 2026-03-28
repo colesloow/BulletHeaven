@@ -17,5 +17,5 @@ MonoBehaviour:
   SpawnInterval: 1.5
   MaxEnemies: 15
   EnemyTypes:
-  - Prefab: {fileID: 9120224855672650358, guid: 063c46e89e97960418cd3ccc1259b931, type: 3}
+  - Prefab: {fileID: 5961385405075670556, guid: 649c9fc4ee7766242939b6cd16e71ad8, type: 3}
     Weight: 1
