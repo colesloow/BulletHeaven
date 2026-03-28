@@ -128,6 +128,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   _speed: 2
+  _damage: 10
+  _damageRange: 0.9
+  _damageInterval: 1
 --- !u!114 &4375205348110235087
 MonoBehaviour:
   m_ObjectHideFlags: 0
