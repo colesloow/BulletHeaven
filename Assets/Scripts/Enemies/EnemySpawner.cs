@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -6,7 +5,6 @@ using UnityEngine.AI;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private GameObject _enemyPrefab;
-    [SerializeField] private float _spawnInterval = 2f;
     [SerializeField] private float _minSpawnDistance = 10f;
     [SerializeField] private float _maxSpawnDistance = 30f;
     [SerializeField] private float _navMeshSampleRadius = 2f;
@@ -22,26 +20,30 @@ public class EnemySpawner : MonoBehaviour
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
             _player = playerObj.transform;
-
-        StartCoroutine(SpawnLoop());
     }
 
-    private IEnumerator SpawnLoop()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(_spawnInterval);
-            TrySpawn();
-        }
-    }
-
-    private void TrySpawn()
+    // Called by WaveManager at base spawn rate, respects MaxEnemies cap
+    public void TrySpawnOne(GameObject prefab = null)
     {
         _activeEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
         if (_player == null || _dungeonGenerator == null) return;
-        if (GameManager.Instance == null) return;
-        if (_activeEnemies.Count >= GameManager.Instance.MaxEnemies) return;
+        if (WaveManager.Instance == null) return;
+        if (_activeEnemies.Count >= WaveManager.Instance.MaxEnemies) return;
 
+        SpawnAtRandomRoom(prefab != null ? prefab : _enemyPrefab);
+    }
+
+    // Called by WaveManager for wave bursts, ignores MaxEnemies cap
+    public void ForceSpawnOne(GameObject prefab = null)
+    {
+        _activeEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
+        if (_player == null || _dungeonGenerator == null) return;
+
+        SpawnAtRandomRoom(prefab != null ? prefab : _enemyPrefab);
+    }
+
+    private void SpawnAtRandomRoom(GameObject prefab)
+    {
         Room room = GetEligibleRoom();
         if (room == null) return;
 
@@ -50,13 +52,12 @@ public class EnemySpawner : MonoBehaviour
 
         if (PoolManager.Instance == null) return;
 
-        GameObject enemy = PoolManager.Instance.Get(_enemyPrefab);
+        GameObject enemy = PoolManager.Instance.Get(prefab);
         enemy.transform.position = spawnPoint;
         _activeEnemies.Add(enemy);
     }
 
-    // Returns a random room within spawn distance range from the player.
-    // Min distance ensures enemies spawn off-screen in a top-down context.
+    // Returns a random room within spawn distance range from the player
     private Room GetEligibleRoom()
     {
         var eligible = new List<Room>();
@@ -65,7 +66,6 @@ public class EnemySpawner : MonoBehaviour
         {
             float dist = Vector3.Distance(_player.position, room.transform.position);
             if (dist < _minSpawnDistance || dist > _maxSpawnDistance) continue;
-
             eligible.Add(room);
         }
 

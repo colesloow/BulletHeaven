@@ -48,4 +48,10 @@ MonoBehaviour:
   _orbitRadius: 2
   _orbitSpeed: 100
   _satelliteCount: 1
+  _damage: 10
+  _contactRadius: 0.35
+  _damageInterval: 0.5
   _maxSatellites: 10
+  _maxOrbitRadius: 3
+  _maxOrbitSpeed: 300
+  _maxDamageBonus: 50

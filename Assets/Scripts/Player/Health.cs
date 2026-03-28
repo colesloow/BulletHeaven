@@ -41,9 +41,9 @@ public class Health : MonoBehaviour
         {
             GameManager.Instance.PlayerHealth = _currentHealth;
         }
-        else if (gameObject.CompareTag("Enemy") && GameManager.Instance != null)
+        else if (gameObject.CompareTag("Enemy") && WaveManager.Instance != null)
         {
-            GameManager.Instance.OnEnemiesLevelUp += ScaleHealth;
+            WaveManager.Instance.OnEnemiesLevelUp += ScaleHealth;
         }
     }
 
@@ -93,9 +93,9 @@ public class Health : MonoBehaviour
 
     private void Die()
     {
-        if (gameObject.CompareTag("Enemy") && GameManager.Instance != null)
+        if (gameObject.CompareTag("Enemy") && WaveManager.Instance != null)
         {
-            GameManager.Instance.OnEnemiesLevelUp -= ScaleHealth;
+            WaveManager.Instance.OnEnemiesLevelUp -= ScaleHealth;
         }
 
         if (gameObject.CompareTag("Player"))

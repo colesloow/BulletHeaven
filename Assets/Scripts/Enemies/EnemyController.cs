@@ -42,6 +42,7 @@ public class EnemyController : MonoBehaviour
     private void CheckPlayerHit()
     {
         if (_playerHealth == null || Time.time < _nextHitTime) return;
+        if (WaveManager.Instance != null && !WaveManager.Instance.EnemyDamageEnabled) return;
 
         Vector2 enemyXZ = new(transform.position.x, transform.position.z);
         Vector2 playerXZ = new(_player.position.x, _player.position.z);

@@ -15,18 +15,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _level = 1;
     [SerializeField] private float _xpThreshold = 100f;
 
-    [Header("Enemies")]
-    [SerializeField] private float _enemyHealthMultiplier = 1.5f;
-    [SerializeField]
-    private float _enemyDamageMultiplier = 1.2f;
-    [SerializeField] private int _maxEnemies;
-    public int MaxEnemies { get => _maxEnemies; }
-
     public event Action<int> OnScoreChanged;
     public event Action<float> OnHealthChanged;
     public event Action<float> OnXPChanged;
     public event Action<int> OnLevelUp;
-    public event Action<float, float> OnEnemiesLevelUp;
 
     public int TotalScore
     {
@@ -93,16 +85,10 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.ResetUI();
     }
 
-    private void ScaleEnemiesWithLevel()
-    {
-        OnEnemiesLevelUp?.Invoke(_enemyHealthMultiplier, _enemyDamageMultiplier);
-    }
-
     private void LevelUp()
     {
         _level++;
         OnLevelUp?.Invoke(_level);
         SoundManager.PlaySound(SoundType.LEVELUP);
-        ScaleEnemiesWithLevel();
     }
 }

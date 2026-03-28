@@ -72,11 +72,11 @@ public class SatelliteWeapon : Weapon
     {
         return upgrade.Type switch
         {
-            UpgradeType.SatelliteCount  => _satelliteCount < _maxSatellites,
+            UpgradeType.SatelliteCount => _satelliteCount < _maxSatellites,
             UpgradeType.SatelliteRadius => _orbitRadius < _maxOrbitRadius,
-            UpgradeType.SatelliteSpeed  => _orbitSpeed < _maxOrbitSpeed,
+            UpgradeType.SatelliteSpeed => _orbitSpeed < _maxOrbitSpeed,
             UpgradeType.SatelliteDamage => _damageBonus < _maxDamageBonus,
-            _                           => true,
+            _  => true,
         };
     }
 
