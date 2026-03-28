@@ -1,8 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Health : MonoBehaviour
 {
+    public static readonly List<Health> ActiveEnemies = new();
+
     [SerializeField]
     private float _maxHealth = 100f;
     [SerializeField]
@@ -12,13 +15,25 @@ public class Health : MonoBehaviour
 
     private Animator _animator;
     private WeaponManager _weaponManager;
+    private PooledObject _pooledObject;
 
     public bool IsDead = false;
+
+    private void OnEnable()
+    {
+        if (CompareTag("Enemy")) ActiveEnemies.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        ActiveEnemies.Remove(this);
+    }
 
     private void Start()
     {
         _animator = GetComponent<Animator>();
         _weaponManager = GetComponent<WeaponManager>();
+        _pooledObject = GetComponent<PooledObject>();
         _currentHealth = _maxHealth;
 
         // if game object is the player, synchronize health
@@ -115,21 +130,23 @@ public class Health : MonoBehaviour
         GameManager.Instance.TriggerGameOver();
     }
 
+    private static readonly WaitForSeconds _deathDelay = new(1f);
+
     private IEnumerator EnemyDeathSequence()
     {
         IsDead = true;
 
-        // disable meshes & collider
-        var collider = GetComponent<Collider>();
         var meshes = GetComponentsInChildren<MeshRenderer>();
-
-        collider.enabled = false;
         foreach (var mesh in meshes)
-        {
             mesh.enabled = false;
-        }
 
-        yield return new WaitForSeconds(1f);
-        Destroy(gameObject); // destroy enemy
+        yield return _deathDelay;
+
+        IsDead = false;
+        _currentHealth = _maxHealth;
+        foreach (var mesh in meshes)
+            mesh.enabled = true;
+
+        if (_pooledObject != null) _pooledObject.Release();
     }
 }

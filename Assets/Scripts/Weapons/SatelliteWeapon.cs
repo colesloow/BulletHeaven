@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SatelliteWeapon : Weapon
@@ -6,6 +7,11 @@ public class SatelliteWeapon : Weapon
     [SerializeField] private float _orbitRadius = 1.5f;
     [SerializeField] private float _orbitSpeed = 100f;
     [SerializeField] private int _satelliteCount = 1;
+
+    [Header("Damage")]
+    [SerializeField] private float _damage = 10f;
+    [SerializeField] private float _contactRadius = 0.3f;
+    [SerializeField] private float _damageInterval = 0.5f;
 
     [Header("Caps")]
     [SerializeField] private int _maxSatellites = 10;
@@ -17,6 +23,7 @@ public class SatelliteWeapon : Weapon
     private Transform _orbitParent;
     private GameObject[] _satellites;
     private bool _laserUnlocked = false;
+    private readonly Dictionary<Health, float> _nextHitTime = new();
 
     protected override void OnInitialize()
     {
@@ -31,6 +38,34 @@ public class SatelliteWeapon : Weapon
     {
         if (_orbitParent != null)
             _orbitParent.Rotate(0, _orbitSpeed * Time.deltaTime, 0);
+
+        CheckHits();
+    }
+
+    private void CheckHits()
+    {
+        if (_satellites == null) return;
+
+        foreach (GameObject sat in _satellites)
+        {
+            if (sat == null) continue;
+            Renderer satRenderer = sat.GetComponentInChildren<Renderer>();
+            Vector3 satCenter = satRenderer != null ? satRenderer.bounds.center : sat.transform.position;
+            Vector2 satXZ = new(satCenter.x, satCenter.z);
+
+            foreach (Health enemy in Health.ActiveEnemies)
+            {
+                if (_nextHitTime.TryGetValue(enemy, out float next) && Time.time < next) continue;
+
+                Vector2 enemyXZ = new(enemy.transform.position.x, enemy.transform.position.z);
+                float dist = Vector2.Distance(satXZ, enemyXZ);
+                if (dist < _contactRadius)
+                {
+                    enemy.LoseHealth(_damage + _damageBonus);
+                    _nextHitTime[enemy] = Time.time + _damageInterval;
+                }
+            }
+        }
     }
 
     public override bool IsUpgradeAvailable(WeaponUpgrade upgrade)
@@ -62,8 +97,6 @@ public class SatelliteWeapon : Weapon
                 break;
             case UpgradeType.SatelliteDamage:
                 _damageBonus = Mathf.Min(_damageBonus + upgrade.Value, _maxDamageBonus);
-                foreach (var sat in _satellites)
-                    sat.GetComponent<HitOtherOnCollision>()?.AddDamage(upgrade.Value);
                 break;
         }
     }
@@ -110,6 +143,19 @@ public class SatelliteWeapon : Weapon
         _orbitParent.SetParent(null);
     }
 
+    private void OnDrawGizmos()
+    {
+        if (_satellites == null) return;
+        Gizmos.color = new Color(1f, 0.3f, 0f, 0.4f);
+        foreach (GameObject sat in _satellites)
+        {
+            if (sat == null) continue;
+            Renderer r = sat.GetComponentInChildren<Renderer>();
+            Vector3 center = r != null ? r.bounds.center : sat.transform.position;
+            Gizmos.DrawSphere(center, _contactRadius);
+        }
+    }
+
     private void SpawnSatellites()
     {
         if (_satellites != null)
@@ -130,9 +176,6 @@ public class SatelliteWeapon : Weapon
             GameObject sat = Instantiate(_satellitePrefab, _orbitParent);
             sat.transform.localPosition = localPos;
             sat.transform.localRotation = Quaternion.Euler(0, -angle, 0) * Quaternion.Euler(90, 90, 0);
-
-            if (_damageBonus > 0f && sat.TryGetComponent(out HitOtherOnCollision hit))
-                hit.AddDamage(_damageBonus);
 
             if (_laserUnlocked)
                 sat.GetComponent<LaserBeamController>()?.Unlock();
