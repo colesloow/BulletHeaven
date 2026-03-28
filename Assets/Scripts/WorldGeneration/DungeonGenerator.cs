@@ -20,6 +20,7 @@ public class DungeonGenerator : MonoBehaviour
     private readonly List<Room> placedRooms = new();
     public IReadOnlyList<Room> PlacedRooms => placedRooms;
     private readonly Dictionary<RoomType, int> roomCounts = new();
+    private readonly List<GameObject> _sealingWalls = new();
 
     // Parent transform that groups all generated rooms in the hierarchy
     private Transform dungeonRoot;
@@ -157,7 +158,8 @@ public class DungeonGenerator : MonoBehaviour
             {
                 if (socket.IsConnected) continue;
 
-                Instantiate(wallPrefab, socket.transform.position, socket.transform.rotation, room.transform);
+                GameObject wall = Instantiate(wallPrefab, socket.transform.position, socket.transform.rotation, room.transform);
+                _sealingWalls.Add(wall);
             }
         }
     }
@@ -239,6 +241,23 @@ public class DungeonGenerator : MonoBehaviour
             if (first) { totalBounds = meshBounds; first = false; }
             else totalBounds.Encapsulate(meshBounds);
         }
+
+        // Add sealing walls as Not Walkable Box sources (Collider bounds).
+        // Using Box instead of Mesh avoids the Read/Write requirement on the wall mesh asset.
+        foreach (GameObject wall in _sealingWalls)
+        {
+            foreach (Collider col in wall.GetComponentsInChildren<Collider>())
+            {
+                sources.Add(new NavMeshBuildSource
+                {
+                    shape = NavMeshBuildSourceShape.Box,
+                    size = col.bounds.size,
+                    transform = Matrix4x4.TRS(col.bounds.center, Quaternion.identity, Vector3.one),
+                    area = 1 // Not Walkable
+                });
+            }
+        }
+
 
         if (sources.Count == 0) return;
 

@@ -12,6 +12,7 @@ public class SatelliteWeapon : Weapon
     [SerializeField] private float _damage = 10f;
     [SerializeField] private float _contactRadius = 0.3f;
     [SerializeField] private float _damageInterval = 0.5f;
+    [SerializeField] private GameObject _hitVfxPrefab;
 
     [Header("Caps")]
     [SerializeField] private int _maxSatellites = 10;
@@ -63,6 +64,11 @@ public class SatelliteWeapon : Weapon
                 {
                     enemy.LoseHealth(_damage + _damageBonus);
                     _nextHitTime[enemy] = Time.time + _damageInterval;
+
+                    if (_hitVfxPrefab != null && PoolManager.Instance != null)
+                        PoolManager.Instance.Get(_hitVfxPrefab).transform.position = enemy.transform.position;
+
+                    // SoundManager.PlaySound(SoundType.HIT);
                 }
             }
         }

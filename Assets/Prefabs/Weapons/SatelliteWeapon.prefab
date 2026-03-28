@@ -51,6 +51,7 @@ MonoBehaviour:
   _damage: 10
   _contactRadius: 0.35
   _damageInterval: 0.5
+  _hitVfxPrefab: {fileID: 4878623340987576373, guid: ac2da8e70fa93be4c85a7b01c0e037a6, type: 3}
   _maxSatellites: 10
   _maxOrbitRadius: 3
   _maxOrbitSpeed: 300

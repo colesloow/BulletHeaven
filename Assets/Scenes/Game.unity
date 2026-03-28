@@ -165,9 +165,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
   startRoom: {fileID: 5093581059593610874, guid: feb4177181e90084fa1ac35f410b2cd9, type: 3}
   rules: {fileID: 11400000, guid: 89aae5bc6e5cf9141b105269b40c3a8f, type: 2}
-  roomCount: 10
+  roomCount: 20
   overlapTolerance: 0.2
   wallPrefab: {fileID: 2440417887079945734, guid: 5530e936e2fa75a43bfc9dc6e819f2fe, type: 3}
+  _wallBorderThickness: 0
+  _doorGapWidth: 5
 --- !u!1 &163068118
 GameObject:
   m_ObjectHideFlags: 0
@@ -1735,12 +1737,12 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 892250132}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -2340,8 +2342,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4d3b98c437481204092e602c3b9e33d5, type: 2}
   - {fileID: 11400000, guid: 748b028cd89e3b344b91b5091edf0f8b, type: 2}
   - {fileID: 11400000, guid: 9d0d9a05323ebe341841d7579f4d3630, type: 2}
-  _enemyHealthMultiplier: 1.1
-  _enemyDamageMultiplier: 1.1
+  _enemyHealthScalingPerLevel: 0.15
+  _enemyDamageScalingPerLevel: 0.1
 --- !u!1 &1154541803
 GameObject:
   m_ObjectHideFlags: 0
