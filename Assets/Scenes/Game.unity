@@ -168,8 +168,6 @@ MonoBehaviour:
   roomCount: 20
   overlapTolerance: 0.2
   wallPrefab: {fileID: 2440417887079945734, guid: 5530e936e2fa75a43bfc9dc6e819f2fe, type: 3}
-  _wallBorderThickness: 0
-  _doorGapWidth: 5
 --- !u!1 &163068118
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,6 +306,7 @@ GameObject:
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
   - component: {fileID: 330585549}
+  - component: {fileID: 330585550}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -333,7 +332,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -465,6 +464,19 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &330585550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86229eab6998e2c4d996298f479d26a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraBackground
+  _backgroundColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &338077277
 GameObject:
   m_ObjectHideFlags: 0
