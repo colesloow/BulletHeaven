@@ -81,6 +81,7 @@ crashlytics-build.properties
 
 # Krita backup files
 *.kra~
+*.png~
 
 # Unity auto-generated volume and pipeline settings at project root
 /[Aa]ssets/DefaultVolumeProfile.asset
