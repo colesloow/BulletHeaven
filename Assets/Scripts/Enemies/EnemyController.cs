@@ -1,26 +1,36 @@
 using UnityEngine;
+using UnityEngine.AI;
 
+[RequireComponent(typeof(NavMeshAgent))]
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private Transform _player;
-    [SerializeField] private float _speed;
-    
+    [SerializeField] private float _speed = 3.5f;
+
+    private NavMeshAgent _agent;
+    private Transform _player;
+
+    private void Awake()
+    {
+        _agent = GetComponent<NavMeshAgent>();
+        _agent.speed = _speed;
+    }
+
     private void Start()
     {
-        _player = FindFirstObjectByType<CharacterController>().transform;
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj != null)
+            _player = playerObj.transform;
     }
 
-    void Update()
+    private void Update()
     {
-        // Move our position a step closer to the target.
-        var step = _speed * Time.deltaTime; // calculate distance to move
-        transform.position = Vector3.MoveTowards(transform.position, _player.position, step);
-
-        Vector3 relativePos = _player.position - transform.position;
-
-        // the second argument, upwards, defaults to Vector3.up
-        Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-        transform.rotation = rotation;
+        if (_player == null || !_agent.isOnNavMesh) return;
+        _agent.SetDestination(_player.position);
     }
 
+    // Called by PooledObject when returned to pool
+    public void OnRelease()
+    {
+        _agent.ResetPath();
+    }
 }

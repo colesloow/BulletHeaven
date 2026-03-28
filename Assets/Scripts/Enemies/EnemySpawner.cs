@@ -1,45 +1,95 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject _enemyPrefab;
-    [SerializeField]
-    private GameObject _enemyParent;
-    [SerializeField]
-    private BoxCollider _spawnArea;
-    [SerializeField]
-    private float _height = 1f;
-    [SerializeField]
-    [Range(0.1f, 2.0f)]
-    private float _spawnDelay = 2.0f;
-    [SerializeField]
-    private int _maxEnemies;
+    [SerializeField] private GameObject _enemyPrefab;
+    [SerializeField] private float _spawnInterval = 2f;
+    [SerializeField] private float _minSpawnDistance = 10f;
+    [SerializeField] private float _maxSpawnDistance = 30f;
+    [SerializeField] private float _navMeshSampleRadius = 2f;
 
-    void Start()
+    private DungeonGenerator _dungeonGenerator;
+    private Transform _player;
+    private readonly List<GameObject> _activeEnemies = new();
+
+    private void Start()
     {
-        _maxEnemies = GameManager.Instance.MaxEnemies;
-        _enemyParent = FindFirstObjectByType<SpawnerOverTime>().gameObject; // enemies will be instantiated in SpawnManager
-        InvokeRepeating(nameof(InstantiateEnemy), 2.0f, _spawnDelay);
+        _dungeonGenerator = FindFirstObjectByType<DungeonGenerator>();
+
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj != null)
+            _player = playerObj.transform;
+
+        StartCoroutine(SpawnLoop());
     }
 
-    private void InstantiateEnemy()
+    private IEnumerator SpawnLoop()
     {
-        Bounds bounds = _spawnArea.bounds;
-
-        // generate random positions in bounds limits
-        float randomPosX = Random.Range(bounds.min.x, bounds.max.x);
-        float randomPosZ = Random.Range(bounds.min.z, bounds.max.z);
-
-        Vector3 randomPosition = new Vector3(randomPosX, _height, randomPosZ);
-
-        // check max number of enemies
-        EnemyController[] enemies = _enemyParent.GetComponentsInChildren<EnemyController>();
-        if (enemies.Length < _maxEnemies)
+        while (true)
         {
-            Instantiate(_enemyPrefab, randomPosition, Quaternion.identity, _enemyParent.transform);
+            yield return new WaitForSeconds(_spawnInterval);
+            TrySpawn();
         }
     }
 
+    private void TrySpawn()
+    {
+        _activeEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
+        if (_player == null || _dungeonGenerator == null) return;
+        if (GameManager.Instance == null) return;
+        if (_activeEnemies.Count >= GameManager.Instance.MaxEnemies) return;
 
+        Room room = GetEligibleRoom();
+        if (room == null) return;
+
+        Vector3 spawnPoint = GetSpawnPoint(room);
+        if (spawnPoint == Vector3.zero) return;
+
+        if (PoolManager.Instance == null) return;
+
+        GameObject enemy = PoolManager.Instance.Get(_enemyPrefab);
+        enemy.transform.position = spawnPoint;
+        _activeEnemies.Add(enemy);
+    }
+
+    // Returns a random room within spawn distance range from the player.
+    // Min distance ensures enemies spawn off-screen in a top-down context.
+    private Room GetEligibleRoom()
+    {
+        var eligible = new List<Room>();
+
+        foreach (Room room in _dungeonGenerator.PlacedRooms)
+        {
+            float dist = Vector3.Distance(_player.position, room.transform.position);
+            if (dist < _minSpawnDistance || dist > _maxSpawnDistance) continue;
+
+            eligible.Add(room);
+        }
+
+        if (eligible.Count == 0) return null;
+        return eligible[Random.Range(0, eligible.Count)];
+    }
+
+    // Returns a random NavMesh-valid point on the room's floor
+    private Vector3 GetSpawnPoint(Room room)
+    {
+        Bounds floor = room.GetFloorBounds();
+
+        for (int attempt = 0; attempt < 10; attempt++)
+        {
+            Vector3 candidate = new(
+                Random.Range(floor.min.x, floor.max.x),
+                0f,
+                Random.Range(floor.min.z, floor.max.z)
+            );
+
+            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, _navMeshSampleRadius, NavMesh.AllAreas))
+                return hit.position;
+        }
+
+        return Vector3.zero;
+    }
 }

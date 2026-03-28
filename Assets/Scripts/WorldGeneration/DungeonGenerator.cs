@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
+[DefaultExecutionOrder(-100)]
 public class DungeonGenerator : MonoBehaviour
 {
     [SerializeField] private Room startRoom;
@@ -17,6 +18,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private readonly List<(DoorSocket door, int depth)> openDoors = new();
     private readonly List<Room> placedRooms = new();
+    public IReadOnlyList<Room> PlacedRooms => placedRooms;
     private readonly Dictionary<RoomType, int> roomCounts = new();
 
     // Parent transform that groups all generated rooms in the hierarchy
@@ -24,7 +26,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private NavMeshDataInstance _navMeshInstance;
 
-    private void Start()
+    private void Awake()
     {
         dungeonRoot = new GameObject("Dungeon").transform;
         dungeonRoot.SetParent(transform);
