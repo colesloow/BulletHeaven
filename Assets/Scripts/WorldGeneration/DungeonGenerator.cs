@@ -230,14 +230,20 @@ public class DungeonGenerator : MonoBehaviour
                 continue;
             }
 
-            Transform navSrc = room.NavMeshSourceTransform != null ? room.NavMeshSourceTransform : room.transform;
             sources.Add(new NavMeshBuildSource
             {
                 shape = NavMeshBuildSourceShape.Mesh,
                 sourceObject = floorMesh,
-                transform = navSrc.localToWorldMatrix,
+                transform = Matrix4x4.TRS(room.transform.position, room.transform.rotation, Vector3.one),
                 area = 0 // Walkable
             });
+
+            Bounds meshBounds = new(
+                room.transform.TransformPoint(floorMesh.bounds.center),
+                floorMesh.bounds.size
+            );
+            if (first) { totalBounds = meshBounds; first = false; }
+            else totalBounds.Encapsulate(meshBounds);
         }
 
         // Add sealing walls as Not Walkable Box sources (Collider bounds).
