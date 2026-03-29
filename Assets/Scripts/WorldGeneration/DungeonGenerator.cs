@@ -196,50 +196,48 @@ public class DungeonGenerator : MonoBehaviour
         return indices;
     }
 
-    // Builds a NavMesh at runtime from flat box sources derived from each room's floor footprint.
-    // This avoids relying on mesh collider quality or FBX normals.
+    // Builds a NavMesh at runtime from the navmesh mesh source on each room.
     private void BuildNavMesh()
     {
         var sources = new List<NavMeshBuildSource>();
+
+        // Compute totalBounds in world space from all rooms' renderer bounds.
+        // Must not use mesh.bounds (local space) because room rotations change the world extents.
         bool first = true;
         Bounds totalBounds = default;
+        foreach (Room room in placedRooms)
+        {
+            Bounds b = room.GetBounds();
+            if (first) { totalBounds = b; first = false; }
+            else totalBounds.Encapsulate(b);
+        }
 
         foreach (Room room in placedRooms)
         {
             Mesh floorMesh = room.NavFloorMesh;
 
-            // Fall back to bounding box if no floor mesh is assigned
+            // Fall back to bounding box if no navmesh source is assigned
             if (floorMesh == null)
             {
                 Bounds floor = room.GetFloorBounds();
                 sources.Add(new NavMeshBuildSource
                 {
-                    shape     = NavMeshBuildSourceShape.Box,
-                    size      = floor.size,
+                    shape = NavMeshBuildSourceShape.Box,
+                    size = floor.size,
                     transform = Matrix4x4.TRS(floor.center, Quaternion.identity, Vector3.one),
-                    area      = 0
+                    area = 0
                 });
-
-                if (first) { totalBounds = floor; first = false; }
-                else totalBounds.Encapsulate(floor);
                 continue;
             }
 
+            Transform navSrc = room.NavMeshSourceTransform != null ? room.NavMeshSourceTransform : room.transform;
             sources.Add(new NavMeshBuildSource
             {
-                shape        = NavMeshBuildSourceShape.Mesh,
+                shape = NavMeshBuildSourceShape.Mesh,
                 sourceObject = floorMesh,
-                transform    = Matrix4x4.TRS(room.transform.position, room.transform.rotation, Vector3.one),
-                area         = 0 // Walkable
+                transform = navSrc.localToWorldMatrix,
+                area = 0 // Walkable
             });
-
-            Bounds meshBounds = new(
-                room.transform.TransformPoint(floorMesh.bounds.center),
-                floorMesh.bounds.size
-            );
-
-            if (first) { totalBounds = meshBounds; first = false; }
-            else totalBounds.Encapsulate(meshBounds);
         }
 
         // Add sealing walls as Not Walkable Box sources (Collider bounds).
