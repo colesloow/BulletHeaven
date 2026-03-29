@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3993a4c7c8519b4698cb09eec4ad743, type: 3}
+  m_Name: Satellite_WeaponData
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  WeaponName: Satellites
+  Prefab: {fileID: 3174512953542081813, guid: 4f2416cf975c2c64baf1f4200c154daf, type: 3}
+  Prerequisite: {fileID: 0}
+  AvailableUpgrades:
+  - {fileID: 11400000, guid: b9ab9e2729b4e264dba35c88baaa7cbf, type: 2}
+  - {fileID: 11400000, guid: 9a88dad735963374e8eae3033e83c42b, type: 2}
+  - {fileID: 11400000, guid: 1e9f71c7f2508bc4c9736b89e7004c2a, type: 2}
+  - {fileID: 11400000, guid: b55dbc3237259d447a1ddb7c9ae2925f, type: 2}
+  - {fileID: 11400000, guid: 2acf7a2d289112d46a27bc00bbadecda, type: 2}
+  - {fileID: 11400000, guid: 7102c47936adc3a498a424470363379b, type: 2}
+  - {fileID: 11400000, guid: 8ad11d167afeb964098bd375f1439ffb, type: 2}
+  - {fileID: 11400000, guid: b66e50c04dcc65d4c931401755267116, type: 2}
+  - {fileID: 11400000, guid: d5f926b1121a6d44fafab3a7f8c44205, type: 2}
+  - {fileID: 11400000, guid: 1e91e4a0b11462c459c7ecaa618aefc2, type: 2}

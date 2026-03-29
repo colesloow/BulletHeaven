@@ -72,6 +72,17 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
+# Unity crash recovery scenes (auto-generated, not source files)
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Krita backup files
+*.kra~
+*.png~
+
 # Unity auto-generated volume and pipeline settings at project root
 /[Aa]ssets/DefaultVolumeProfile.asset
 /[Aa]ssets/DefaultVolumeProfile.asset.meta

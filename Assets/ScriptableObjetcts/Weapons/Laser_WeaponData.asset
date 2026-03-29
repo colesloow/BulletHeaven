@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3993a4c7c8519b4698cb09eec4ad743, type: 3}
+  m_Name: Laser_WeaponData
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  WeaponName: Laser Beam
+  Prefab: {fileID: 4990370023717747748, guid: 931577ca1845fdf46b549e86d16941c8, type: 3}
+  Prerequisite: {fileID: 11400000, guid: b8799ff0c9ef2044da84ba09d60f0965, type: 2}
+  AvailableUpgrades:
+  - {fileID: 11400000, guid: 2afae174831addc4eb57c54fcb64cc91, type: 2}
+  - {fileID: 11400000, guid: abfc6e17792895c45a0df98b8f8bb8bf, type: 2}
+  - {fileID: 11400000, guid: 53c1880a645d58b47afd698a487b52f7, type: 2}
+  - {fileID: 11400000, guid: f2c00140a749888469aedf92fcad6b8e, type: 2}
+  - {fileID: 11400000, guid: 342c0ba824a8c40409fb1e902ee322f5, type: 2}
+  - {fileID: 11400000, guid: b386ef3f092006d4e894dcb714216555, type: 2}

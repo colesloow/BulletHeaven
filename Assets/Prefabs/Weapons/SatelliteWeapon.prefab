@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3174512953542081813
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8427126442506776698}
+  - component: {fileID: 2655966751848423194}
+  m_Layer: 0
+  m_Name: SatelliteWeapon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8427126442506776698
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3174512953542081813}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2655966751848423194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3174512953542081813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c04aab22196dbeb479cc78570718eb8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SatelliteWeapon
+  _satellitePrefab: {fileID: 8118963732262246295, guid: 5a267822f4bdd3345a43681f6d08cafb, type: 3}
+  _orbitRadius: 2
+  _orbitSpeed: 100
+  _satelliteCount: 1
+  _damage: 10
+  _contactRadius: 0.35
+  _damageInterval: 0.5
+  _hitVfxPrefab: {fileID: 4878623340987576373, guid: ac2da8e70fa93be4c85a7b01c0e037a6, type: 3}
+  _maxSatellites: 10
+  _maxOrbitRadius: 3
+  _maxOrbitSpeed: 300
+  _maxDamageBonus: 50
