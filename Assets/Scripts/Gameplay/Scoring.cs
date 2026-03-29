@@ -16,13 +16,13 @@ public class Scoring : MonoBehaviour
     {
         GameManager.Instance.TotalScore += _objectScoring;
 
-        if (Random.value * 100f <= _healthDropChance)
-        {
-            Instantiate(_healthCollectablePrefab, transform.position, Quaternion.identity);
-        }
-        else 
-        {
-            Instantiate(_xpCollectablePrefab, transform.position, Quaternion.identity);
-        }
+        if (PoolManager.Instance == null) return;
+
+        GameObject prefab = (Random.value * 100f <= _healthDropChance)
+            ? _healthCollectablePrefab
+            : _xpCollectablePrefab;
+
+        if (prefab != null)
+            PoolManager.Instance.Get(prefab).transform.position = transform.position;
     }
 }
