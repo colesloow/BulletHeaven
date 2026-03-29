@@ -14,8 +14,11 @@ public class Room : MonoBehaviour
     public RoomType Type { get; set; }
     public DoorSocket[] Doors;
 
-    // Floor mesh used as NavMesh source. Assign the matching floor FBX in each prefab.
-    [SerializeField] public Mesh NavFloorMesh;
+    // MeshFilter on the navmesh child object. Assign in each room prefab Inspector.
+    [SerializeField] private MeshFilter _navMeshSource;
+
+    public Mesh NavFloorMesh => _navMeshSource != null ? _navMeshSource.sharedMesh : null;
+    public Transform NavMeshSourceTransform => _navMeshSource != null ? _navMeshSource.transform : null;
 
     void Awake()
     {
