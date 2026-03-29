@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6492460159729906307}
   - component: {fileID: 7464630550440154611}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: DoorSocket_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,6 +45,96 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
   IsConnected: 0
+--- !u!1 &776468992553550823
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8860970308701975610}
+  - component: {fileID: 7033848912436050494}
+  - component: {fileID: 2029336862788048772}
+  m_Layer: 8
+  m_Name: Floor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8860970308701975610
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776468992553550823}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7966089348320986852}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &7033848912436050494
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776468992553550823}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2e0f5a9aef57f9145ac736f39acace89, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &2029336862788048772
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776468992553550823}
+  m_Mesh: {fileID: -4614141577286497892, guid: fb6374e9ecaa98f4aadb30b54d67bc0a, type: 3}
 --- !u!1 &1122616364598426008
 GameObject:
   m_ObjectHideFlags: 0
@@ -55,7 +145,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3039953297055755525}
   - component: {fileID: 2715025899366754516}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: DoorSocket_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -99,7 +189,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7636807375963087550}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Doors
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -138,7 +228,7 @@ GameObject:
   - component: {fileID: 4394601551989466766}
   - component: {fileID: 9112470848611711378}
   - component: {fileID: -6357124013290264684}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Room_Small_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,6 +248,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8860970308701975610}
   - {fileID: 7636807375963087550}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -168,7 +259,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2966252387633165162}
-  m_Mesh: {fileID: -4438767471215625965, guid: e299c51f0765a384badf18c0783ce6d4, type: 3}
+  m_Mesh: {fileID: -4438767471215625965, guid: fb6374e9ecaa98f4aadb30b54d67bc0a, type: 3}
 --- !u!23 &4394601551989466766
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -194,7 +285,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2e0f5a9aef57f9145ac736f39acace89, type: 2}
+  - {fileID: 2100000, guid: 0a9c701c06200bc46838477b873e281f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -231,7 +322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room
   Doors: []
-  NavFloorMesh: {fileID: -4614141577286497892, guid: 6fd65291de6252141bd3db0737626e75, type: 3}
+  NavFloorMesh: {fileID: 8038335055268853771, guid: fb6374e9ecaa98f4aadb30b54d67bc0a, type: 3}
 --- !u!64 &-6357124013290264684
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -253,7 +344,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -4438767471215625965, guid: e299c51f0765a384badf18c0783ce6d4, type: 3}
+  m_Mesh: {fileID: -4438767471215625965, guid: fb6374e9ecaa98f4aadb30b54d67bc0a, type: 3}
 --- !u!1 &3606888456961062438
 GameObject:
   m_ObjectHideFlags: 0
@@ -264,7 +355,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4019938681315524027}
   - component: {fileID: 8593888339634540807}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: DoorSocket_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -309,7 +400,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6188724065289087133}
   - component: {fileID: 4180949621893286729}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: DoorSocket_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
