@@ -267,6 +267,7 @@ GameObject:
   - component: {fileID: 8660774191940771280}
   - component: {fileID: 949854266991802236}
   - component: {fileID: 3363595615004328700}
+  - component: {fileID: 4121056682303189308}
   m_Layer: 0
   m_Name: Corridor_Transition
   m_TagString: Untagged
@@ -371,3 +372,17 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -4733361316454651803, guid: 52bf3c9c9e6f02f418a2faba7b99e0af, type: 3}
+--- !u!114 &4121056682303189308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8546727749986340792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72b4e3ac1f8bc0b4a9bb72bdd55f33da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Corridor
+  Doors: []
+  Type: 5

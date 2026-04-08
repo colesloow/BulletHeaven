@@ -267,6 +267,7 @@ GameObject:
   - component: {fileID: 5326442321740127909}
   - component: {fileID: 5006432285327497758}
   - component: {fileID: 8475394137360418416}
+  - component: {fileID: 5424964940348703965}
   m_Layer: 0
   m_Name: Corridor_Wide
   m_TagString: Untagged
@@ -371,3 +372,17 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 5530263122616296519, guid: 4d742362240af0047b8b8e28df744867, type: 3}
+--- !u!114 &5424964940348703965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6904748265286804123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72b4e3ac1f8bc0b4a9bb72bdd55f33da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Corridor
+  Doors: []
+  Type: 0

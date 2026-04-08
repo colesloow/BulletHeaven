@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
   IsConnected: 0
+  Width: 0
 --- !u!1 &3066118293866334006
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,6 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
   IsConnected: 0
+  Width: 0
 --- !u!1 &4215516984687199756
 GameObject:
   m_ObjectHideFlags: 0

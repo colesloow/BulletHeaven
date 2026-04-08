@@ -1,11 +1,16 @@
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System.Collections.Generic;
 
 public static class DungeonPrefabSetup
 {
     private const string PrefabsPath = "Assets/Prefabs/Rooms";
-    private const string MeshesPath = "Assets/Meshes";
+    private const string MeshesPath  = "Assets/Meshes";
+
+    // -------------------------------------------------------------------------
+    // Setup Dungeon Prefabs
+    // -------------------------------------------------------------------------
 
     [MenuItem("BulletHeaven/Setup Dungeon Prefabs")]
     public static void Execute()
@@ -37,7 +42,6 @@ public static class DungeonPrefabSetup
         // Corridor_Wide_Corner -> CorridorWideCorner  /  Room_Large -> RoomLarge
         string fbxBaseName = prefabName.Replace("_", "");
 
-        // Find FBX by name (case-insensitive on Windows)
         string[] fbxGuids = AssetDatabase.FindAssets(fbxBaseName + " t:Model", new[] { MeshesPath });
         if (fbxGuids.Length == 0)
         {
@@ -45,14 +49,12 @@ public static class DungeonPrefabSetup
             return false;
         }
 
-        string fbxPath = AssetDatabase.GUIDToAssetPath(fbxGuids[0]);
-
-        // CorridorWideCorner -> corridor-wide-corner
+        string fbxPath   = AssetDatabase.GUIDToAssetPath(fbxGuids[0]);
         string kebabName = PascalToKebab(Path.GetFileNameWithoutExtension(fbxPath));
 
         Mesh wallsMesh = LoadMesh(fbxPath, kebabName);
         Mesh floorMesh = LoadMesh(fbxPath, kebabName + "-floor");
-        Mesh navMesh = LoadMesh(fbxPath, kebabName + "-navmesh");
+        Mesh navMesh   = LoadMesh(fbxPath, kebabName + "-navmesh");
 
         if (wallsMesh == null)
         {
@@ -63,6 +65,9 @@ public static class DungeonPrefabSetup
         using var scope = new PrefabUtility.EditPrefabContentsScope(prefabPath);
         GameObject root = scope.prefabContentsRoot;
 
+        bool isRoom     = prefabName.StartsWith("Room_");
+        bool isCorridor = prefabName.StartsWith("Corridor_") || prefabName == "Corridor";
+
         // Root: walls mesh + collider
         SetMesh(root, wallsMesh, wallMat);
         MeshCollider col = root.GetComponent<MeshCollider>();
@@ -70,32 +75,34 @@ public static class DungeonPrefabSetup
         col.sharedMesh = wallsMesh;
 
         // Floor child
-        bool isRoom = prefabName.StartsWith("Room_");
         if (floorMesh != null)
-        {
-            GameObject floorGO = GetOrCreateChild(root, "Floor");
-            SetMesh(floorGO, floorMesh, floorMat);
-        }
+            SetMesh(GetOrCreateChild(root, "Floor"), floorMesh, floorMat);
 
-        // Navmesh child (no renderer, invisible)
-        // Always created for rooms; created for corridors only if mesh exists.
+        // Navmesh child (no renderer, invisible) — always for rooms, only if mesh exists for corridors
         if (navMesh != null || isRoom)
         {
-            GameObject navGO = GetOrCreateChild(root, "Navmesh");
-            MeshFilter navMF = navGO.GetComponent<MeshFilter>();
-            if (navMF == null) navMF = navGO.AddComponent<MeshFilter>();
-            navMF.sharedMesh = navMesh; // null is acceptable if mesh not yet in FBX
+            MeshFilter navMF = GetOrCreateChild(root, "Navmesh").GetComponent<MeshFilter>();
+            if (navMF == null) navMF = GetOrCreateChild(root, "Navmesh").AddComponent<MeshFilter>();
+            navMF.sharedMesh = navMesh;
         }
 
-        // For Room prefabs: add Room component and assign NavFloorMesh
+        // Room component
         if (isRoom)
         {
             Room room = root.GetComponent<Room>();
             if (room == null) room = root.AddComponent<Room>();
-            room.NavFloorMesh = navMesh; // null if not yet in FBX
+            room.NavFloorMesh = navMesh;
         }
 
-        // Add DoorSocket component to each child of the "Doors" GameObject
+        // Corridor component with auto-detected CorridorType
+        if (isCorridor)
+        {
+            Corridor corridor = root.GetComponent<Corridor>();
+            if (corridor == null) corridor = root.AddComponent<Corridor>();
+            corridor.Type = DetectCorridorType(prefabName);
+        }
+
+        // DoorSocket component on each child of the "Doors" GameObject
         Transform doorsParent = root.transform.Find("Doors");
         if (doorsParent != null)
         {
@@ -108,6 +115,81 @@ public static class DungeonPrefabSetup
 
         Debug.Log($"[DungeonPrefabSetup] {prefabName} -> {kebabName} (walls: {wallsMesh.name}, floor: {floorMesh?.name ?? "none"}, navmesh: {navMesh?.name ?? "none"})");
         return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // Fill Corridor Rules
+    // Populates CorridorRules on the first DungeonRules asset found.
+    // One rule per CorridorType, weight = 1, MaxCount = 0 (unlimited).
+    // CorridorProbability is left unchanged so the user controls it.
+    // -------------------------------------------------------------------------
+
+    [MenuItem("BulletHeaven/Fill Corridor Rules")]
+    public static void FillCorridorRules()
+    {
+        // Find the DungeonRules ScriptableObject
+        string[] rulesGuids = AssetDatabase.FindAssets("t:DungeonRules");
+        if (rulesGuids.Length == 0)
+        {
+            Debug.LogError("[DungeonPrefabSetup] No DungeonRules asset found in the project.");
+            return;
+        }
+
+        string rulesPath   = AssetDatabase.GUIDToAssetPath(rulesGuids[0]);
+        DungeonRules rules = AssetDatabase.LoadAssetAtPath<DungeonRules>(rulesPath);
+
+        // Collect all Corridor prefabs grouped by CorridorType
+        var byType = new Dictionary<CorridorType, List<Corridor>>();
+        foreach (CorridorType t in System.Enum.GetValues(typeof(CorridorType)))
+            byType[t] = new List<Corridor>();
+
+        string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab", new[] { PrefabsPath });
+        foreach (string guid in prefabGuids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            string name = Path.GetFileNameWithoutExtension(path);
+            if (!name.StartsWith("Corridor_") && name != "Corridor") continue;
+
+            Corridor corridor = AssetDatabase.LoadAssetAtPath<GameObject>(path)?.GetComponent<Corridor>();
+            if (corridor == null) continue;
+
+            byType[corridor.Type].Add(corridor);
+        }
+
+        // Build one CorridorRule per type that has at least one prefab
+        var newRules = new List<CorridorRule>();
+        foreach (var kvp in byType)
+        {
+            if (kvp.Value.Count == 0) continue;
+            newRules.Add(new CorridorRule
+            {
+                Type     = kvp.Key,
+                Prefabs  = kvp.Value.ToArray(),
+                Weight   = 1f,
+                MaxCount = 0
+            });
+        }
+
+        rules.CorridorRules = newRules.ToArray();
+        EditorUtility.SetDirty(rules);
+        AssetDatabase.SaveAssets();
+
+        Debug.Log($"[DungeonPrefabSetup] Filled {newRules.Count} corridor rules in '{rulesPath}'.");
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    static CorridorType DetectCorridorType(string prefabName)
+    {
+        string lower = prefabName.ToLower();
+        if (lower.Contains("corner"))       return CorridorType.Corner;
+        if (lower.Contains("intersection")) return CorridorType.Intersection;
+        if (lower.Contains("junction"))     return CorridorType.Junction;
+        if (lower.Contains("end"))          return CorridorType.End;
+        if (lower.Contains("transition"))   return CorridorType.Transition;
+        return CorridorType.Straight;
     }
 
     static void SetMesh(GameObject go, Mesh mesh, Material mat)

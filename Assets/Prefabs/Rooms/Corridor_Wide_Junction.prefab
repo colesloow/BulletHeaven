@@ -314,6 +314,7 @@ GameObject:
   - component: {fileID: 1180356062532780560}
   - component: {fileID: 7035832297842270585}
   - component: {fileID: 1683768674084854793}
+  - component: {fileID: 6240679360658276352}
   m_Layer: 0
   m_Name: Corridor_Wide_Junction
   m_TagString: Untagged
@@ -418,3 +419,17 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4527604871638918006, guid: a33dd4ee73fa5f244a5fe930783d0322, type: 3}
+--- !u!114 &6240679360658276352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6590088036116600360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72b4e3ac1f8bc0b4a9bb72bdd55f33da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Corridor
+  Doors: []
+  Type: 2

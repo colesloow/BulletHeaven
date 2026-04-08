@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
   IsConnected: 0
+  Width: 0
 --- !u!1 &2978616151148697215
 GameObject:
   m_ObjectHideFlags: 0
@@ -163,6 +164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
   IsConnected: 0
+  Width: 0
 --- !u!1 &6794424361910549911
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,6 +177,7 @@ GameObject:
   - component: {fileID: 4666720633161740805}
   - component: {fileID: 6218974225818797866}
   - component: {fileID: 5635453550063408409}
+  - component: {fileID: 5333038641953197442}
   m_Layer: 0
   m_Name: Corridor
   m_TagString: Untagged
@@ -279,6 +282,20 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1529682118313172751, guid: a7784c8eb84abe14892462b367b1466e, type: 3}
+--- !u!114 &5333038641953197442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6794424361910549911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72b4e3ac1f8bc0b4a9bb72bdd55f33da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Corridor
+  Doors: []
+  Type: 0
 --- !u!1 &6991799999639298678
 GameObject:
   m_ObjectHideFlags: 0
