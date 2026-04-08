@@ -51,42 +51,41 @@ MonoBehaviour:
     - {fileID: 5093581059593610874, guid: feb4177181e90084fa1ac35f410b2cd9, type: 3}
     Weight: 0.1
     MaxCount: 1
-  CorridorRules:
+  CorridorPrefabs:
   - Type: 0
     Prefabs:
     - {fileID: 5333038641953197442, guid: 06ef854039405ac4781ef3aa43773727, type: 3}
     - {fileID: 5424964940348703965, guid: cf17e9c44eeb4fe47bde4c5f73eddbf9, type: 3}
-    Weight: 1
-    MaxCount: 0
   - Type: 1
     Prefabs:
     - {fileID: 2475525266508617768, guid: 4842fccfcd1f13748a449608639d919c, type: 3}
     - {fileID: 534471433153471947, guid: fbae1aaf2185aae4f8d88262dc244d77, type: 3}
-    Weight: 1
-    MaxCount: 0
   - Type: 2
     Prefabs:
     - {fileID: 5734251352917381654, guid: 97dcfee3d231433419cc2628f2ce0584, type: 3}
     - {fileID: 6240679360658276352, guid: 8ecd57f17b1335041b09c2c1893a36fc, type: 3}
-    Weight: 1
-    MaxCount: 0
   - Type: 3
     Prefabs:
     - {fileID: 4996230663010465797, guid: 0d35d3a0fe7e04743b0a9ff7a8733a3e, type: 3}
     - {fileID: 465146682531989633, guid: 4c64f49e272d75f468022ff4b984f283, type: 3}
-    Weight: 1
-    MaxCount: 0
   - Type: 4
     Prefabs:
     - {fileID: 5029765657163841266, guid: b78e73a40dd4c6b438d9f91100e9fc2b, type: 3}
     - {fileID: 390725915578980000, guid: 941045f9cda618d429afa2ec7af895b9, type: 3}
-    Weight: 1
-    MaxCount: 0
   - Type: 5
     Prefabs:
     - {fileID: 4121056682303189308, guid: 51cf16df171ceae4d8c1e902a135aea3, type: 3}
+  CorridorSequences:
+  - Pattern: 00000000
+    Weight: 3
+  - Pattern: 0000000000000000
+    Weight: 2
+  - Pattern: 000000000100000000000000
+    Weight: 2
+  - Pattern: 0000000002000000
     Weight: 1
-    MaxCount: 0
   CorridorProbability: 0.5
+  LoopProbability: 0
+  MaxLoops: 0
   BifurcationProbability: 0.5
   MaxBranchDepth: 5
