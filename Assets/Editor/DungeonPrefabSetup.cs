@@ -49,12 +49,12 @@ public static class DungeonPrefabSetup
             return false;
         }
 
-        string fbxPath   = AssetDatabase.GUIDToAssetPath(fbxGuids[0]);
+        string fbxPath = AssetDatabase.GUIDToAssetPath(fbxGuids[0]);
         string kebabName = PascalToKebab(Path.GetFileNameWithoutExtension(fbxPath));
 
         Mesh wallsMesh = LoadMesh(fbxPath, kebabName);
         Mesh floorMesh = LoadMesh(fbxPath, kebabName + "-floor");
-        Mesh navMesh   = LoadMesh(fbxPath, kebabName + "-navmesh");
+        Mesh navMesh  = LoadMesh(fbxPath, kebabName + "-navmesh");
 
         if (wallsMesh == null)
         {
@@ -65,7 +65,7 @@ public static class DungeonPrefabSetup
         using var scope = new PrefabUtility.EditPrefabContentsScope(prefabPath);
         GameObject root = scope.prefabContentsRoot;
 
-        bool isRoom     = prefabName.StartsWith("Room_");
+        bool isRoom = prefabName.StartsWith("Room_");
         bool isCorridor = prefabName.StartsWith("Corridor_") || prefabName == "Corridor";
 
         // Root: walls mesh + collider
@@ -124,8 +124,8 @@ public static class DungeonPrefabSetup
     // CorridorProbability is left unchanged so the user controls it.
     // -------------------------------------------------------------------------
 
-    [MenuItem("BulletHeaven/Fill Corridor Rules")]
-    public static void FillCorridorRules()
+    [MenuItem("BulletHeaven/Fill Corridor Prefabs")]
+    public static void FillCorridorPrefabs()
     {
         // Find the DungeonRules ScriptableObject
         string[] rulesGuids = AssetDatabase.FindAssets("t:DungeonRules");
@@ -135,7 +135,7 @@ public static class DungeonPrefabSetup
             return;
         }
 
-        string rulesPath   = AssetDatabase.GUIDToAssetPath(rulesGuids[0]);
+        string rulesPath = AssetDatabase.GUIDToAssetPath(rulesGuids[0]);
         DungeonRules rules = AssetDatabase.LoadAssetAtPath<DungeonRules>(rulesPath);
 
         // Collect all Corridor prefabs grouped by CorridorType
@@ -156,25 +156,62 @@ public static class DungeonPrefabSetup
             byType[corridor.Type].Add(corridor);
         }
 
-        // Build one CorridorRule per type that has at least one prefab
-        var newRules = new List<CorridorRule>();
+        // Build one CorridorPrefabSet per type that has at least one prefab
+        var newSets = new List<CorridorPrefabSet>();
         foreach (var kvp in byType)
         {
             if (kvp.Value.Count == 0) continue;
-            newRules.Add(new CorridorRule
+            newSets.Add(new CorridorPrefabSet
             {
-                Type     = kvp.Key,
-                Prefabs  = kvp.Value.ToArray(),
-                Weight   = 1f,
-                MaxCount = 0
+                Type = kvp.Key,
+                Prefabs = kvp.Value.ToArray()
             });
         }
 
-        rules.CorridorRules = newRules.ToArray();
+        rules.CorridorPrefabs = newSets.ToArray();
         EditorUtility.SetDirty(rules);
         AssetDatabase.SaveAssets();
 
-        Debug.Log($"[DungeonPrefabSetup] Filled {newRules.Count} corridor rules in '{rulesPath}'.");
+        Debug.Log($"[DungeonPrefabSetup] Filled {newSets.Count} corridor prefab sets in '{rulesPath}'.");
+    }
+
+    // -------------------------------------------------------------------------
+    // Fill Corridor Sequences
+    // Populates CorridorSequences with sensible default patterns.
+    // -------------------------------------------------------------------------
+
+    [MenuItem("BulletHeaven/Fill Corridor Sequences")]
+    public static void FillCorridorSequences()
+    {
+        string[] rulesGuids = AssetDatabase.FindAssets("t:DungeonRules");
+        if (rulesGuids.Length == 0)
+        {
+            Debug.LogError("[DungeonPrefabSetup] No DungeonRules asset found in the project.");
+            return;
+        }
+
+        string rulesPath = AssetDatabase.GUIDToAssetPath(rulesGuids[0]);
+        DungeonRules rules = AssetDatabase.LoadAssetAtPath<DungeonRules>(rulesPath);
+
+        rules.CorridorSequences = new[]
+        {
+            // Short straight passage
+            new CorridorSequence { Pattern = new[] { CorridorType.Straight }, Weight = 3f },
+
+            // Medium straight passage
+            new CorridorSequence { Pattern = new[] { CorridorType.Straight, CorridorType.Straight }, Weight = 2f },
+
+            // L-shaped hallway: straight in, corner, straight out
+            new CorridorSequence { Pattern = new[] { CorridorType.Straight, CorridorType.Corner, CorridorType.Straight }, Weight = 2f },
+
+            // Branching hallway: straight then a junction (one branch goes elsewhere)
+            new CorridorSequence { Pattern = new[] { CorridorType.Straight, CorridorType.Junction }, Weight = 1f },
+        };
+
+        EditorUtility.SetDirty(rules);
+        AssetDatabase.SaveAssets();
+
+        Debug.Log($"[DungeonPrefabSetup] Filled {rules.CorridorSequences.Length} corridor sequences in '{rulesPath}'.");
     }
 
     // -------------------------------------------------------------------------
@@ -184,11 +221,11 @@ public static class DungeonPrefabSetup
     static CorridorType DetectCorridorType(string prefabName)
     {
         string lower = prefabName.ToLower();
-        if (lower.Contains("corner"))       return CorridorType.Corner;
+        if (lower.Contains("corner")) return CorridorType.Corner;
         if (lower.Contains("intersection")) return CorridorType.Intersection;
-        if (lower.Contains("junction"))     return CorridorType.Junction;
-        if (lower.Contains("end"))          return CorridorType.End;
-        if (lower.Contains("transition"))   return CorridorType.Transition;
+        if (lower.Contains("junction")) return CorridorType.Junction;
+        if (lower.Contains("end")) return CorridorType.End;
+        if (lower.Contains("transition")) return CorridorType.Transition;
         return CorridorType.Straight;
     }
 
