@@ -3,17 +3,21 @@ using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
 
-public static class DungeonPrefabSetup
+// Editor tools for the dungeon system, accessible via the BulletHeaven menu.
+// All functions are idempotent: safe to re-run without duplicating data.
+public static class DungeonEditorTools
 {
     private const string PrefabsPath = "Assets/Prefabs/Rooms";
     private const string MeshesPath  = "Assets/Meshes";
 
     // -------------------------------------------------------------------------
     // Setup Dungeon Prefabs
+    // Assigns meshes, materials, components, and NavFloorMesh on all Room and
+    // Corridor prefabs found in PrefabsPath.
     // -------------------------------------------------------------------------
 
     [MenuItem("BulletHeaven/Setup Dungeon Prefabs")]
-    public static void Execute()
+    public static void SetupDungeonPrefabs()
     {
         Material wallMat  = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/MAT_WallCutout.mat");
         Material floorMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/MAT_Colormap.mat");
@@ -34,7 +38,7 @@ public static class DungeonPrefabSetup
         }
 
         AssetDatabase.SaveAssets();
-        Debug.Log($"[DungeonPrefabSetup] Done. {processed} prefabs processed.");
+        Debug.Log($"[DungeonEditorTools] Done. {processed} prefabs processed.");
     }
 
     static bool SetupPrefab(string prefabPath, string prefabName, Material wallMat, Material floorMat)
@@ -45,27 +49,27 @@ public static class DungeonPrefabSetup
         string[] fbxGuids = AssetDatabase.FindAssets(fbxBaseName + " t:Model", new[] { MeshesPath });
         if (fbxGuids.Length == 0)
         {
-            Debug.LogWarning($"[DungeonPrefabSetup] No FBX found for '{prefabName}' (searched: {fbxBaseName})");
+            Debug.LogWarning($"[DungeonEditorTools] No FBX found for '{prefabName}' (searched: {fbxBaseName})");
             return false;
         }
 
-        string fbxPath = AssetDatabase.GUIDToAssetPath(fbxGuids[0]);
+        string fbxPath   = AssetDatabase.GUIDToAssetPath(fbxGuids[0]);
         string kebabName = PascalToKebab(Path.GetFileNameWithoutExtension(fbxPath));
 
         Mesh wallsMesh = LoadMesh(fbxPath, kebabName);
         Mesh floorMesh = LoadMesh(fbxPath, kebabName + "-floor");
-        Mesh navMesh  = LoadMesh(fbxPath, kebabName + "-navmesh");
+        Mesh navMesh   = LoadMesh(fbxPath, kebabName + "-navmesh");
 
         if (wallsMesh == null)
         {
-            Debug.LogWarning($"[DungeonPrefabSetup] Walls mesh '{kebabName}' not found in {fbxPath}");
+            Debug.LogWarning($"[DungeonEditorTools] Walls mesh '{kebabName}' not found in {fbxPath}");
             return false;
         }
 
         using var scope = new PrefabUtility.EditPrefabContentsScope(prefabPath);
         GameObject root = scope.prefabContentsRoot;
 
-        bool isRoom = prefabName.StartsWith("Room_");
+        bool isRoom     = prefabName.StartsWith("Room_");
         bool isCorridor = prefabName.StartsWith("Corridor_") || prefabName == "Corridor";
 
         // Root: walls mesh + collider
@@ -114,30 +118,71 @@ public static class DungeonPrefabSetup
             }
         }
 
-        Debug.Log($"[DungeonPrefabSetup] {prefabName} -> {kebabName} (walls: {wallsMesh.name}, floor: {floorMesh?.name ?? "none"}, navmesh: {navMesh?.name ?? "none"})");
+        Debug.Log($"[DungeonEditorTools] {prefabName} -> {kebabName} (walls: {wallsMesh.name}, floor: {floorMesh?.name ?? "none"}, navmesh: {navMesh?.name ?? "none"})");
         return true;
     }
 
     // -------------------------------------------------------------------------
-    // Fill Corridor Rules
-    // Populates CorridorRules on the first DungeonRules asset found.
-    // One rule per CorridorType, weight = 1, MaxCount = 0 (unlimited).
-    // CorridorProbability is left unchanged so the user controls it.
+    // Fill Room Prefabs
+    // Populates RoomRules on the DungeonRules asset with all Room prefabs found,
+    // grouped by RoomType. Weight = 1, MaxCount = 0 (unlimited) by default.
+    // -------------------------------------------------------------------------
+
+    [MenuItem("BulletHeaven/Fill Room Prefabs")]
+    public static void FillRoomPrefabs()
+    {
+        DungeonRules rules = LoadDungeonRules();
+        if (rules == null) return;
+
+        // Collect all Room prefabs grouped by RoomType
+        var byType = new Dictionary<RoomType, List<Room>>();
+        foreach (RoomType t in System.Enum.GetValues(typeof(RoomType)))
+            byType[t] = new List<Room>();
+
+        string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab", new[] { PrefabsPath });
+        foreach (string guid in prefabGuids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            string name = Path.GetFileNameWithoutExtension(path);
+            if (!name.StartsWith("Room_")) continue;
+
+            Room room = AssetDatabase.LoadAssetAtPath<GameObject>(path)?.GetComponent<Room>();
+            if (room == null) continue;
+
+            byType[DetectRoomType(name)].Add(room);
+        }
+
+        // Build one RoomRule per type that has at least one prefab
+        var newRules = new List<RoomRule>();
+        foreach (var kvp in byType)
+        {
+            if (kvp.Value.Count == 0) continue;
+            newRules.Add(new RoomRule
+            {
+                Type     = kvp.Key,
+                Prefabs  = kvp.Value.ToArray(),
+                Weight   = 1f,
+                MaxCount = 0
+            });
+        }
+
+        rules.RoomRules = newRules.ToArray();
+        EditorUtility.SetDirty(rules);
+        AssetDatabase.SaveAssets();
+
+        Debug.Log($"[DungeonEditorTools] Filled {newRules.Count} room rules in '{AssetDatabase.GetAssetPath(rules)}'.");
+    }
+
+    // -------------------------------------------------------------------------
+    // Fill Corridor Prefabs
+    // Populates CorridorPrefabs on the DungeonRules asset, one set per CorridorType.
     // -------------------------------------------------------------------------
 
     [MenuItem("BulletHeaven/Fill Corridor Prefabs")]
     public static void FillCorridorPrefabs()
     {
-        // Find the DungeonRules ScriptableObject
-        string[] rulesGuids = AssetDatabase.FindAssets("t:DungeonRules");
-        if (rulesGuids.Length == 0)
-        {
-            Debug.LogError("[DungeonPrefabSetup] No DungeonRules asset found in the project.");
-            return;
-        }
-
-        string rulesPath = AssetDatabase.GUIDToAssetPath(rulesGuids[0]);
-        DungeonRules rules = AssetDatabase.LoadAssetAtPath<DungeonRules>(rulesPath);
+        DungeonRules rules = LoadDungeonRules();
+        if (rules == null) return;
 
         // Collect all Corridor prefabs grouped by CorridorType
         var byType = new Dictionary<CorridorType, List<Corridor>>();
@@ -164,7 +209,7 @@ public static class DungeonPrefabSetup
             if (kvp.Value.Count == 0) continue;
             newSets.Add(new CorridorPrefabSet
             {
-                Type = kvp.Key,
+                Type    = kvp.Key,
                 Prefabs = kvp.Value.ToArray()
             });
         }
@@ -173,7 +218,7 @@ public static class DungeonPrefabSetup
         EditorUtility.SetDirty(rules);
         AssetDatabase.SaveAssets();
 
-        Debug.Log($"[DungeonPrefabSetup] Filled {newSets.Count} corridor prefab sets in '{rulesPath}'.");
+        Debug.Log($"[DungeonEditorTools] Filled {newSets.Count} corridor prefab sets in '{AssetDatabase.GetAssetPath(rules)}'.");
     }
 
     // -------------------------------------------------------------------------
@@ -184,15 +229,8 @@ public static class DungeonPrefabSetup
     [MenuItem("BulletHeaven/Fill Corridor Sequences")]
     public static void FillCorridorSequences()
     {
-        string[] rulesGuids = AssetDatabase.FindAssets("t:DungeonRules");
-        if (rulesGuids.Length == 0)
-        {
-            Debug.LogError("[DungeonPrefabSetup] No DungeonRules asset found in the project.");
-            return;
-        }
-
-        string rulesPath = AssetDatabase.GUIDToAssetPath(rulesGuids[0]);
-        DungeonRules rules = AssetDatabase.LoadAssetAtPath<DungeonRules>(rulesPath);
+        DungeonRules rules = LoadDungeonRules();
+        if (rules == null) return;
 
         rules.CorridorSequences = new[]
         {
@@ -212,24 +250,54 @@ public static class DungeonPrefabSetup
         EditorUtility.SetDirty(rules);
         AssetDatabase.SaveAssets();
 
-        Debug.Log($"[DungeonPrefabSetup] Filled {rules.CorridorSequences.Length} corridor sequences in '{rulesPath}'.");
+        Debug.Log($"[DungeonEditorTools] Filled {rules.CorridorSequences.Length} corridor sequences in '{AssetDatabase.GetAssetPath(rules)}'.");
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
+    // Loads the first DungeonRules asset found in the project.
+    // Logs an error and returns null if none is found.
+    static DungeonRules LoadDungeonRules()
+    {
+        string[] guids = AssetDatabase.FindAssets("t:DungeonRules");
+        if (guids.Length == 0)
+        {
+            Debug.LogError("[DungeonEditorTools] No DungeonRules asset found in the project.");
+            return null;
+        }
+        return AssetDatabase.LoadAssetAtPath<DungeonRules>(AssetDatabase.GUIDToAssetPath(guids[0]));
+    }
+
+    // Detects RoomType from a prefab name by looking for keywords.
+    // Defaults to Normal if no keyword matches (covers all geometry-only variants:
+    // Room_Large, Room_Large_2, Room_Small, Room_Wide, etc.).
+    static RoomType DetectRoomType(string prefabName)
+    {
+        string lower = prefabName.ToLower();
+        if (lower.Contains("treasure")) return RoomType.Treasure;
+        if (lower.Contains("arena"))    return RoomType.Arena;
+        if (lower.Contains("trap"))     return RoomType.Trap;
+        if (lower.Contains("event"))    return RoomType.Event;
+        return RoomType.Normal;
+    }
+
+    // Detects CorridorType from a prefab name by looking for keywords.
+    // Defaults to Straight if no keyword matches.
     static CorridorType DetectCorridorType(string prefabName)
     {
         string lower = prefabName.ToLower();
-        if (lower.Contains("corner")) return CorridorType.Corner;
+        if (lower.Contains("corner"))       return CorridorType.Corner;
         if (lower.Contains("intersection")) return CorridorType.Intersection;
-        if (lower.Contains("junction")) return CorridorType.Junction;
-        if (lower.Contains("end")) return CorridorType.End;
-        if (lower.Contains("transition")) return CorridorType.Transition;
+        if (lower.Contains("junction"))     return CorridorType.Junction;
+        if (lower.Contains("end"))          return CorridorType.End;
+        if (lower.Contains("transition"))   return CorridorType.Transition;
         return CorridorType.Straight;
     }
 
+    // Assigns a mesh and material to a GameObject's MeshFilter and MeshRenderer.
+    // Adds the components if they don't already exist.
     static void SetMesh(GameObject go, Mesh mesh, Material mat)
     {
         MeshFilter mf = go.GetComponent<MeshFilter>();
@@ -241,6 +309,7 @@ public static class DungeonPrefabSetup
         if (mat != null) mr.sharedMaterial = mat;
     }
 
+    // Returns an existing child GameObject by name, or creates it under parent.
     static GameObject GetOrCreateChild(GameObject parent, string childName)
     {
         Transform existing = parent.transform.Find(childName);
@@ -250,6 +319,8 @@ public static class DungeonPrefabSetup
         return go;
     }
 
+    // Loads a sub-asset Mesh by name from an FBX file.
+    // Returns null if no mesh with that name exists in the asset.
     static Mesh LoadMesh(string fbxPath, string meshName)
     {
         foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(fbxPath))
@@ -257,7 +328,9 @@ public static class DungeonPrefabSetup
         return null;
     }
 
-    // CorridorWideCorner -> corridor-wide-corner  /  RoomLarge2 -> room-large-2
+    // Converts a PascalCase name to kebab-case.
+    // Inserts a hyphen before uppercase letters and before digits preceded by a non-digit.
+    // Examples: CorridorWideCorner -> corridor-wide-corner  /  RoomLarge2 -> room-large-2
     static string PascalToKebab(string pascal)
     {
         var sb = new System.Text.StringBuilder();
