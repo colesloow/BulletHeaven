@@ -78,8 +78,9 @@ public class EnemySpawner : MonoBehaviour
     {
         var eligible = new List<Room>();
 
-        foreach (Room room in _dungeonGenerator.PlacedRooms)
+        foreach (DungeonPiece piece in _dungeonGenerator.PlacedPieces)
         {
+            if (piece is not Room room) continue;
             float dist = Vector3.Distance(_player.position, room.transform.position);
             if (dist < _minSpawnDistance || dist > _maxSpawnDistance) continue;
             eligible.Add(room);
