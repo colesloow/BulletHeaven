@@ -100,6 +100,7 @@ public static class DungeonPrefabSetup
             Corridor corridor = root.GetComponent<Corridor>();
             if (corridor == null) corridor = root.AddComponent<Corridor>();
             corridor.Type = DetectCorridorType(prefabName);
+            corridor.NavFloorMesh = navMesh;
         }
 
         // DoorSocket component on each child of the "Doors" GameObject

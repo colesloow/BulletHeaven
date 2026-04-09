@@ -13,4 +13,7 @@ public enum CorridorType
 public class Corridor : DungeonPiece
 {
     public CorridorType Type;
+
+    // Navmesh mesh asset for this corridor. Assign the navmesh submesh from the FBX in each prefab.
+    public Mesh NavFloorMesh;
 }
