@@ -315,7 +315,7 @@ GameObject:
   - component: {fileID: 7035832297842270585}
   - component: {fileID: 1683768674084854793}
   - component: {fileID: 6240679360658276352}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Corridor_Wide_Junction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -433,3 +433,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Corridor
   Doors: []
   Type: 2
+  NavFloorMesh: {fileID: 6504816235025333656, guid: a33dd4ee73fa5f244a5fe930783d0322, type: 3}
