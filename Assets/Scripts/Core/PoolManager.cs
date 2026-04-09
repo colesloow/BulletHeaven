@@ -6,8 +6,8 @@ public class PoolManager : MonoBehaviour
 {
     public static PoolManager Instance { get; private set; }
 
-    [SerializeField] private int _defaultInitialSize = 10;
-    [SerializeField] private int _defaultMaxSize = 50;
+    [SerializeField] private int defaultInitialSize = 10;
+    [SerializeField] private int defaultMaxSize = 50;
 
     private readonly Dictionary<GameObject, ObjectPool<GameObject>> _pools = new();
 
@@ -65,11 +65,11 @@ public class PoolManager : MonoBehaviour
                 }
                 return go;
             },
-            actionOnGet:     go => go.SetActive(true),
+            actionOnGet: go => go.SetActive(true),
             actionOnRelease: go => go.SetActive(false),
             actionOnDestroy: go => Destroy(go),
-            defaultCapacity: _defaultInitialSize,
-            maxSize:         _defaultMaxSize
+            defaultCapacity: defaultInitialSize,
+            maxSize: defaultMaxSize
         );
     }
 }

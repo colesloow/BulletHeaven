@@ -47,6 +47,17 @@ public class DungeonRules : ScriptableObject
     // If empty, rooms connect directly (or via a single random corridor if CorridorProbability > 0).
     public CorridorSequence[] CorridorSequences;
 
+    [Header("Generation")]
+    // Total number of rooms to place (excluding the start room).
+    [Min(1)] public int RoomCount = 10;
+
+    // Amount by which a candidate's bounds are shrunk before overlap testing,
+    // so that pieces sharing a wall do not incorrectly block each other.
+    [Min(0f)] public float OverlapTolerance = 0.2f;
+
+    // Prefab spawned to seal door openings that were not connected to any piece.
+    public GameObject WallPrefab;
+
     [Header("Topology")]
     // Probability that a corridor sequence is inserted before a room. 0 = rooms connect directly.
     [Range(0f, 1f)] public float CorridorProbability;

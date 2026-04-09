@@ -1,29 +1,23 @@
 using UnityEngine;
-using UnityEngine.AI;
 using System.Collections.Generic;
 
 // Runs before all other scripts so the dungeon exists before anything tries to use it.
+// Requires DungeonNavMeshBuilder on the same GameObject to build the runtime NavMesh
+// once generation is complete.
 [DefaultExecutionOrder(-100)]
+[RequireComponent(typeof(DungeonNavMeshBuilder))]
 public class DungeonGenerator : MonoBehaviour
 {
     [SerializeField] private Room startRoom;
     [SerializeField] private DungeonRules rules;
-    [SerializeField] private int roomCount = 10;
-
-    // Amount by which a candidate's bounds are shrunk before overlap testing,
-    // so that pieces sharing a wall do not incorrectly block each other.
-    [SerializeField] private float overlapTolerance = 0.2f;
-
-    // Prefab used to seal door openings that were not connected to any piece.
-    [SerializeField] private GameObject wallPrefab;
-
-    // Open doors waiting to receive a room or corridor, paired with their branch depth.
-    // Depth is tracked to enforce MaxBranchDepth and limit infinite branching.
-    private readonly List<(DoorSocket door, int depth)> openDoors = new();
 
     // All pieces (rooms + corridors) placed so far.
     private readonly List<DungeonPiece> placedPieces = new();
     public IReadOnlyList<DungeonPiece> PlacedPieces => placedPieces;
+
+    // Open doors waiting to receive a room or corridor, paired with their branch depth.
+    // Depth is tracked to enforce MaxBranchDepth and limit infinite branching.
+    private readonly List<(DoorSocket door, int depth)> openDoors = new();
 
     // How many rooms of each type have been placed (used to enforce MaxCount per rule).
     private readonly Dictionary<RoomType, int> roomCounts = new();
@@ -33,9 +27,6 @@ public class DungeonGenerator : MonoBehaviour
 
     // Root transform that groups all generated pieces in the hierarchy.
     private Transform dungeonRoot;
-
-    // Handle to the runtime NavMesh so it can be removed when the scene unloads.
-    private NavMeshDataInstance navMeshInstance;
 
     // -------------------------------------------------------------------------
     // Generation entry point
@@ -54,7 +45,7 @@ public class DungeonGenerator : MonoBehaviour
 
         // Each iteration places exactly one room. Corridors are transitions
         // inserted before the room and do not consume a room slot.
-        for (int i = 0; i < roomCount; i++)
+        for (int i = 0; i < rules.RoomCount; i++)
         {
             if (openDoors.Count == 0)
                 break;
@@ -79,12 +70,7 @@ public class DungeonGenerator : MonoBehaviour
 
         TryCloseLoops();
         SealOpenDoors();
-        BuildNavMesh();
-    }
-
-    private void OnDestroy()
-    {
-        NavMesh.RemoveNavMeshData(navMeshInstance);
+        GetComponent<DungeonNavMeshBuilder>().Build(placedPieces, sealingWalls);
     }
 
     // -------------------------------------------------------------------------
@@ -115,61 +101,49 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     // Tries to attach a room to targetDoor.
-    // Iterates prefabs in random order, tries each door on the prefab,
-    // and accepts the first placement that does not overlap existing pieces.
+    // Iterates prefabs in random order and accepts the first placement that fits.
     private void AttachRoom(DoorSocket targetDoor, int depth)
     {
         var candidates = GetRoomCandidates();
         if (candidates.Count == 0) return;
 
-        int[] order = RandomOrder(candidates.Count);
-
-        foreach (int i in order)
+        foreach (int i in DungeonPlacer.RandomOrder(candidates.Count))
         {
             (Room prefab, RoomType assignedType) = candidates[i];
             Room newRoom = Instantiate(prefab, dungeonRoot);
 
-            int[] doorOrder = RandomOrder(newRoom.Doors.Length);
-            bool placed = false;
-
-            foreach (int j in doorOrder)
+            DoorSocket fittingDoor = FindFittingDoor(newRoom, targetDoor);
+            if (fittingDoor != null)
             {
-                DoorSocket newDoor = newRoom.Doors[j];
-
-                // Only connect doors of matching width (Normal <-> Normal, Wide <-> Wide).
-                if (newDoor.Width != targetDoor.Width) continue;
-
-                RotatePieceToMatchDoors(newRoom, newDoor, targetDoor);
-                AlignPiecePosition(newRoom, newDoor, targetDoor);
-
-                if (!OverlapsAnyPiece(newRoom))
-                {
-                    targetDoor.IsConnected = true;
-                    newDoor.IsConnected = true;
-
-                    // Always add at least one free door so the tree keeps growing.
-                    // Additional doors are added probabilistically (BifurcationProbability).
-                    bool firstFreeDoor = true;
-                    foreach (DoorSocket door in newRoom.Doors)
-                    {
-                        if (door.IsConnected) continue;
-                        if (depth >= rules.MaxBranchDepth) continue;
-                        if (firstFreeDoor || Random.value < rules.BifurcationProbability)
-                            openDoors.Add((door, depth + 1));
-                        firstFreeDoor = false;
-                    }
-
-                    newRoom.Type = assignedType;
-                    placedPieces.Add(newRoom);
-                    roomCounts.TryGetValue(assignedType, out int current);
-                    roomCounts[assignedType] = current + 1;
-                    placed = true;
-                    break;
-                }
+                targetDoor.IsConnected  = true;
+                fittingDoor.IsConnected = true;
+                RegisterPlacedRoom(newRoom, assignedType, depth);
+                return;
             }
 
-            if (placed) return;
             Destroy(newRoom.gameObject);
+        }
+    }
+
+    // Records a successfully placed room: updates type, piece list, room counts,
+    // and adds its free doors to openDoors for future iterations.
+    private void RegisterPlacedRoom(Room room, RoomType type, int depth)
+    {
+        room.Type = type;
+        placedPieces.Add(room);
+        roomCounts.TryGetValue(type, out int current);
+        roomCounts[type] = current + 1;
+
+        // Always add at least one free door so the tree keeps growing.
+        // Additional doors are added probabilistically (BifurcationProbability).
+        bool firstFreeDoor = true;
+        foreach (DoorSocket door in room.Doors)
+        {
+            if (door.IsConnected) continue;
+            if (depth >= rules.MaxBranchDepth) continue;
+            if (firstFreeDoor || Random.value < rules.BifurcationProbability)
+                openDoors.Add((door, depth + 1));
+            firstFreeDoor = false;
         }
     }
 
@@ -200,7 +174,7 @@ public class DungeonGenerator : MonoBehaviour
 
             // Deconstruct the nullable tuple: piece = placed corridor, entryDoor = door used to connect.
             (Corridor placed, DoorSocket entryDoor) = result.Value;
-            DoorSocket continuation = FindContinuationDoor(placed, entryDoor);
+            DoorSocket continuation = DungeonPlacer.FindContinuationDoor(placed, entryDoor);
 
             // Non-continuation free doors (e.g. a junction's side exits) become
             // open attachment points for future rooms.
@@ -253,28 +227,18 @@ public class DungeonGenerator : MonoBehaviour
 
         if (candidates.Count == 0) return null;
 
-        int[] order = RandomOrder(candidates.Count);
-        foreach (int i in order)
+        foreach (int i in DungeonPlacer.RandomOrder(candidates.Count))
         {
             Corridor piece = Instantiate(candidates[i], dungeonRoot);
-            int[] doorOrder = RandomOrder(piece.Doors.Length);
 
-            foreach (int j in doorOrder)
+            DoorSocket entry = FindFittingDoor(piece, targetDoor);
+            if (entry != null)
             {
-                DoorSocket entry = piece.Doors[j];
-                if (entry.Width != targetDoor.Width) continue;
-
-                RotatePieceToMatchDoors(piece, entry, targetDoor);
-                AlignPiecePosition(piece, entry, targetDoor);
-
-                if (!OverlapsAnyPiece(piece))
-                {
-                    targetDoor.IsConnected = true;
-                    entry.IsConnected = true;
-                    piece.Type = type;
-                    placedPieces.Add(piece);
-                    return (piece, entry);
-                }
+                targetDoor.IsConnected = true;
+                entry.IsConnected = true;
+                piece.Type = type;
+                placedPieces.Add(piece);
+                return (piece, entry);
             }
 
             Destroy(piece.gameObject);
@@ -283,23 +247,24 @@ public class DungeonGenerator : MonoBehaviour
         return null;
     }
 
-    // Returns the unconnected door of a piece that best continues the hallway direction.
-    // "Best" means the door whose forward vector is most opposite to the entry door's forward,
-    // found via the dot product: dot = -1 means perfectly opposite (straight through),
-    // dot = 1 means same direction (dead end / U-turn). We pick the smallest dot value.
-    private DoorSocket FindContinuationDoor(DungeonPiece piece, DoorSocket entryDoor)
+    // Tries each door on piece (in random order) to find one that matches targetDoor's width
+    // and allows placement without overlap. If found, piece is rotated and positioned in place
+    // and the matched door is returned. Returns null if no door fits.
+    // Only connect doors of matching width (Normal <-> Normal, Wide <-> Wide).
+    private DoorSocket FindFittingDoor(DungeonPiece piece, DoorSocket targetDoor)
     {
-        DoorSocket best = null;
-        float bestDot = 1f;
-
-        foreach (DoorSocket door in piece.Doors)
+        foreach (int j in DungeonPlacer.RandomOrder(piece.Doors.Length))
         {
-            if (door.IsConnected) continue;
-            float dot = Vector3.Dot(door.transform.forward, entryDoor.transform.forward);
-            if (dot < bestDot) { bestDot = dot; best = door; }
-        }
+            DoorSocket door = piece.Doors[j];
+            if (door.Width != targetDoor.Width) continue;
 
-        return best;
+            DungeonPlacer.RotatePieceToMatchDoors(piece, door, targetDoor);
+            DungeonPlacer.AlignPiecePosition(piece, door, targetDoor);
+
+            if (!DungeonPlacer.OverlapsAnyPiece(piece, placedPieces, rules.OverlapTolerance))
+                return door;
+        }
+        return null;
     }
 
     // -------------------------------------------------------------------------
@@ -362,12 +327,12 @@ public class DungeonGenerator : MonoBehaviour
             {
                 if (entry.Width != doorA.Width) continue;
 
-                RotatePieceToMatchDoors(piece, entry, doorA);
-                AlignPiecePosition(piece, entry, doorA);
+                DungeonPlacer.RotatePieceToMatchDoors(piece, entry, doorA);
+                DungeonPlacer.AlignPiecePosition(piece, entry, doorA);
 
-                if (OverlapsAnyPiece(piece)) continue;
+                if (DungeonPlacer.OverlapsAnyPiece(piece, placedPieces, rules.OverlapTolerance)) continue;
 
-                DoorSocket exit = FindContinuationDoor(piece, entry);
+                DoorSocket exit = DungeonPlacer.FindContinuationDoor(piece, entry);
                 if (exit == null) continue;
 
                 float dist = Vector3.Distance(exit.transform.position, doorB.transform.position);
@@ -392,186 +357,22 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     // -------------------------------------------------------------------------
-    // Door sealing and NavMesh
+    // Door sealing
     // -------------------------------------------------------------------------
 
     // Spawns a wall prefab in front of every door that was never connected.
     private void SealOpenDoors()
     {
-        if (wallPrefab == null) return;
+        if (rules.WallPrefab == null) return;
 
         foreach (DungeonPiece piece in placedPieces)
         {
             foreach (DoorSocket socket in piece.Doors)
             {
                 if (socket.IsConnected) continue;
-                GameObject wall = Instantiate(wallPrefab, socket.transform.position, socket.transform.rotation, piece.transform);
+                GameObject wall = Instantiate(rules.WallPrefab, socket.transform.position, socket.transform.rotation, piece.transform);
                 sealingWalls.Add(wall);
             }
         }
-    }
-
-    // Builds a runtime NavMesh from all placed pieces and sealing walls.
-    // Uses NavMeshBuilder.BuildNavMeshData rather than a baked NavMesh Surface
-    // so the mesh can be generated at runtime from procedural geometry.
-    //
-    // Each NavMeshBuildSource describes one walkable (area=0) or obstacle (area=1) shape.
-    // The transform field is a TRS matrix (Translation * Rotation * Scale) that places the
-    // source shape in world space. For mesh sources this transforms the mesh vertices;
-    // for box sources it defines the center and orientation of the box.
-    private void BuildNavMesh()
-    {
-        var sources = new List<NavMeshBuildSource>();
-
-        // Compute the world-space bounding volume of the entire dungeon.
-        // NavMeshBuilder ignores sources that fall outside this volume.
-        bool first = true;
-        Bounds totalBounds = default;
-
-        foreach (DungeonPiece piece in placedPieces)
-        {
-            Bounds b = piece.GetBounds();
-            if (first) { totalBounds = b; first = false; }
-            else totalBounds.Encapsulate(b);
-        }
-
-        // Rooms: use the precise navmesh sub-mesh from the FBX if assigned,
-        // otherwise fall back to a flat axis-aligned box covering the room footprint.
-        foreach (DungeonPiece piece in placedPieces)
-        {
-            if (piece is not Room room) continue;
-
-            Mesh floorMesh = room.NavFloorMesh;
-
-            if (floorMesh == null)
-            {
-                Bounds floor = room.GetFloorBounds();
-                sources.Add(new NavMeshBuildSource
-                {
-                    shape = NavMeshBuildSourceShape.Box,
-                    size = floor.size,
-                    transform = Matrix4x4.TRS(floor.center, Quaternion.identity, Vector3.one),
-                    area = 0
-                });
-                continue;
-            }
-
-            sources.Add(new NavMeshBuildSource
-            {
-                shape = NavMeshBuildSourceShape.Mesh,
-                sourceObject = floorMesh,
-                transform = Matrix4x4.TRS(room.transform.position, room.transform.rotation, Vector3.one),
-                area = 0
-            });
-
-            Bounds meshBounds = new(
-                room.transform.TransformPoint(floorMesh.bounds.center),
-                floorMesh.bounds.size
-            );
-            if (first) { totalBounds = meshBounds; first = false; }
-            else totalBounds.Encapsulate(meshBounds);
-        }
-
-        // Corridors: same approach with their own navmesh sub-mesh.
-        foreach (DungeonPiece piece in placedPieces)
-        {
-            if (piece is not Corridor corridor) continue;
-            if (corridor.NavFloorMesh == null) continue;
-
-            sources.Add(new NavMeshBuildSource
-            {
-                shape = NavMeshBuildSourceShape.Mesh,
-                sourceObject = corridor.NavFloorMesh,
-                transform = Matrix4x4.TRS(corridor.transform.position, corridor.transform.rotation, Vector3.one),
-                area = 0
-            });
-        }
-
-        // Sealing walls: mark them as non-walkable (area=1) so the NavMesh agent
-        // does not try to walk through sealed doorways.
-        foreach (GameObject wall in sealingWalls)
-        {
-            foreach (Collider col in wall.GetComponentsInChildren<Collider>())
-            {
-                sources.Add(new NavMeshBuildSource
-                {
-                    shape = NavMeshBuildSourceShape.Box,
-                    size = col.bounds.size,
-                    transform = Matrix4x4.TRS(col.bounds.center, Quaternion.identity, Vector3.one),
-                    area = 1
-                });
-            }
-        }
-
-        if (sources.Count == 0) return;
-
-        NavMeshData data = NavMeshBuilder.BuildNavMeshData(
-            NavMesh.GetSettingsByID(0),
-            sources,
-            totalBounds,
-            Vector3.zero,
-            Quaternion.identity
-        );
-
-        if (data != null)
-            navMeshInstance = NavMesh.AddNavMeshData(data);
-    }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    // Returns true if the candidate piece's bounds (shrunk by overlapTolerance)
-    // intersect any already-placed piece.
-    private bool OverlapsAnyPiece(DungeonPiece candidate)
-    {
-        Bounds candidateBounds = candidate.GetBounds();
-        candidateBounds.Expand(-overlapTolerance);
-
-        foreach (DungeonPiece placed in placedPieces)
-            if (candidateBounds.Intersects(placed.GetBounds())) return true;
-
-        return false;
-    }
-
-    // Returns an array of indices [0..count-1] in a random order (Fisher-Yates shuffle).
-    // Used to iterate prefab and door lists without bias.
-    private int[] RandomOrder(int count)
-    {
-        int[] indices = new int[count];
-        for (int i = 0; i < count; i++) indices[i] = i;
-
-        for (int i = count - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-            (indices[i], indices[j]) = (indices[j], indices[i]);
-        }
-
-        return indices;
-    }
-
-    // Rotates piece so that newDoor faces the opposite direction of targetDoor,
-    // making the two doors snap together face-to-face.
-    // SignedAngle returns the signed Y rotation needed on the horizontal plane.
-    private void RotatePieceToMatchDoors(DungeonPiece piece, DoorSocket newDoor, DoorSocket targetDoor)
-    {
-        Vector3 targetForward = targetDoor.transform.forward;
-        Vector3 newForward    = newDoor.transform.forward;
-
-        targetForward.y = 0f;
-        newForward.y    = 0f;
-        targetForward.Normalize();
-        newForward.Normalize();
-
-        float angle = Vector3.SignedAngle(newForward, -targetForward, Vector3.up);
-        piece.transform.Rotate(0f, angle, 0f);
-    }
-
-    // Translates piece so that newDoor's world position coincides with targetDoor's.
-    // The offset between the door and the piece root is preserved after rotation.
-    private void AlignPiecePosition(DungeonPiece piece, DoorSocket newDoor, DoorSocket targetDoor)
-    {
-        Vector3 offset = newDoor.transform.position - piece.transform.position;
-        piece.transform.position = targetDoor.transform.position - offset;
     }
 }

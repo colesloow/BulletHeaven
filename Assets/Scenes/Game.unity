@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 51476258}
   - component: {fileID: 51476259}
+  - component: {fileID: 51476260}
   m_Layer: 0
   m_Name: DungeonGenerator
   m_TagString: Untagged
@@ -165,9 +166,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
   startRoom: {fileID: 5093581059593610874, guid: feb4177181e90084fa1ac35f410b2cd9, type: 3}
   rules: {fileID: 11400000, guid: 89aae5bc6e5cf9141b105269b40c3a8f, type: 2}
-  roomCount: 20
-  overlapTolerance: 0.2
-  wallPrefab: {fileID: 2440417887079945734, guid: 5530e936e2fa75a43bfc9dc6e819f2fe, type: 3}
+--- !u!114 &51476260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 51476257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5c2a446fdb6f3f45818472098f29033, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonNavMeshBuilder
 --- !u!1 &163068118
 GameObject:
   m_ObjectHideFlags: 0
