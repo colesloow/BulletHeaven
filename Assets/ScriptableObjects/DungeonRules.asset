@@ -84,6 +84,10 @@ MonoBehaviour:
     Weight: 2
   - Pattern: 0000000002000000
     Weight: 1
+  - Pattern: 000000000300000000000000
+    Weight: 1
+  - Pattern: 000000000000000001000000
+    Weight: 1
   RoomCount: 40
   OverlapTolerance: 0.2
   WallPrefab: {fileID: 2440417887079945734, guid: 5530e936e2fa75a43bfc9dc6e819f2fe, type: 3}
