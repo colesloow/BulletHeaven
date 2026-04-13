@@ -10,6 +10,9 @@ public struct RoomRule
 
     // Maximum number of rooms of this type in the dungeon. 0 means unlimited.
     [Min(0)] public int MaxCount;
+
+    // Decoration rules applied to rooms of this type. Null means no decoration.
+    public RoomDecorationRules DecorationRules;
 }
 
 // Maps a CorridorType to its set of prefabs. Used by the sequence system to

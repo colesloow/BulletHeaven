@@ -80,6 +80,7 @@ public class DungeonGenerator : MonoBehaviour
         TryCloseLoops();
         SealOpenDoors();
         GetComponent<DungeonNavMeshBuilder>().Build(placedPieces, sealingWalls);
+        DecorateRooms();
     }
 
     // -------------------------------------------------------------------------
@@ -366,6 +367,32 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         return false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Room decoration
+    // -------------------------------------------------------------------------
+
+    private void DecorateRooms()
+    {
+        foreach (DungeonPiece piece in placedPieces)
+        {
+            if (piece is not Room room) continue;
+
+            RoomDecorationRules decorRules = GetDecorationRulesFor(room.Type);
+            if (decorRules == null) continue;
+
+            Transform decorParent = new GameObject("Decorations").transform;
+            decorParent.SetParent(room.transform);
+            RoomDecorator.DecorateRoom(room, decorRules, decorParent);
+        }
+    }
+
+    private RoomDecorationRules GetDecorationRulesFor(RoomType type)
+    {
+        foreach (RoomRule rule in rules.RoomRules)
+            if (rule.Type == type) return rule.DecorationRules;
+        return null;
     }
 
     // -------------------------------------------------------------------------
