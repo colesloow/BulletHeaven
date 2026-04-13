@@ -55,6 +55,7 @@ public class DungeonGenerator : MonoBehaviour
             openDoors.RemoveAt(randomIndex);
 
             DoorSocket roomDoor = targetDoor;
+            bool corridorPlaced = false;
 
             if (rules.CorridorProbability > 0f && Random.value < rules.CorridorProbability)
             {
@@ -62,15 +63,24 @@ public class DungeonGenerator : MonoBehaviour
                 // attaches to the sequence's final door instead of the original one.
                 DoorSocket continuation = AttachCorridorSequence(targetDoor, depth);
                 if (continuation != null)
+                {
                     roomDoor = continuation;
+                    corridorPlaced = true;
+                }
             }
 
-            AttachRoom(roomDoor, depth);
+            bool roomPlaced = AttachRoom(roomDoor, depth);
+
+            // If no room fits at the end of a corridor sequence, cap it with an End piece
+            // so the hallway terminates cleanly instead of stopping mid-air.
+            if (!roomPlaced && corridorPlaced)
+                TryPlaceOnePiece(CorridorType.End, roomDoor);
         }
 
         TryCloseLoops();
         SealOpenDoors();
         GetComponent<DungeonNavMeshBuilder>().Build(placedPieces, sealingWalls);
+        DecorateRooms();
     }
 
     // -------------------------------------------------------------------------
@@ -102,10 +112,11 @@ public class DungeonGenerator : MonoBehaviour
 
     // Tries to attach a room to targetDoor.
     // Iterates prefabs in random order and accepts the first placement that fits.
-    private void AttachRoom(DoorSocket targetDoor, int depth)
+    // Returns true if a room was successfully placed, false otherwise.
+    private bool AttachRoom(DoorSocket targetDoor, int depth)
     {
         var candidates = GetRoomCandidates();
-        if (candidates.Count == 0) return;
+        if (candidates.Count == 0) return false;
 
         foreach (int i in DungeonPlacer.RandomOrder(candidates.Count))
         {
@@ -115,14 +126,16 @@ public class DungeonGenerator : MonoBehaviour
             DoorSocket fittingDoor = FindFittingDoor(newRoom, targetDoor);
             if (fittingDoor != null)
             {
-                targetDoor.IsConnected  = true;
+                targetDoor.IsConnected = true;
                 fittingDoor.IsConnected = true;
                 RegisterPlacedRoom(newRoom, assignedType, depth);
-                return;
+                return true;
             }
 
             Destroy(newRoom.gameObject);
         }
+
+        return false;
     }
 
     // Records a successfully placed room: updates type, piece list, room counts,
@@ -354,6 +367,32 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         return false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Room decoration
+    // -------------------------------------------------------------------------
+
+    private void DecorateRooms()
+    {
+        foreach (DungeonPiece piece in placedPieces)
+        {
+            if (piece is not Room room) continue;
+
+            RoomDecorationRules decorRules = GetDecorationRulesFor(room.Type);
+            if (decorRules == null) continue;
+
+            Transform decorParent = new GameObject("Decorations").transform;
+            decorParent.SetParent(room.transform);
+            RoomDecorator.DecorateRoom(room, decorRules, decorParent);
+        }
+    }
+
+    private RoomDecorationRules GetDecorationRulesFor(RoomType type)
+    {
+        foreach (RoomRule rule in rules.RoomRules)
+            if (rule.Type == type) return rule.DecorationRules;
+        return null;
     }
 
     // -------------------------------------------------------------------------

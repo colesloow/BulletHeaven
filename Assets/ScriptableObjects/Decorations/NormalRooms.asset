@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cbe6792ff9bf934cbe0bb45479a0fd3, type: 3}
+  m_Name: NormalRooms
+  m_EditorClassIdentifier: Assembly-CSharp::RoomDecorationRules
+  Entries:
+  - Prefab: {fileID: 8561167147062786980, guid: 743b0f79d548d3b4c9077bf30f4e4a76, type: 3}
+    Placement: 0
+    MinDensity: 0.002
+    MaxDensity: 0.004
+    ObjectRadius: 0.3
+    SpacingRadius: 4
+    DoorExclusionRadius: 4
+    MinWallDistance: 5
+    RandomYRotation: 1
+  - Prefab: {fileID: 5406353907546572494, guid: d0db2616b65f79a40aa77eb16bfbc999, type: 3}
+    Placement: 0
+    MinDensity: 0.005
+    MaxDensity: 0.01
+    ObjectRadius: 0
+    SpacingRadius: 1
+    DoorExclusionRadius: 0
+    MinWallDistance: 2
+    RandomYRotation: 1
+  - Prefab: {fileID: 9147742783575291693, guid: 7e16f436c5e37a948a30deb3c9d00562, type: 3}
+    Placement: 0
+    MinDensity: 0.01
+    MaxDensity: 0.02
+    ObjectRadius: 0.2
+    SpacingRadius: 0
+    DoorExclusionRadius: 0
+    MinWallDistance: 0
+    RandomYRotation: 1
+  MaxAttemptsPerEntry: 30

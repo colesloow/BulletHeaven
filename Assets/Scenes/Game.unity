@@ -301,8 +301,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a5b190dd4e78f748977332261e989c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PoolManager
-  _defaultInitialSize: 10
-  _defaultMaxSize: 100
+  defaultInitialSize: 10
+  defaultMaxSize: 50
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0

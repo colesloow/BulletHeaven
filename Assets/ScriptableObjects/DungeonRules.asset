@@ -24,6 +24,7 @@ MonoBehaviour:
     - {fileID: 5915138271125960190, guid: 0fde6c6e73ba6f345a82ef1f9d60378e, type: 3}
     Weight: 0.7
     MaxCount: 0
+    DecorationRules: {fileID: 11400000, guid: 72319eb0132b8e544a7fc4134f3b2ba4, type: 2}
   - Type: 1
     Prefabs:
     - {fileID: 97393004552021929, guid: 474f9dea23426814daeefebeb8fd8817, type: 3}
@@ -31,6 +32,7 @@ MonoBehaviour:
     - {fileID: 4232227226640502030, guid: 3bb7aca42b78b3d40a78440fc375c3e2, type: 3}
     Weight: 0.3
     MaxCount: 2
+    DecorationRules: {fileID: 0}
   - Type: 2
     Prefabs:
     - {fileID: 5093581059593610874, guid: feb4177181e90084fa1ac35f410b2cd9, type: 3}
@@ -38,6 +40,7 @@ MonoBehaviour:
     - {fileID: 5915138271125960190, guid: 0fde6c6e73ba6f345a82ef1f9d60378e, type: 3}
     Weight: 0.2
     MaxCount: 2
+    DecorationRules: {fileID: 0}
   - Type: 3
     Prefabs:
     - {fileID: 9112470848611711378, guid: 4aad4956e00115b4287b6ca840f9dafa, type: 3}
@@ -45,12 +48,14 @@ MonoBehaviour:
     - {fileID: 4232227226640502030, guid: 3bb7aca42b78b3d40a78440fc375c3e2, type: 3}
     Weight: 0.2
     MaxCount: 2
+    DecorationRules: {fileID: 0}
   - Type: 4
     Prefabs:
     - {fileID: 3148299075758353193, guid: 05369d5315f2bcf42879fc414683633e, type: 3}
     - {fileID: 5093581059593610874, guid: feb4177181e90084fa1ac35f410b2cd9, type: 3}
     Weight: 0.1
     MaxCount: 1
+    DecorationRules: {fileID: 0}
   CorridorPrefabs:
   - Type: 0
     Prefabs:
@@ -83,6 +88,10 @@ MonoBehaviour:
   - Pattern: 000000000100000000000000
     Weight: 2
   - Pattern: 0000000002000000
+    Weight: 1
+  - Pattern: 000000000300000000000000
+    Weight: 1
+  - Pattern: 000000000000000001000000
     Weight: 1
   RoomCount: 40
   OverlapTolerance: 0.2
