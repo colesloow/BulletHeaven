@@ -16,6 +16,9 @@ public class Room : DungeonPiece
     // Navmesh mesh asset for this room. Assign the navmesh submesh from the room FBX in each prefab.
     public Mesh NavFloorMesh;
 
+    // Decoration profile for this room shape. Contains layout presets per RoomType.
+    public RoomDecorationProfile DecorationProfile;
+
     // Returns a flat box at floor level (Y=0) covering the XZ footprint of this room.
     // Used to build NavMesh sources without relying on mesh colliders.
     public Bounds GetFloorBounds()

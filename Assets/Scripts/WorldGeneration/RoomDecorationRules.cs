@@ -27,33 +27,11 @@ public struct DecorationEntry
     [Min(0f)] public float DoorExclusionRadius;
 
     // Distance from any wall surface, measured via NavMesh.FindClosestEdge.
-    // Useful to keep floor objects near or away from walls without AlignToWall.
     [Min(0f)] public float MinWallDistance;
     [Min(0f)] public float MaxWallDistance;
 
     // If false, the object keeps its prefab rotation.
     public bool RandomYRotation;
-}
-
-// ── Wall socket entry ─────────────────────────────────────────────────────────
-// Placed at pre-defined WallSocket positions inside room prefabs.
-// Rotation and position come from the socket Transform — no random rejection loop.
-[System.Serializable]
-public struct WallDecorationEntry
-{
-    // All variants of this entry. One is chosen at random per socket used.
-    public GameObject[] Variants;
-
-    // Maximum number of sockets this entry may occupy in a room.
-    // 0 = no cap (uses all remaining available sockets).
-    [Min(0)] public int MaxCount;
-
-    // Skip this entry entirely if the room floor area (m²) is below this threshold.
-    [Min(0f)] public float MinRoomArea;
-
-    // Random yaw offset (degrees) applied on top of the socket's rotation.
-    // Adds slight angle variation while keeping the set roughly wall-aligned.
-    [Range(0f, 45f)] public float YawVariance;
 }
 
 // ── ScriptableObject ──────────────────────────────────────────────────────────
@@ -65,13 +43,10 @@ public class RoomDecorationRules : ScriptableObject
     [FormerlySerializedAs("Entries")]
     public DecorationEntry[] FloorEntries;
 
-    // Wall-aligned furniture placed at WallSocket positions defined in each room prefab.
-    public WallDecorationEntry[] WallEntries;
-
     // How many random positions to attempt before giving up on one floor instance.
     [Min(1)] public int MaxAttemptsPerEntry = 30;
 
     // Hard cap on total floor objects placed in a single room across all FloorEntries.
-    // 0 = no cap. Does not apply to WallEntries (sockets are designer-controlled).
+    // 0 = no cap.
     [Min(0)] public int MaxTotalObjects;
 }

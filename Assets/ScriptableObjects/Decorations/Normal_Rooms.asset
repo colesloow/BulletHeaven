@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7cbe6792ff9bf934cbe0bb45479a0fd3, type: 3}
-  m_Name: NormalRooms
+  m_Name: Normal_Rooms
   m_EditorClassIdentifier: Assembly-CSharp::RoomDecorationRules
   FloorEntries:
   - Variants:
@@ -36,14 +36,6 @@ MonoBehaviour:
     MinWallDistance: 2
     MaxWallDistance: 0
     RandomYRotation: 1
-  WallEntries:
-  - Variants:
-    - {fileID: 837410547962053967, guid: 6e630f48fe0a6234e9defb02c24b6f19, type: 3}
-    - {fileID: 1651916644228764315, guid: 80b1b3e56b3898a4687bd03839c51dc2, type: 3}
-    - {fileID: 595498460452242386, guid: e4165bcef479b374cbb2a087c0060f6f, type: 3}
-    - {fileID: 8072077776684646468, guid: 55b120cd82e63b94692e27ef16afc20e, type: 3}
-    MaxCount: 3
-    MinRoomArea: 0
-    YawVariance: 0
+  WallEntries: []
   MaxAttemptsPerEntry: 30
   MaxTotalObjects: 20

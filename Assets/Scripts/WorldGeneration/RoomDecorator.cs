@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
-// Static utility class that decorates a room with floor scatter and wall-socket sets.
+// Static utility class that scatters decoration objects on the navigable floor of a room.
 // Mirrors the pattern of DungeonPlacer: pure logic, no MonoBehaviour dependency.
 public static class RoomDecorator
 {
@@ -14,7 +14,6 @@ public static class RoomDecorator
         if (rules == null) return;
 
         ScatterFloor(room, rules, parent);
-        PlaceWallSets(room, rules, parent);
     }
 
     // ── Floor scatter ─────────────────────────────────────────────────────────
@@ -120,48 +119,6 @@ public static class RoomDecorator
         }
     }
 
-    // ── Wall socket placement ─────────────────────────────────────────────────
-
-    private static void PlaceWallSets(Room room, RoomDecorationRules rules, Transform parent)
-    {
-        if (rules.WallEntries == null || rules.WallEntries.Length == 0) return;
-
-        WallSocket[] sockets = room.GetComponentsInChildren<WallSocket>();
-        if (sockets.Length == 0) return;
-
-        float area = room.GetFloorBounds().size.x * room.GetFloorBounds().size.z;
-
-        // Shuffle so entries don't always claim the same sockets.
-        WallSocket[] shuffled = (WallSocket[])sockets.Clone();
-        Shuffle(shuffled);
-
-        int socketIndex = 0;
-
-        foreach (WallDecorationEntry entry in rules.WallEntries)
-        {
-            if (entry.Variants == null || entry.Variants.Length == 0) continue;
-            if (entry.MinRoomArea > 0f && area < entry.MinRoomArea) continue;
-            if (socketIndex >= shuffled.Length) break;
-
-            int available = shuffled.Length - socketIndex;
-            int count = entry.MaxCount > 0 ? Mathf.Min(entry.MaxCount, available) : available;
-
-            for (int i = 0; i < count; i++)
-            {
-                WallSocket socket = shuffled[socketIndex++];
-                GameObject prefab = entry.Variants[Random.Range(0, entry.Variants.Length)];
-
-                Quaternion rotation = socket.transform.rotation;
-                if (entry.YawVariance > 0f)
-                    rotation *= Quaternion.Euler(0f, Random.Range(-entry.YawVariance, entry.YawVariance), 0f);
-
-                Object.Instantiate(prefab, socket.transform.position, rotation, parent);
-
-                if (socketIndex >= shuffled.Length) break;
-            }
-        }
-    }
-
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private static bool IsFarEnoughFromDoors(Vector3 candidate, List<Vector3> doorPositions, float radius)
@@ -199,15 +156,6 @@ public static class RoomDecorator
             if (dx * dx + dz * dz < radiusSq) return false;
         }
         return true;
-    }
-
-    private static void Shuffle<T>(T[] array)
-    {
-        for (int i = array.Length - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-            (array[i], array[j]) = (array[j], array[i]);
-        }
     }
 
     // Returns the largest XZ footprint radius across all variants.

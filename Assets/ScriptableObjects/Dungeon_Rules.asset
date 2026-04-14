@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ad06cab05ec14243a4b34a3f20ef2c4, type: 3}
-  m_Name: DungeonRules
+  m_Name: Dungeon_Rules
   m_EditorClassIdentifier: Assembly-CSharp::DungeonRules
   RoomRules:
   - Type: 0

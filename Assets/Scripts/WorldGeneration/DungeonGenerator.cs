@@ -379,12 +379,21 @@ public class DungeonGenerator : MonoBehaviour
         {
             if (piece is not Room room) continue;
 
-            RoomDecorationRules decorRules = GetDecorationRulesFor(room.Type);
-            if (decorRules == null) continue;
-
             Transform decorParent = new GameObject("Decorations").transform;
             decorParent.SetParent(room.transform);
-            RoomDecorator.DecorateRoom(room, decorRules, decorParent);
+
+            // Pick a layout preset matching this room's assigned type.
+            if (room.DecorationProfile != null)
+            {
+                GameObject preset = room.DecorationProfile.GetRandomPreset(room.Type);
+                if (preset != null)
+                    Instantiate(preset, room.transform.position, room.transform.rotation, decorParent);
+            }
+
+            // Rules-based scatter and wall sets run on top of (or instead of) the preset.
+            RoomDecorationRules decorRules = GetDecorationRulesFor(room.Type);
+            if (decorRules != null)
+                RoomDecorator.DecorateRoom(room, decorRules, decorParent);
         }
     }
 

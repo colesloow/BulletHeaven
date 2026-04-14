@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
   IsConnected: 0
+  Width: 0
 --- !u!1 &776468992553550823
 GameObject:
   m_ObjectHideFlags: 0
@@ -180,6 +181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
   IsConnected: 0
+  Width: 0
 --- !u!1 &1183752274840951404
 GameObject:
   m_ObjectHideFlags: 0
@@ -323,6 +325,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Room
   Doors: []
   NavFloorMesh: {fileID: 8038335055268853771, guid: fb6374e9ecaa98f4aadb30b54d67bc0a, type: 3}
+  DecorationPresets:
+  - {fileID: 894908772923670974, guid: 49e0431a3c8c2d345a47b906d4f8ac72, type: 3}
 --- !u!64 &-6357124013290264684
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -390,6 +394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
   IsConnected: 0
+  Width: 0
 --- !u!1 &6740685959783143547
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,3 +440,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSocket
   IsConnected: 0
+  Width: 0

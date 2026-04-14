@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c056d40a356ce9d4798fea1bb67be358, type: 3}
+  m_Name: Profile_Room_Large_2
+  m_EditorClassIdentifier: Assembly-CSharp::RoomDecorationProfile
+  Entries:
+  - Type: 0
+    Presets:
+    - {fileID: 2934796070429771706, guid: 1d32297214e0f4c4cb1bf9b8036609c0, type: 3}
