@@ -27,10 +27,7 @@ public static class RoomDecorator
         {
             if (entry.Prefab == null) continue;
 
-            // Use inspector value if set, otherwise measure the prefab automatically.
-            float objectRadius = entry.ObjectRadius > 0f
-                ? entry.ObjectRadius
-                : GetPrefabRadius(entry.Prefab);
+            float objectRadius = GetPrefabRadius(entry.Prefab);
 
             float density = Random.Range(entry.MinDensity, entry.MaxDensity);
             int count = Mathf.RoundToInt(density * area);
@@ -39,12 +36,7 @@ public static class RoomDecorator
             var entryPlaced = new List<Vector3>();
 
             for (int i = 0; i < count; i++)
-            {
-                if (entry.Placement == PlacementType.Floor)
-                    TryPlaceOnFloor(entry, objectRadius, floorBounds, doorPositions, allPlaced, entryPlaced, parent, rules.MaxAttemptsPerEntry);
-                else
-                    TryPlaceOnWall(entry, objectRadius, floorBounds, doorPositions, allPlaced, entryPlaced, parent, rules.MaxAttemptsPerEntry);
-            }
+                TryPlaceOnFloor(entry, objectRadius, floorBounds, doorPositions, allPlaced, entryPlaced, parent, rules.MaxAttemptsPerEntry);
         }
     }
 
@@ -58,8 +50,6 @@ public static class RoomDecorator
         Transform parent,
         int maxAttempts)
     {
-        int rejectNavMesh = 0, rejectDoor = 0, rejectOverlap = 0, rejectSpacing = 0, rejectWall = 0;
-
         for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
             float x = Random.Range(floorBounds.min.x, floorBounds.max.x);
@@ -68,78 +58,34 @@ public static class RoomDecorator
 
             // Reject points outside the actual floor shape (handles non-convex rooms).
             if (!NavMesh.SamplePosition(candidate, out NavMeshHit navHit, 0.3f, NavMesh.AllAreas))
-            { rejectNavMesh++; continue; }
+                continue;
 
             candidate = new Vector3(navHit.position.x, 0f, navHit.position.z);
 
             if (!IsFarEnoughFromDoors(candidate, doorPositions, entry.DoorExclusionRadius))
-            { rejectDoor++; continue; }
+                continue;
 
             if (!IsFarEnoughFromAllObjects(candidate, objectRadius, allPlaced))
-            { rejectOverlap++; continue; }
+                continue;
 
             if (!IsFarEnoughFromSameEntry(candidate, entryPlaced, entry.SpacingRadius))
-            { rejectSpacing++; continue; }
+                continue;
 
             // FindClosestEdge returns the distance to the nearest NavMesh boundary (= wall surface).
             // This works correctly regardless of room shape or MeshCollider normal direction,
             // because it queries the NavMesh geometry rather than physics colliders.
-            if (entry.MinWallDistance > 0f &&
-                (!NavMesh.FindClosestEdge(candidate, out NavMeshHit edgeHit, NavMesh.AllAreas) || edgeHit.distance < entry.MinWallDistance))
-            { rejectWall++; continue; }
+            if (entry.MinWallDistance > 0f || entry.MaxWallDistance > 0f)
+            {
+                if (!NavMesh.FindClosestEdge(candidate, out NavMeshHit edgeHit, NavMesh.AllAreas))
+                    continue;
+                if (entry.MinWallDistance > 0f && edgeHit.distance < entry.MinWallDistance)
+                    continue;
+                if (entry.MaxWallDistance > 0f && edgeHit.distance > entry.MaxWallDistance)
+                    continue;
+            }
 
             float yRot = entry.RandomYRotation ? Random.Range(0f, 360f) : 0f;
             UnityEngine.Object.Instantiate(entry.Prefab, candidate, Quaternion.Euler(0f, yRot, 0f), parent);
-            allPlaced.Add((candidate, objectRadius));
-            entryPlaced.Add(candidate);
-            Debug.Log($"[RoomDecorator] Placed {entry.Prefab.name} at {candidate} after {attempt + 1} attempt(s). Rejects: navmesh={rejectNavMesh} door={rejectDoor} overlap={rejectOverlap} spacing={rejectSpacing} wall={rejectWall}");
-            return;
-        }
-
-        Debug.LogWarning($"[RoomDecorator] Failed to place {entry.Prefab.name} after {maxAttempts} attempts. Rejects: navmesh={rejectNavMesh} door={rejectDoor} overlap={rejectOverlap} spacing={rejectSpacing} wall={rejectWall}");
-    }
-
-    private static void TryPlaceOnWall(
-        DecorationEntry entry,
-        float objectRadius,
-        Bounds floorBounds,
-        List<Vector3> doorPositions,
-        List<(Vector3 position, float radius)> allPlaced,
-        List<Vector3> entryPlaced,
-        Transform parent,
-        int maxAttempts)
-    {
-        for (int attempt = 0; attempt < maxAttempts; attempt++)
-        {
-            // Cast from a random interior point at half-height outward in a random horizontal direction.
-            float x = Random.Range(floorBounds.min.x, floorBounds.max.x);
-            float z = Random.Range(floorBounds.min.z, floorBounds.max.z);
-            var origin = new Vector3(x, 0.5f, z);
-
-            // Only cast from points that are actually inside the room's NavMesh.
-            if (!NavMesh.SamplePosition(origin, out _, 0.3f, NavMesh.AllAreas))
-                continue;
-
-            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-            var direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
-
-            if (!Physics.Raycast(origin, direction, out RaycastHit hit, 20f))
-                continue;
-
-            var candidate = new Vector3(hit.point.x, 0f, hit.point.z);
-
-            if (!IsFarEnoughFromDoors(candidate, doorPositions, entry.DoorExclusionRadius))
-                continue;
-
-            if (!IsFarEnoughFromAllObjects(candidate, objectRadius, allPlaced))
-                continue;
-
-            if (!IsFarEnoughFromSameEntry(candidate, entryPlaced, entry.SpacingRadius))
-                continue;
-
-            // Face away from the wall (toward room interior).
-            Quaternion rotation = Quaternion.LookRotation(-hit.normal, Vector3.up);
-            UnityEngine.Object.Instantiate(entry.Prefab, candidate, rotation, parent);
             allPlaced.Add((candidate, objectRadius));
             entryPlaced.Add(candidate);
             return;

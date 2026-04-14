@@ -1,20 +1,13 @@
 using UnityEngine;
 
-public enum PlacementType { Floor, Wall }
-
 [System.Serializable]
 public struct DecorationEntry
 {
     public GameObject Prefab;
-    public PlacementType Placement;
 
     // Objects per square metre. Count = Random(Min, Max) * room floor area.
     [Min(0f)] public float MinDensity;
     [Min(0f)] public float MaxDensity;
-
-    // Physical footprint radius used to prevent overlaps with all other placed objects.
-    // Leave at 0 to auto-compute from the prefab's renderer bounds.
-    [Min(0f)] public float ObjectRadius;
 
     // Extra minimum distance between two instances of this same entry.
     // Useful to spread out objects of the same type (e.g. keep columns far apart).
@@ -23,9 +16,11 @@ public struct DecorationEntry
     // Objects will not be placed within this distance from any door socket.
     [Min(0f)] public float DoorExclusionRadius;
 
-    // Minimum distance from any wall surface, measured via NavMesh.FindClosestEdge.
+    // Min/max distance from any wall surface, measured via NavMesh.FindClosestEdge.
     // Works correctly on any room shape; not affected by MeshCollider normal direction.
+    // MaxWallDistance > 0 prevents objects from clustering in the room center.
     [Min(0f)] public float MinWallDistance;
+    [Min(0f)] public float MaxWallDistance;
 
     // If false, the object keeps its prefab rotation (useful for aligned furniture, crates, etc.).
     public bool RandomYRotation;
