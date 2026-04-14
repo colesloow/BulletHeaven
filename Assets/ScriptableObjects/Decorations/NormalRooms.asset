@@ -12,29 +12,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cbe6792ff9bf934cbe0bb45479a0fd3, type: 3}
   m_Name: NormalRooms
   m_EditorClassIdentifier: Assembly-CSharp::RoomDecorationRules
-  Entries:
-  - Prefab: {fileID: 8561167147062786980, guid: 743b0f79d548d3b4c9077bf30f4e4a76, type: 3}
+  FloorEntries:
+  - Variants:
+    - {fileID: 8561167147062786980, guid: 743b0f79d548d3b4c9077bf30f4e4a76, type: 3}
     MinDensity: 0.002
     MaxDensity: 0.004
+    MaxCount: 2
+    MinRoomArea: 0
     SpacingRadius: 4
     DoorExclusionRadius: 4
     MinWallDistance: 5
     MaxWallDistance: 0
     RandomYRotation: 1
-  - Prefab: {fileID: 4104946636678401695, guid: e96be6ad824153b48925a3bbda8d2bd0, type: 3}
+  - Variants:
+    - {fileID: 1509122704816956777, guid: 5d78cc41cbbd2324caa1e9dafd02b21c, type: 3}
+    - {fileID: 4104946636678401695, guid: e96be6ad824153b48925a3bbda8d2bd0, type: 3}
     MinDensity: 0.005
     MaxDensity: 0.01
+    MaxCount: 3
+    MinRoomArea: 0
     SpacingRadius: 1
     DoorExclusionRadius: 0
     MinWallDistance: 2
     MaxWallDistance: 0
     RandomYRotation: 1
-  - Prefab: {fileID: 5413758656826165693, guid: 1932f6a12921a93409ebb2a02bee368f, type: 3}
-    MinDensity: 0.001
-    MaxDensity: 0.005
-    SpacingRadius: 1
-    DoorExclusionRadius: 2
-    MinWallDistance: 0.5
-    MaxWallDistance: 1.5
-    RandomYRotation: 1
+  WallEntries:
+  - Variants:
+    - {fileID: 837410547962053967, guid: 6e630f48fe0a6234e9defb02c24b6f19, type: 3}
+    - {fileID: 1651916644228764315, guid: 80b1b3e56b3898a4687bd03839c51dc2, type: 3}
+    - {fileID: 595498460452242386, guid: e4165bcef479b374cbb2a087c0060f6f, type: 3}
+    - {fileID: 8072077776684646468, guid: 55b120cd82e63b94692e27ef16afc20e, type: 3}
+    MaxCount: 3
+    MinRoomArea: 0
+    YawVariance: 0
   MaxAttemptsPerEntry: 30
+  MaxTotalObjects: 20

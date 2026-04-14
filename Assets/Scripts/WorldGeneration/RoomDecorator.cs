@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
-// Static utility class that scatters decoration objects inside a room.
+// Static utility class that decorates a room with floor scatter and wall-socket sets.
 // Mirrors the pattern of DungeonPlacer: pure logic, no MonoBehaviour dependency.
 public static class RoomDecorator
 {
@@ -11,7 +11,17 @@ public static class RoomDecorator
 
     public static void DecorateRoom(Room room, RoomDecorationRules rules, Transform parent)
     {
-        if (rules == null || rules.Entries == null) return;
+        if (rules == null) return;
+
+        ScatterFloor(room, rules, parent);
+        PlaceWallSets(room, rules, parent);
+    }
+
+    // ── Floor scatter ─────────────────────────────────────────────────────────
+
+    private static void ScatterFloor(Room room, RoomDecorationRules rules, Transform parent)
+    {
+        if (rules.FloorEntries == null) return;
 
         Bounds floorBounds = room.GetFloorBounds();
         float area = floorBounds.size.x * floorBounds.size.z;
@@ -23,20 +33,30 @@ public static class RoomDecorator
         // Shared across all entries: (position, radius) for cross-entry overlap checks.
         var allPlaced = new List<(Vector3 position, float radius)>();
 
-        foreach (DecorationEntry entry in rules.Entries)
+        foreach (DecorationEntry entry in rules.FloorEntries)
         {
-            if (entry.Prefab == null) continue;
+            if (entry.Variants == null || entry.Variants.Length == 0) continue;
+            if (entry.MinRoomArea > 0f && area < entry.MinRoomArea) continue;
 
-            float objectRadius = GetPrefabRadius(entry.Prefab);
+            // Radius is the largest footprint across all variants (conservative overlap check).
+            float objectRadius = GetVariantsRadius(entry.Variants);
 
             float density = Random.Range(entry.MinDensity, entry.MaxDensity);
             int count = Mathf.RoundToInt(density * area);
+
+            if (entry.MaxCount > 0)
+                count = Mathf.Min(count, entry.MaxCount);
 
             // Per-entry list for same-type spacing checks.
             var entryPlaced = new List<Vector3>();
 
             for (int i = 0; i < count; i++)
+            {
+                if (rules.MaxTotalObjects > 0 && allPlaced.Count >= rules.MaxTotalObjects)
+                    return;
+
                 TryPlaceOnFloor(entry, objectRadius, floorBounds, doorPositions, allPlaced, entryPlaced, parent, rules.MaxAttemptsPerEntry);
+            }
         }
     }
 
@@ -62,6 +82,12 @@ public static class RoomDecorator
 
             candidate = new Vector3(navHit.position.x, 0f, navHit.position.z);
 
+            // Reject if NavMesh snapping pushed the candidate outside the room floor bounds.
+            // This catches cases where SamplePosition snaps to a nearby corridor NavMesh.
+            if (candidate.x < floorBounds.min.x || candidate.x > floorBounds.max.x ||
+                candidate.z < floorBounds.min.z || candidate.z > floorBounds.max.z)
+                continue;
+
             if (!IsFarEnoughFromDoors(candidate, doorPositions, entry.DoorExclusionRadius))
                 continue;
 
@@ -71,10 +97,8 @@ public static class RoomDecorator
             if (!IsFarEnoughFromSameEntry(candidate, entryPlaced, entry.SpacingRadius))
                 continue;
 
-            // FindClosestEdge returns the distance to the nearest NavMesh boundary (= wall surface).
-            // This works correctly regardless of room shape or MeshCollider normal direction,
-            // because it queries the NavMesh geometry rather than physics colliders.
-            if (entry.MinWallDistance > 0f || entry.MaxWallDistance > 0f)
+            bool needsEdge = entry.MinWallDistance > 0f || entry.MaxWallDistance > 0f;
+            if (needsEdge)
             {
                 if (!NavMesh.FindClosestEdge(candidate, out NavMeshHit edgeHit, NavMesh.AllAreas))
                     continue;
@@ -84,13 +108,61 @@ public static class RoomDecorator
                     continue;
             }
 
-            float yRot = entry.RandomYRotation ? Random.Range(0f, 360f) : 0f;
-            UnityEngine.Object.Instantiate(entry.Prefab, candidate, Quaternion.Euler(0f, yRot, 0f), parent);
+            Quaternion rotation = entry.RandomYRotation
+                ? Quaternion.Euler(0f, Random.Range(0f, 360f), 0f)
+                : Quaternion.identity;
+
+            GameObject prefab = entry.Variants[Random.Range(0, entry.Variants.Length)];
+            UnityEngine.Object.Instantiate(prefab, candidate, rotation, parent);
             allPlaced.Add((candidate, objectRadius));
             entryPlaced.Add(candidate);
             return;
         }
     }
+
+    // ── Wall socket placement ─────────────────────────────────────────────────
+
+    private static void PlaceWallSets(Room room, RoomDecorationRules rules, Transform parent)
+    {
+        if (rules.WallEntries == null || rules.WallEntries.Length == 0) return;
+
+        WallSocket[] sockets = room.GetComponentsInChildren<WallSocket>();
+        if (sockets.Length == 0) return;
+
+        float area = room.GetFloorBounds().size.x * room.GetFloorBounds().size.z;
+
+        // Shuffle so entries don't always claim the same sockets.
+        WallSocket[] shuffled = (WallSocket[])sockets.Clone();
+        Shuffle(shuffled);
+
+        int socketIndex = 0;
+
+        foreach (WallDecorationEntry entry in rules.WallEntries)
+        {
+            if (entry.Variants == null || entry.Variants.Length == 0) continue;
+            if (entry.MinRoomArea > 0f && area < entry.MinRoomArea) continue;
+            if (socketIndex >= shuffled.Length) break;
+
+            int available = shuffled.Length - socketIndex;
+            int count = entry.MaxCount > 0 ? Mathf.Min(entry.MaxCount, available) : available;
+
+            for (int i = 0; i < count; i++)
+            {
+                WallSocket socket = shuffled[socketIndex++];
+                GameObject prefab = entry.Variants[Random.Range(0, entry.Variants.Length)];
+
+                Quaternion rotation = socket.transform.rotation;
+                if (entry.YawVariance > 0f)
+                    rotation *= Quaternion.Euler(0f, Random.Range(-entry.YawVariance, entry.YawVariance), 0f);
+
+                Object.Instantiate(prefab, socket.transform.position, rotation, parent);
+
+                if (socketIndex >= shuffled.Length) break;
+            }
+        }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private static bool IsFarEnoughFromDoors(Vector3 candidate, List<Vector3> doorPositions, float radius)
     {
@@ -107,7 +179,7 @@ public static class RoomDecorator
     // Checks against all placed objects using the sum of their radii.
     private static bool IsFarEnoughFromAllObjects(Vector3 candidate, float candidateRadius, List<(Vector3 position, float radius)> allPlaced)
     {
-        foreach ((Vector3 pos, float radius) in allPlaced)
+        foreach (var (pos, radius) in allPlaced)
         {
             float minDist = candidateRadius + radius;
             float dx = candidate.x - pos.x;
@@ -129,6 +201,28 @@ public static class RoomDecorator
         return true;
     }
 
+    private static void Shuffle<T>(T[] array)
+    {
+        for (int i = array.Length - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (array[i], array[j]) = (array[j], array[i]);
+        }
+    }
+
+    // Returns the largest XZ footprint radius across all variants.
+    // Used as a conservative overlap radius so no variant can clip into another object.
+    private static float GetVariantsRadius(GameObject[] variants)
+    {
+        float max = 0f;
+        foreach (GameObject variant in variants)
+        {
+            if (variant != null)
+                max = Mathf.Max(max, GetPrefabRadius(variant));
+        }
+        return max;
+    }
+
     // Instantiates the prefab once to measure its renderer bounds, then destroys it.
     // Result is cached so each prefab is measured only once per play session.
     private static float GetPrefabRadius(GameObject prefab)
@@ -136,7 +230,8 @@ public static class RoomDecorator
         if (radiusCache.TryGetValue(prefab, out float cached))
             return cached;
 
-        GameObject temp = UnityEngine.Object.Instantiate(prefab);
+        // Instantiate far below the scene so the temp object is never visible.
+        GameObject temp = UnityEngine.Object.Instantiate(prefab, new Vector3(0f, -9999f, 0f), Quaternion.identity);
         Renderer[] renderers = temp.GetComponentsInChildren<Renderer>();
 
         float radius = 0f;
