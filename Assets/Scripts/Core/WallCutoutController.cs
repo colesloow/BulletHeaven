@@ -12,7 +12,7 @@ using UnityEngine;
 public class WallCutoutController : MonoBehaviour
 {
     [SerializeField] private Transform _maskSphere;
-    [SerializeField] private float     _maskRadius   = 3f;
+    [SerializeField] private float _maskRadius   = 3f;
     [SerializeField] private LayerMask _occluderMask;
 
     private Camera _camera;
@@ -28,9 +28,9 @@ public class WallCutoutController : MonoBehaviour
     {
         if (_maskSphere == null || _camera == null) return;
 
-        Vector3 camPos   = _camera.transform.position;
+        Vector3 camPos = _camera.transform.position;
         Vector3 toPlayer = transform.position - camPos;
-        float   dist     = toPlayer.magnitude;
+        float dist = toPlayer.magnitude;
 
         bool blocked = Physics.Raycast(camPos, toPlayer.normalized, dist, _occluderMask);
         _maskSphere.localScale = Vector3.one * (blocked ? _maskRadius : 0f);
