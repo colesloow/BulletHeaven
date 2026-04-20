@@ -3,27 +3,7 @@ guid: 2f74373f96ab8664e80c69d6bc26cb83
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: ground_06_02_Mat
-    second: {fileID: 2100000, guid: 39b0403ab4c3925429b87e394cf8a8f1, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: ground_06_03_Mat
-    second: {fileID: 2100000, guid: 720d14d808ac0f541b309cfbc3e76d03, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: ground_06_04_Mat
-    second: {fileID: 2100000, guid: 79c73d50363853e43bc41766183b5e36, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: rack
-    second: {fileID: 2100000, guid: 680bbf6c37fc59a4eb525152a0b1bff1, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
