@@ -7,55 +7,75 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [Header("Health & Score")]
-    [SerializeField] private int _totalScore;
-    [SerializeField] private float _playerHealth;
+    [SerializeField] private int totalScore;
+    [SerializeField] private float playerHealth;
 
     [Header("Levels & XP")]
-    [SerializeField] private float _playerXP;
-    [SerializeField] private int _level = 1;
-    [SerializeField] private float _xpThreshold = 100f;
+    [SerializeField] private float playerXP;
+    [SerializeField] private int level = 1;
+    [SerializeField] private float xpThreshold = 100f;
+
+    [Header("Timer")]
+    [SerializeField] private float gameDuration = 1800f;
+    private float timeRemaining;
+    private bool timerRunning;
+    private int secondsRemaining;
+
+    public int SecondsRemaining
+    {
+        get => secondsRemaining;
+        private set
+        {
+            if (value == secondsRemaining) return;
+            secondsRemaining = value;
+            OnTimerChanged?.Invoke(secondsRemaining);
+        }
+    }
 
     public event Action<int> OnScoreChanged;
     public event Action<float> OnHealthChanged;
     public event Action<float> OnXPChanged;
     public event Action<int> OnLevelUp;
+    public event Action<int> OnTimerChanged;
 
     public int TotalScore
     {
-        get => _totalScore;
+        get => totalScore;
         set
         {
-            _totalScore = value;
-            OnScoreChanged?.Invoke(_totalScore);
+            totalScore = value;
+            OnScoreChanged?.Invoke(totalScore);
         }
     }
 
     public float PlayerHealth
     {
-        get => _playerHealth;
+        get => playerHealth;
         set
         {
-            _playerHealth = Mathf.Clamp(value, 0, 100);
-            OnHealthChanged?.Invoke(_playerHealth);
+            playerHealth = Mathf.Clamp(value, 0, 100);
+            OnHealthChanged?.Invoke(playerHealth);
         }
     }
 
     public float PlayerXP
     {
-        get => _playerXP;
+        get => playerXP;
         set
         {
-            _playerXP = Mathf.Clamp(value, 0, _xpThreshold);
+            playerXP = Mathf.Clamp(value, 0, xpThreshold);
 
-            if (_playerXP >= _xpThreshold)
+            if (playerXP >= xpThreshold)
             {
-                _playerXP = 0;
+                playerXP = 0;
                 LevelUp();
             }
 
-            OnXPChanged?.Invoke(_playerXP);
+            OnXPChanged?.Invoke(playerXP);
         }
     }
+
+    public float TimeRemaining => timeRemaining;
 
     private void Awake()
     {
@@ -69,8 +89,36 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void Start()
+    {
+        StartTimer();
+    }
+
+    private void Update()
+    {
+        if (!timerRunning) return;
+
+        timeRemaining -= Time.deltaTime;
+        SecondsRemaining = Mathf.CeilToInt(timeRemaining);
+
+        if (timeRemaining <= 0f)
+        {
+            timeRemaining = 0f;
+            timerRunning = false;
+            TriggerGameOver();
+        }
+    }
+
+    private void StartTimer()
+    {
+        timeRemaining = gameDuration;
+        timerRunning = true;
+        secondsRemaining = -1;
+    }
+
     public void TriggerGameOver()
     {
+        timerRunning = false;
         Time.timeScale = 0;
         UIManager.Instance.ShowGameOver();
     }
@@ -80,15 +128,16 @@ public class GameManager : MonoBehaviour
         TotalScore = 0;
         PlayerHealth = 100f;
         PlayerXP = 0f;
-        _level = 1;
+        level = 1;
+        StartTimer();
 
         UIManager.Instance.ResetUI();
     }
 
     private void LevelUp()
     {
-        _level++;
-        OnLevelUp?.Invoke(_level);
+        level++;
+        OnLevelUp?.Invoke(level);
         SoundManager.PlaySound(SoundType.LEVELUP);
     }
 }

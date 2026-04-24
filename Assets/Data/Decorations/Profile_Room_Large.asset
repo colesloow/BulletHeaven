@@ -17,6 +17,6 @@ MonoBehaviour:
     Presets:
     - {fileID: 2358051844131022563, guid: a2710a99903eb8d428c41808169b665d, type: 3}
     - {fileID: 4371248900312351286, guid: 753013e784394bd40bd22bed3d53c578, type: 3}
-  - Type: 1
+  - Type: 2
     Presets:
     - {fileID: 4371248900312351286, guid: 8287f73072c50234e96bb1fc347b9621, type: 3}
