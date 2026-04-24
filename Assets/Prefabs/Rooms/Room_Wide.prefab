@@ -303,6 +303,37 @@ Transform:
   - {fileID: 5786620736718475674}
   m_Father: {fileID: 8523045858995545206}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4142293401804876531
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8929221415397922023}
+  m_Layer: 8
+  m_Name: Layout_1_Wide
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8929221415397922023
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4142293401804876531}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8523045858995545206}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4818388620406448404
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,6 +418,7 @@ Transform:
   - {fileID: 1852070392308765348}
   - {fileID: 1661541068797149433}
   - {fileID: 5473032346121120591}
+  - {fileID: 8929221415397922023}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3699027790598916150
@@ -460,6 +492,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Room
   Doors: []
   NavFloorMesh: {fileID: 8776737338088349721, guid: 7e8347820b301994188421cadddce0ed, type: 3}
+  DecorationProfile: {fileID: 11400000, guid: 51365f176ab9a0545b16c8e2a06efb2f, type: 2}
 --- !u!64 &-3563930563053416828
 MeshCollider:
   m_ObjectHideFlags: 0

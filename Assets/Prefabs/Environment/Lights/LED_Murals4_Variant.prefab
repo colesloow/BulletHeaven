@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 110601639575412730}
   - component: {fileID: 3979387981002391774}
   - component: {fileID: 3578555862772417624}
-  - component: {fileID: 1995309994089672134}
   m_Layer: 0
   m_Name: light_ON
   m_TagString: Untagged
@@ -91,29 +90,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &1995309994089672134
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 323060197843119221}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &2886816119077997877
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,7 +313,6 @@ GameObject:
   - component: {fileID: 4571501673224767736}
   - component: {fileID: 1913793258639944}
   - component: {fileID: 106122089371181285}
-  - component: {fileID: 7610711653859457540}
   m_Layer: 0
   m_Name: glass
   m_TagString: Untagged
@@ -417,29 +392,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &7610711653859457540
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5438162364556031272}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &5782198520727902974
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,7 +403,6 @@ GameObject:
   - component: {fileID: 4403490640461691981}
   - component: {fileID: 545805334709955689}
   - component: {fileID: 4332129048876472368}
-  - component: {fileID: 5249656462364323563}
   m_Layer: 0
   m_Name: light_ON
   m_TagString: Untagged
@@ -531,29 +482,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &5249656462364323563
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5782198520727902974}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &5933545287553834275
 GameObject:
   m_ObjectHideFlags: 0
@@ -565,7 +493,6 @@ GameObject:
   - component: {fileID: 8008898336113050083}
   - component: {fileID: 2159396943871988044}
   - component: {fileID: 2160013982917103680}
-  - component: {fileID: 5886663728602025395}
   m_Layer: 0
   m_Name: glass
   m_TagString: Untagged
@@ -645,29 +572,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &5886663728602025395
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5933545287553834275}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &6203395609787183193
 GameObject:
   m_ObjectHideFlags: 0
@@ -828,7 +732,11 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -9.32
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3716551316421208495, guid: 1b39ca0e06fae4d48af3ae0365959d76, type: 3}
+    - {fileID: 4011786615482597942, guid: 1b39ca0e06fae4d48af3ae0365959d76, type: 3}
+    - {fileID: 6267073039610808951, guid: 1b39ca0e06fae4d48af3ae0365959d76, type: 3}
+    - {fileID: 6744737150946458045, guid: 1b39ca0e06fae4d48af3ae0365959d76, type: 3}
     m_RemovedGameObjects:
     - {fileID: 536539723382679615, guid: 1b39ca0e06fae4d48af3ae0365959d76, type: 3}
     - {fileID: 5717969284072761329, guid: 1b39ca0e06fae4d48af3ae0365959d76, type: 3}
