@@ -3,7 +3,17 @@ guid: 5ff5048de7f4b8049bad05a55363af50
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MATIN_Caja_1
+    second: {fileID: 2100000, guid: a4d17d222cbc5a2469ccd22e0b07df11, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MATIN_Caja_1.002
+    second: {fileID: 2100000, guid: a4d17d222cbc5a2469ccd22e0b07df11, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

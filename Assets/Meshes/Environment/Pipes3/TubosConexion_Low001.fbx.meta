@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: conexion_tubos
-    second: {fileID: 2100000, guid: 4bc27a451eed6e44fbfdfb1a8b4b6557, type: 2}
+    second: {fileID: 2100000, guid: d7ebcee476f31b247a9bbaec07ed4d25, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

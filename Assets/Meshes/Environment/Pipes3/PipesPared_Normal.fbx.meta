@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: tubos_largos
-    second: {fileID: 2100000, guid: 10881b0bdbe9314479212f6603f964ce, type: 2}
+    second: {fileID: 2100000, guid: d7ebcee476f31b247a9bbaec07ed4d25, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
