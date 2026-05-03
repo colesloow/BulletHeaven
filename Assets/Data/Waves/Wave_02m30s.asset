@@ -10,14 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1a68445341c04ec4998c472f3d7d7ce7, type: 3}
-  m_Name: Wave_07m00s
+  m_Name: Wave_02m30s
   m_EditorClassIdentifier: Assembly-CSharp::WaveConfig
-  TriggerTime: 420
-  Duration: 50
-  SpawnInterval: 0.5
-  MaxEnemies: 60
+  TriggerTime: 150
+  Duration: 30
+  SpawnInterval: 0.9
+  MaxEnemies: 30
   EnemyTypes:
   - Prefab: {fileID: 5961385405075670556, guid: 649c9fc4ee7766242939b6cd16e71ad8, type: 3}
     Weight: 1
-  - Prefab: {fileID: 5961385405075670556, guid: 649c9fc4ee7766242939b6cd16e71ad8, type: 3}
-    Weight: 3

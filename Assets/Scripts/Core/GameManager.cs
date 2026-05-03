@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float xpThreshold = 100f;
 
     [Header("Timer")]
-    [SerializeField] private float gameDuration = 1800f;
+    [SerializeField] private float gameDuration = 600f;
     private float timeRemaining;
     private bool timerRunning;
     private int secondsRemaining;

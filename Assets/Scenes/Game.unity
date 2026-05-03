@@ -2359,12 +2359,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0a0b514caa3928b46a51ca1eb687bfd4, type: 2}
   - {fileID: 11400000, guid: eff764b42a597c243bbeb11a6e0ee327, type: 2}
   - {fileID: 11400000, guid: f4982ff973ee5ee42b922e51c8f951b1, type: 2}
-  - {fileID: 11400000, guid: 7c27605012ccb6f4e87d0204a6072dc9, type: 2}
-  - {fileID: 11400000, guid: 14d8e952fc988f94ab52d3f1a5748a41, type: 2}
-  - {fileID: 11400000, guid: 5e9c0385533e5d843843d84aa4bca2cb, type: 2}
+  - {fileID: 11400000, guid: 830d79cd32eefba43bc514173f90a44a, type: 2}
+  - {fileID: 11400000, guid: ceee01571af407d4d99fae9fded479ba, type: 2}
   - {fileID: 11400000, guid: 4d3b98c437481204092e602c3b9e33d5, type: 2}
-  - {fileID: 11400000, guid: 748b028cd89e3b344b91b5091edf0f8b, type: 2}
-  - {fileID: 11400000, guid: 9d0d9a05323ebe341841d7579f4d3630, type: 2}
+  - {fileID: 11400000, guid: 6c2e0e0b28692904e8198b975a51b52a, type: 2}
+  - {fileID: 11400000, guid: b206da9c2bdbb8d4d8e727b7fe3252b4, type: 2}
+  - {fileID: 11400000, guid: 0ec622056e7611446ae0676733da914e, type: 2}
+  - {fileID: 11400000, guid: 05d01e0d63db3d74397dc4e165c937f6, type: 2}
   _enemyHealthScalingPerLevel: 0.15
   _enemyDamageScalingPerLevel: 0.1
 --- !u!1 &1154541803
@@ -2709,7 +2710,7 @@ MonoBehaviour:
   playerXP: 0
   level: 1
   xpThreshold: 100
-  gameDuration: 1800
+  gameDuration: 600
 --- !u!114 &1628975992
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Wave_01m30s
   m_EditorClassIdentifier: Assembly-CSharp::WaveConfig
   TriggerTime: 90
-  Duration: 30
+  Duration: 25
   SpawnInterval: 1
   MaxEnemies: 25
   EnemyTypes:

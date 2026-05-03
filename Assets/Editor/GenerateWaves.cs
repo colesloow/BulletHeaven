@@ -3,62 +3,56 @@ using UnityEngine;
 
 public static class GenerateWaves
 {
-    private const string OutputFolder = "Assets/ScriptableObjetcts/Waves";
-    private const string BasicEnemyPath = "Assets/Prefabs/Enemy.prefab";
+    private const string OutputFolder = "Assets/Data/Waves";
     private const string FlyingEnemyPath = "Assets/Prefabs/Enemy_FlyingRobot.prefab";
+    private const string SpiderEnemyPath = "Assets/Prefabs/Enemy_SpiderRobot.prefab";
 
     [MenuItem("BulletHeaven/Generate Waves")]
     public static void Generate()
     {
         if (!AssetDatabase.IsValidFolder(OutputFolder))
-            AssetDatabase.CreateFolder("Assets/ScriptableObjetcts", "Waves");
+            AssetDatabase.CreateFolder("Assets/Data", "Waves");
 
-        // Delete existing Wave_*.asset files before regenerating
         string[] existing = AssetDatabase.FindAssets("Wave_", new[] { OutputFolder });
         foreach (string guid in existing)
             AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(guid));
 
-        GameObject basicEnemy = AssetDatabase.LoadAssetAtPath<GameObject>(BasicEnemyPath);
         GameObject flyingEnemy = AssetDatabase.LoadAssetAtPath<GameObject>(FlyingEnemyPath);
+        GameObject spiderEnemy = AssetDatabase.LoadAssetAtPath<GameObject>(SpiderEnemyPath);
 
-        if (basicEnemy == null)
-            Debug.LogWarning($"Basic enemy prefab not found at {BasicEnemyPath}");
-        if (flyingEnemy == null)
-            Debug.LogWarning($"Flying enemy prefab not found at {FlyingEnemyPath}");
+        if (flyingEnemy == null) Debug.LogWarning($"Flying enemy prefab not found at {FlyingEnemyPath}");
+        if (spiderEnemy == null) Debug.LogWarning($"Spider enemy prefab not found at {SpiderEnemyPath}");
 
-        // Entry helpers
-        EnemySpawnEntry Basic(float w) => new() { Prefab = basicEnemy, Weight = w };
         EnemySpawnEntry Flying(float w) => new() { Prefab = flyingEnemy, Weight = w };
+        EnemySpawnEntry Spider(float w) => new() { Prefab = spiderEnemy, Weight = w };
 
         // (fileName, triggerTime, duration, spawnInterval, maxEnemies, enemyTypes[])
-        var definitions = new (string fileName, float triggerTime, float duration, float spawnInterval, int maxEnemies, EnemySpawnEntry[] enemies)[]
+        // Game duration: 10 minutes (600s). Spider introduced at 3m30 to ensure both types
+        // are present for most of the session. MaxEnemies=0 disables the per-wave cap.
+        var definitions = new (string name, float trigger, float duration, float interval, int max, EnemySpawnEntry[] enemies)[]
         {
-            // Early waves: only basic enemies
-            ("Wave_00m30s",  30f, 20f, 1.5f, 15, new[] { Basic(1f) }),
-            ("Wave_01m00s",  60f, 25f, 1.2f, 20, new[] { Basic(1f) }),
-            ("Wave_01m30s",  90f, 30f, 1.0f, 25, new[] { Basic(1f) }),
-
-            // Mid waves: mix basic + flying, flying increases over time
-            ("Wave_02m00s", 120f, 30f, 1.0f, 30, new[] { Basic(3f), Flying(1f) }),
-            ("Wave_03m00s", 180f, 35f, 0.8f, 35, new[] { Basic(2f), Flying(1f) }),
-            ("Wave_04m00s", 240f, 40f, 0.7f, 40, new[] { Basic(1f), Flying(1f) }),
-
-            // Late waves: flying enemies dominant
-            ("Wave_05m00s", 300f, 45f, 0.6f, 50, new[] { Basic(1f), Flying(2f) }),
-            ("Wave_07m00s", 420f, 50f, 0.5f, 60, new[] { Basic(1f), Flying(3f) }),
-            ("Wave_10m00s", 600f, 60f, 0.4f, 80, new[] { Basic(1f), Flying(4f) }),
+            ("Wave_00m30s",  30f, 20f, 1.5f, 15, new[] { Flying(1f) }),
+            ("Wave_01m00s",  60f, 25f, 1.2f, 20, new[] { Flying(1f) }),
+            ("Wave_01m30s",  90f, 25f, 1.0f, 25, new[] { Flying(1f) }),
+            ("Wave_02m30s", 150f, 30f, 0.9f, 30, new[] { Flying(1f) }),
+            ("Wave_03m30s", 210f, 30f, 0.7f, 35, new[] { Flying(2f), Spider(1f) }),
+            ("Wave_05m00s", 300f, 35f, 0.6f, 45, new[] { Flying(1f), Spider(1f) }),
+            ("Wave_06m30s", 390f, 35f, 0.5f, 55, new[] { Flying(1f), Spider(2f) }),
+            ("Wave_08m00s", 480f, 40f, 0.4f, 70, new[] { Flying(1f), Spider(3f) }),
+            ("Wave_09m00s", 540f, 40f, 0.35f, 80, new[] { Flying(1f), Spider(4f) }),
+            ("Wave_09m30s", 570f, 30f, 0.3f,   0, new[] { Flying(1f), Spider(5f) }),
         };
 
         int count = 0;
-        foreach (var (fileName, triggerTime, duration, spawnInterval, maxEnemies, enemies) in definitions)
+        foreach (var (name, trigger, duration, interval, max, enemies) in definitions)
         {
-            string assetPath = $"{OutputFolder}/{fileName}.asset";
+            string assetPath = $"{OutputFolder}/{name}.asset";
 
             WaveConfig asset = ScriptableObject.CreateInstance<WaveConfig>();
-            asset.TriggerTime = triggerTime;
+            asset.TriggerTime = trigger;
             asset.Duration = duration;
-            asset.SpawnInterval = spawnInterval;
-            asset.MaxEnemies = maxEnemies;
+            asset.SpawnInterval = interval;
+            asset.MaxEnemies = max;
             asset.EnemyTypes = enemies;
 
             AssetDatabase.CreateAsset(asset, assetPath);
