@@ -591,7 +591,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c229376a9f900964f913276f8bf2201a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  _speed: 2
+  _speed: 3
   _damage: 10
   _damageRange: 0.9
   _damageInterval: 1
@@ -650,7 +650,7 @@ MonoBehaviour:
   stepThresholdVariation: 0.05
   stepHeight: 0.7
   stepSpeed: 10
-  snapDistance: 1
+  snapDistance: 1.5
   raycastOriginHeight: 1
   raycastDistance: 3
   groundMask:
@@ -658,8 +658,10 @@ MonoBehaviour:
     m_Bits: 512
   bodyRoot: {fileID: 487885952010643693}
   bodyRestHeight: 0.5
-  bodySpring: 10
+  bodySpring: 50
   bodyDamping: 5
+  bodyTiltAmount: 50
+  bodyTiltSpeed: 8
 --- !u!1 &6130112138564573889
 GameObject:
   m_ObjectHideFlags: 0

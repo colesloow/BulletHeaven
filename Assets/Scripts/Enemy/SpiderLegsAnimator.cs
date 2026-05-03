@@ -29,7 +29,7 @@ public class SpiderLegsAnimator : MonoBehaviour
     [SerializeField] private float stepHeight = 0.2f;
     [Tooltip("How fast the foot travels to its new target (higher = snappier steps)")]
     [SerializeField] private float stepSpeed = 8f;
-    [Tooltip("If a foot drifts further than this (e.g. after a teleport), it snaps instantly without animation")]
+    [Tooltip("If a foot drifts further than this, it snaps instantly without animation")]
     [SerializeField] private float snapDistance = 1.5f;
 
     [Header("Raycast")]
@@ -46,9 +46,13 @@ public class SpiderLegsAnimator : MonoBehaviour
     [Tooltip("Target height of bodyRoot above the average foot Y")]
     [SerializeField] private float bodyRestHeight = 0.5f;
     [Tooltip("Spring stiffness for body height tracking")]
-    [SerializeField] private float bodySpring = 10f;
+    [SerializeField] private float bodySpring = 35f;
     [Tooltip("Spring damping to prevent oscillation")]
     [SerializeField] private float bodyDamping = 5f;
+    [Tooltip("Degrees of tilt per unit of height difference between foot pairs")]
+    [SerializeField] private float bodyTiltAmount = 25f;
+    [Tooltip("Speed at which body tilt tracks foot height differences")]
+    [SerializeField] private float bodyTiltSpeed = 8f;
 
     // Leg order: 0=FR, 1=FL, 2=BR, 3=BL
     // Adjacent pairs block each other so at most one leg per side steps at a time.
@@ -77,12 +81,15 @@ public class SpiderLegsAnimator : MonoBehaviour
 
     private float[] legStepThreshold;
     private Vector3[] planted;
+    private Vector3[] currentFeet;
     private Vector3[] stepFrom;
     private Vector3[] stepTarget;
     private float[] stepProgress;
     private bool[] isStepping;
 
     private float bodyVelocity;
+    private float bodyPitch;
+    private float bodyRoll;
 
     private void OnEnable()
     {
@@ -106,6 +113,7 @@ public class SpiderLegsAnimator : MonoBehaviour
         legStretchAxis = new Vector3[4];
         legStepThreshold = new float[4];
         planted = new Vector3[4];
+        currentFeet = new Vector3[4];
         stepFrom = new Vector3[4];
         stepTarget = new Vector3[4];
         stepProgress = new float[4];
@@ -131,6 +139,7 @@ public class SpiderLegsAnimator : MonoBehaviour
             legStretchAxis[i] = DominantAxis(forwardInLegLocal);
 
             planted[i] = SampleGround(homeWorldPos);
+            currentFeet[i] = planted[i];
         }
     }
 
@@ -162,6 +171,10 @@ public class SpiderLegsAnimator : MonoBehaviour
 
             if (isStepping[i])
             {
+                // Keep the target updated so the foot lands at the correct position
+                // even if the body moved or rotated during the step animation.
+                stepTarget[i] = ideal;
+
                 stepProgress[i] = Mathf.Min(stepProgress[i] + Time.deltaTime * stepSpeed, 1f);
 
                 currentFoot = Vector3.Lerp(stepFrom[i], stepTarget[i], stepProgress[i]);
@@ -188,6 +201,7 @@ public class SpiderLegsAnimator : MonoBehaviour
                 currentFoot = planted[i];
             }
 
+            currentFeet[i] = currentFoot;
             OrientLeg(i, currentFoot);
         }
     }
@@ -256,6 +270,21 @@ public class SpiderLegsAnimator : MonoBehaviour
         Vector3 pos = bodyRoot.position;
         pos.y = currentWorldY + bodyVelocity * Time.deltaTime;
         bodyRoot.position = pos;
+
+        // Tilt the body to match the slope defined by the four foot positions.
+        // Pitch: front feet higher than back feet -> body tilts nose-up (negative X).
+        // Roll:  right feet higher than left feet -> body tilts right (positive Z).
+        float frontAvgY = (currentFeet[0].y + currentFeet[1].y) * 0.5f;
+        float backAvgY = (currentFeet[2].y + currentFeet[3].y) * 0.5f;
+        float rightAvgY = (currentFeet[0].y + currentFeet[2].y) * 0.5f;
+        float leftAvgY = (currentFeet[1].y + currentFeet[3].y) * 0.5f;
+
+        float targetPitch = (backAvgY - frontAvgY) * bodyTiltAmount;
+        float targetRoll = (rightAvgY - leftAvgY) * bodyTiltAmount;
+
+        bodyPitch = Mathf.Lerp(bodyPitch, targetPitch, bodyTiltSpeed * Time.deltaTime);
+        bodyRoll = Mathf.Lerp(bodyRoll, targetRoll, bodyTiltSpeed * Time.deltaTime);
+        bodyRoot.localRotation = Quaternion.Euler(bodyPitch, 0f, bodyRoll);
     }
 
 #if UNITY_EDITOR
