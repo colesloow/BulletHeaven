@@ -6,6 +6,7 @@ using UnityEngine;
 public class EnemyRewards : MonoBehaviour
 {
     [SerializeField] private int _scoreValue = 10;
+    [SerializeField] private float _dropHeight = 0.3f;
 
     [SerializeField] private DropEntry[] _drops;
 
@@ -16,11 +17,12 @@ public class EnemyRewards : MonoBehaviour
 
         if (PoolManager.Instance == null) return;
 
+        Vector3 dropPosition = new Vector3(position.x, _dropHeight, position.z);
         foreach (var drop in _drops)
         {
             if (drop.Prefab == null || drop.Chance <= 0f) continue;
             if (Random.value <= drop.Chance)
-                PoolManager.Instance.Get(drop.Prefab).transform.position = position;
+                PoolManager.Instance.Get(drop.Prefab).transform.position = dropPosition;
         }
     }
 }

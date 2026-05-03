@@ -60,7 +60,7 @@ public class Health : MonoBehaviour
 
     public void LoseHealth(float amount)
     {
-        // Debug.Log($"{gameObject.name} took {amount} damage. Current Health: {_currentHealth}");
+        if (IsDead) return;
 
         _currentHealth -= amount;
         if (_currentHealth < 0)
@@ -151,6 +151,10 @@ public class Health : MonoBehaviour
         foreach (var mesh in meshes)
             mesh.enabled = true;
 
-        if (_pooledObject != null) _pooledObject.Release();
+        _pooledObject ??= GetComponent<PooledObject>();
+        if (_pooledObject != null)
+            _pooledObject.Release();
+        else
+            gameObject.SetActive(false);
     }
 }
