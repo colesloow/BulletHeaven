@@ -4,29 +4,64 @@ public enum CollectableType { XP, Health, Scrap }
 
 public class Collectable : MonoBehaviour
 {
-    [SerializeField] private CollectableType _type;
-    [SerializeField] private float _value = 10f;
+    [SerializeField] private CollectableType type;
+    [SerializeField] private float value = 10f;
+    [SerializeField] private float attractRadius = 2.5f;
+    [SerializeField] private float collectRadius = 0.5f;
+    [SerializeField] private float attractSpeed = 8f;
 
-    private PooledObject _pooledObject;
+    private PooledObject pooledObject;
+    private Transform playerTransform;
+    private Health playerHealth;
 
     private void Start()
     {
-        _pooledObject = GetComponent<PooledObject>();
+        pooledObject = GetComponent<PooledObject>();
+    }
+
+    private void OnEnable()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null) return;
+        playerTransform = player.transform;
+        playerHealth = player.GetComponent<Health>();
+    }
+
+    private void Update()
+    {
+        if (playerTransform == null) return;
+
+        float distance = Vector3.Distance(transform.position, playerTransform.position);
+
+        if (distance > attractRadius) return;
+
+        if (distance < collectRadius)
+        {
+            Collect();
+            return;
+        }
+
+        float speed = Mathf.Min(attractSpeed * (attractRadius / distance), attractSpeed * 3f);
+        transform.position = Vector3.MoveTowards(transform.position, playerTransform.position, speed * Time.deltaTime);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
+        Collect();
+    }
 
-        switch (_type)
+    private void Collect()
+    {
+        switch (type)
         {
             case CollectableType.XP:
                 if (GameManager.Instance != null)
-                    GameManager.Instance.PlayerXP += _value;
+                    GameManager.Instance.PlayerXP += value;
                 break;
 
             case CollectableType.Health:
-                other.GetComponent<Health>()?.GainHealth(_value);
+                playerHealth?.GainHealth(value);
                 break;
 
             case CollectableType.Scrap:
@@ -36,7 +71,7 @@ public class Collectable : MonoBehaviour
 
         SoundManager.PlaySound(SoundType.COLLECT);
 
-        if (_pooledObject != null) _pooledObject.Release();
+        if (pooledObject != null) pooledObject.Release();
         else Destroy(gameObject);
     }
 }
