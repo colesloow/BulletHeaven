@@ -10,20 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7cbe6792ff9bf934cbe0bb45479a0fd3, type: 3}
-  m_Name: Normal_Rooms
+  m_Name: Arena_Rooms
   m_EditorClassIdentifier: Assembly-CSharp::RoomDecorationRules
   FloorEntries:
-  - Variants:
-    - {fileID: 8561167147062786980, guid: 743b0f79d548d3b4c9077bf30f4e4a76, type: 3}
-    MinDensity: 0.002
-    MaxDensity: 0.004
-    MaxCount: 2
-    MinRoomArea: 0
-    SpacingRadius: 4
-    DoorExclusionRadius: 4
-    MinWallDistance: 5
-    MaxWallDistance: 0
-    RandomYRotation: 1
   - Variants:
     - {fileID: 1509122704816956777, guid: 5d78cc41cbbd2324caa1e9dafd02b21c, type: 3}
     - {fileID: 4104946636678401695, guid: e96be6ad824153b48925a3bbda8d2bd0, type: 3}

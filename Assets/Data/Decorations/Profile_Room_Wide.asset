@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RoomDecorationProfile
   Entries:
   - Type: 0
-    Presets: []
+    Presets:
+    - {fileID: 8343207327961152697, guid: 8ef2b2a0bca42cf46bb7e839e96f2d9e, type: 3}
