@@ -15,6 +15,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int level = 1;
     [SerializeField] private float xpThreshold = 100f;
 
+    [Header("Currency")]
+    [SerializeField] private int playerScrews;
+
     [Header("Timer")]
     [SerializeField] private float gameDuration = 600f;
     private float timeRemaining;
@@ -37,6 +40,7 @@ public class GameManager : MonoBehaviour
     public event Action<float> OnXPChanged;
     public event Action<int> OnLevelUp;
     public event Action<int> OnTimerChanged;
+    public event Action<int> OnScrewsChanged;
 
     public int TotalScore
     {
@@ -72,6 +76,16 @@ public class GameManager : MonoBehaviour
             }
 
             OnXPChanged?.Invoke(playerXP);
+        }
+    }
+
+    public int PlayerScrews
+    {
+        get => playerScrews;
+        set
+        {
+            playerScrews = Mathf.Max(0, value);
+            OnScrewsChanged?.Invoke(playerScrews);
         }
     }
 
@@ -128,6 +142,7 @@ public class GameManager : MonoBehaviour
         TotalScore = 0;
         PlayerHealth = 100f;
         PlayerXP = 0f;
+        PlayerScrews = 0;
         level = 1;
         StartTimer();
 

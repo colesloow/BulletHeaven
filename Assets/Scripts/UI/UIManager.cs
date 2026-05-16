@@ -17,6 +17,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI level;
     [SerializeField] private TextMeshProUGUI score;
     [SerializeField] private TextMeshProUGUI timer;
+    [SerializeField] private TextMeshProUGUI screws;
 
     [Header("References")]
     [SerializeField] private SceneLoader sceneLoader;
@@ -45,6 +46,7 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.OnXPChanged += UpdateXP;
         GameManager.Instance.OnLevelUp += UpdateLevel;
         GameManager.Instance.OnTimerChanged += UpdateTimer;
+        GameManager.Instance.OnScrewsChanged += UpdateScrews;
     }
 
     private void OnDestroy()
@@ -55,6 +57,7 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.OnXPChanged -= UpdateXP;
         GameManager.Instance.OnLevelUp -= UpdateLevel;
         GameManager.Instance.OnTimerChanged -= UpdateTimer;
+        GameManager.Instance.OnScrewsChanged -= UpdateScrews;
     }
 
     private void InitializeUI()
@@ -63,6 +66,7 @@ public class UIManager : MonoBehaviour
         UpdateHealth(GameManager.Instance.PlayerHealth);
         UpdateXP(GameManager.Instance.PlayerXP);
         UpdateTimer(GameManager.Instance.SecondsRemaining);
+        UpdateScrews(GameManager.Instance.PlayerScrews);
     }
 
     private void UpdateScore(int score)
@@ -90,6 +94,11 @@ public class UIManager : MonoBehaviour
         timer.text = $"{seconds / 60:D2}:{seconds % 60:D2}";
     }
 
+    private void UpdateScrews(int count)
+    {
+        if (screws != null) screws.text = count.ToString();
+    }
+
     public void ShowUpgradePanel(System.Collections.Generic.List<WeaponUpgrade> choices, System.Action<WeaponUpgrade> onPicked)
     {
         upgradeUI.Show(choices, onPicked);
@@ -105,6 +114,7 @@ public class UIManager : MonoBehaviour
         UpdateScore(0);
         UpdateHealth(100f);
         UpdateXP(0f);
+        UpdateScrews(0);
         UpdateLevel(1);
         UpdateTimer(GameManager.Instance.SecondsRemaining);
         SetPanel(gameOverPanel, false);

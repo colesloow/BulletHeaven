@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum CollectableType { XP, Health, Scrap }
+public enum CollectableType { XP, Health, Screw }
 
 public class Collectable : MonoBehaviour
 {
@@ -64,8 +64,9 @@ public class Collectable : MonoBehaviour
                 playerHealth?.GainHealth(value);
                 break;
 
-            case CollectableType.Scrap:
-                // TODO: add scrap currency to GameManager
+            case CollectableType.Screw:
+                if (GameManager.Instance != null)
+                    GameManager.Instance.PlayerScrews += Mathf.RoundToInt(value);
                 break;
         }
 
