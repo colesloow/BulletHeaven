@@ -2355,6 +2355,7 @@ MonoBehaviour:
   _baseSpawnInterval: 2
   _initialMaxEnemies: 10
   _maxEnemiesIncreasePerMinute: 5
+  defaultEnemyPrefab: {fileID: 5961385405075670556, guid: 649c9fc4ee7766242939b6cd16e71ad8, type: 3}
   _waves:
   - {fileID: 11400000, guid: 0a0b514caa3928b46a51ca1eb687bfd4, type: 2}
   - {fileID: 11400000, guid: eff764b42a597c243bbeb11a6e0ee327, type: 2}
@@ -2905,10 +2906,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27c246ada39eb194597c53cb5f6df694, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  _enemyPrefab: {fileID: 5961385405075670556, guid: 649c9fc4ee7766242939b6cd16e71ad8, type: 3}
-  _minSpawnDistance: 10
-  _maxSpawnDistance: 20
-  _navMeshSampleRadius: 2
+  minSpawnDistance: 10
+  maxSpawnDistance: 30
+  navMeshSampleRadius: 2
+  despawnDistance: 40
+  engagementRange: 8
+  maxChaseTime: 8
 --- !u!1001 &8457062002825681497
 PrefabInstance:
   m_ObjectHideFlags: 0
