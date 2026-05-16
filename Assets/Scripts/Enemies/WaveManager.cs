@@ -30,6 +30,7 @@ public class WaveManager : MonoBehaviour
     public int MaxEnemies => Mathf.RoundToInt(_initialMaxEnemies + (_elapsedTime / 60f) * _maxEnemiesIncreasePerMinute);
 
     [Header("Waves")]
+    [SerializeField] private GameObject defaultEnemyPrefab;
     [SerializeField] private List<WaveConfig> _waves;
 
     [Header("Enemy Scaling")]
@@ -74,7 +75,7 @@ public class WaveManager : MonoBehaviour
         _spawnTimer += Time.deltaTime;
         if (_spawnTimer >= _baseSpawnInterval)
         {
-            _enemySpawner.TrySpawnOne();
+            _enemySpawner.TrySpawnOne(defaultEnemyPrefab);
             _spawnTimer = 0f;
         }
 

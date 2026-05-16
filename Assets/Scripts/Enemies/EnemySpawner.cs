@@ -12,8 +12,6 @@ using UnityEngine.AI;
 //   - Retrieves an enemy instance from the pool.
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject enemyPrefab;
-
     [SerializeField] private float minSpawnDistance = 10f;
     [SerializeField] private float maxSpawnDistance = 30f;
     [SerializeField] private float navMeshSampleRadius = 2f;
@@ -74,22 +72,22 @@ public class EnemySpawner : MonoBehaviour
         else enemy.SetActive(false);
     }
 
-    public void TrySpawnOne(GameObject prefab = null)
+    public void TrySpawnOne(GameObject prefab)
     {
         activeEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
         if (player == null || dungeonGenerator == null) return;
         if (WaveManager.Instance == null) return;
         if (activeEnemies.Count >= WaveManager.Instance.MaxEnemies) return;
 
-        SpawnAtRandomRoom(prefab != null ? prefab : enemyPrefab);
+        SpawnAtRandomRoom(prefab);
     }
 
-    public void ForceSpawnOne(GameObject prefab = null)
+    public void ForceSpawnOne(GameObject prefab)
     {
         activeEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
         if (player == null || dungeonGenerator == null) return;
 
-        SpawnAtRandomRoom(prefab != null ? prefab : enemyPrefab);
+        SpawnAtRandomRoom(prefab);
     }
 
     private void SpawnAtRandomRoom(GameObject prefab)
