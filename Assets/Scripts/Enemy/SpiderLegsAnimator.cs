@@ -91,13 +91,9 @@ public class SpiderLegsAnimator : MonoBehaviour
     private float bodyPitch;
     private float bodyRoll;
 
-    private void OnEnable()
+    private void Awake()
     {
-        Init();
-    }
-
-    private void Init()
-    {
+        // Capture rest pose once from the prefab state, before any animation runs.
         homeOffsets = new[]
         {
             new Vector3(footSpread.x, 0f, footSpread.y),
@@ -111,17 +107,6 @@ public class SpiderLegsAnimator : MonoBehaviour
         legRestForwardLocal = new Vector3[4];
         legRestLength = new float[4];
         legStretchAxis = new Vector3[4];
-        legStepThreshold = new float[4];
-        planted = new Vector3[4];
-        currentFeet = new Vector3[4];
-        stepFrom = new Vector3[4];
-        stepTarget = new Vector3[4];
-        stepProgress = new float[4];
-        isStepping = new bool[4];
-
-        // Randomise per-leg thresholds slightly so legs don't all step in unison.
-        for (int i = 0; i < 4; i++)
-            legStepThreshold[i] = Mathf.Max(0.05f, stepThreshold + Random.Range(-stepThresholdVariation, stepThresholdVariation));
 
         for (int i = 0; i < 4; i++)
         {
@@ -137,7 +122,40 @@ public class SpiderLegsAnimator : MonoBehaviour
             // Project the rest-forward direction into leg local space to find the dominant mesh axis.
             Vector3 forwardInLegLocal = Quaternion.Inverse(legRestLocalRot[i]) * legRestForwardLocal[i];
             legStretchAxis[i] = DominantAxis(forwardInLegLocal);
+        }
+    }
 
+    private void OnEnable()
+    {
+        // Reset dynamic state so Init() runs in the first Update, after the spawner sets the position.
+        planted = null;
+    }
+
+    private void Init()
+    {
+        legStepThreshold = new float[4];
+        planted = new Vector3[4];
+        currentFeet = new Vector3[4];
+        stepFrom = new Vector3[4];
+        stepTarget = new Vector3[4];
+        stepProgress = new float[4];
+        isStepping = new bool[4];
+
+        bodyVelocity = 0f;
+        bodyPitch = 0f;
+        bodyRoll = 0f;
+
+        // Randomise per-leg thresholds slightly so legs don't all step in unison.
+        for (int i = 0; i < 4; i++)
+            legStepThreshold[i] = Mathf.Max(0.05f, stepThreshold + Random.Range(-stepThresholdVariation, stepThresholdVariation));
+
+        // Reset legs to rest pose, then plant them at the correct ground position.
+        for (int i = 0; i < 4; i++)
+        {
+            legTransforms[i].localRotation = legRestLocalRot[i];
+            legTransforms[i].localScale = legRestLocalScale[i];
+
+            Vector3 homeWorldPos = transform.TransformPoint(homeOffsets[i]);
             planted[i] = SampleGround(homeWorldPos);
             currentFeet[i] = planted[i];
         }
