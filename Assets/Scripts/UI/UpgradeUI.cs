@@ -51,8 +51,13 @@ public class UpgradeUI : MonoBehaviour
             Button btn = Instantiate(_buttonPrefab, _buttonContainer);
             _spawnedButtons.Add(btn);
 
+            string costLabel = upgrade.ScrapCost > 0 ? $"{upgrade.ScrapCost} screws" : "Free";
             btn.GetComponentInChildren<TextMeshProUGUI>().text =
-                $"[{upgrade.Rarity}]  {upgrade.UpgradeName}";
+                $"[{upgrade.Rarity}]  {upgrade.UpgradeName}\n{costLabel}";
+
+            bool canAfford = upgrade.ScrapCost == 0 ||
+                             (GameManager.Instance != null && GameManager.Instance.PlayerScrews >= upgrade.ScrapCost);
+            btn.interactable = canAfford;
 
             WeaponUpgrade captured = upgrade;
             btn.onClick.AddListener(() => Pick(captured));
@@ -81,6 +86,8 @@ public class UpgradeUI : MonoBehaviour
     {
         HidePanel();
         Time.timeScale = 1f;
+        if (upgrade.ScrapCost > 0 && GameManager.Instance != null)
+            GameManager.Instance.PlayerScrews -= upgrade.ScrapCost;
         _onPicked?.Invoke(upgrade);
     }
 }

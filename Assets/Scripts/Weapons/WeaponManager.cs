@@ -58,7 +58,7 @@ public class WeaponManager : MonoBehaviour
     }
 
     // Returns a weighted random selection of available upgrades across all active weapons.
-    // Common = weight 10, Uncommon = weight 4, Rare = weight 1.
+    // Always guarantees at least one Common. Common = weight 10, Uncommon = weight 4, Rare = weight 1.
     public List<WeaponUpgrade> GetUpgradeChoices()
     {
         var pool = _activeWeapons
@@ -66,7 +66,18 @@ public class WeaponManager : MonoBehaviour
             .SelectMany(w => w.Data.AvailableUpgrades.Where(u => w.IsUpgradeAvailable(u)))
             .ToList();
 
-        // Build weighted list: each entry appears N times proportional to its weight
+        var seen = new System.Collections.Generic.HashSet<WeaponUpgrade>();
+        var choices = new List<WeaponUpgrade>();
+
+        // Always include one Common upgrade if any are available.
+        var commons = pool.Where(u => u.Rarity == UpgradeRarity.Common).OrderBy(_ => Random.value).ToList();
+        if (commons.Count > 0)
+        {
+            seen.Add(commons[0]);
+            choices.Add(commons[0]);
+        }
+
+        // Fill remaining slots from weighted pool.
         var weighted = new List<WeaponUpgrade>();
         foreach (var upgrade in pool)
         {
@@ -81,11 +92,7 @@ public class WeaponManager : MonoBehaviour
                 weighted.Add(upgrade);
         }
 
-        var choices = new List<WeaponUpgrade>();
-        var seen = new System.Collections.Generic.HashSet<WeaponUpgrade>();
-
-        var shuffled = weighted.OrderBy(_ => Random.value).ToList();
-        foreach (var upgrade in shuffled)
+        foreach (var upgrade in weighted.OrderBy(_ => Random.value))
         {
             if (seen.Add(upgrade))
                 choices.Add(upgrade);

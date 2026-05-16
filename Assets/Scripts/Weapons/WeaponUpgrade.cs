@@ -27,4 +27,5 @@ public class WeaponUpgrade : ScriptableObject
     public UpgradeType Type;
     public float Value;
     public UpgradeRarity Rarity;
+    public int ScrapCost;
 }
