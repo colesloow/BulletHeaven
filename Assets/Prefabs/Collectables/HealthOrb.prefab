@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 2623683039468817780}
   - component: {fileID: 5601070474593534744}
   - component: {fileID: 6410871862105406757}
-  - component: {fileID: -4005405317273946809}
+  - component: {fileID: -9101035455516748862}
   m_Layer: 0
-  m_Name: VFX_XPOrb
+  m_Name: HealthOrb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -59,7 +59,7 @@ VisualEffect:
       m_Array: []
     m_Vector4f:
       m_Array:
-      - m_Value: {x: 0, y: 26.7204, z: 95.87452, w: 0}
+      - m_Value: {x: 99.9849, y: 0, z: 48.655125, w: 0}
         m_Name: Color01
         m_Overridden: 1
     m_Uint:
@@ -140,7 +140,7 @@ MonoBehaviour:
   attractRadius: 2
   collectRadius: 0.5
   attractSpeed: 5
---- !u!114 &-4005405317273946809
+--- !u!114 &-9101035455516748862
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
