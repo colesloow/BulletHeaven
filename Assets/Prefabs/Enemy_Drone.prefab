@@ -229,9 +229,11 @@ MonoBehaviour:
   _dropHeight: 0.3
   _drops:
   - Prefab: {fileID: 4510951735512833629, guid: 56fb1a41d3f9a5640b6069dd4f021940, type: 3}
-    Chance: 0.3
+    Weight: 30
   - Prefab: {fileID: 4510951735512833629, guid: 1aa73eb4b0616914d9a2f1d5d0063e13, type: 3}
-    Chance: 0.7
+    Weight: 60
+  - Prefab: {fileID: 4401066724296947326, guid: 5f0d38866a09ae54e8709e1c5de4c8c4, type: 3}
+    Weight: 10
 --- !u!114 &2228660951559633828
 MonoBehaviour:
   m_ObjectHideFlags: 0
