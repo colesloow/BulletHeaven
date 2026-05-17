@@ -21,9 +21,9 @@ public class SatelliteWeapon : Weapon
     [SerializeField] private float _maxDamageBonus = 50f;
 
     private float _damageBonus = 0f;
+    private bool _laserUnlocked = false;
     private Transform _orbitParent;
     private GameObject[] _satellites;
-    private bool _laserUnlocked = false;
     private readonly Dictionary<Health, float> _nextHitTime = new();
 
     protected override void OnInitialize()
@@ -110,27 +110,33 @@ public class SatelliteWeapon : Weapon
     public void UnlockLasers()
     {
         _laserUnlocked = true;
+        if (_satellites == null) return;
         foreach (var sat in _satellites)
-            sat.GetComponent<LaserBeamController>()?.Unlock();
+        {
+            if (sat == null) continue;
+            sat.GetComponentInChildren<LaserBeamController>()?.Unlock();
+        }
     }
 
-    public void ApplyLaserUpgrade(WeaponUpgrade upgrade)
+    public void ModifyLaserInterval(float delta)
     {
-        switch (upgrade.Type)
-        {
-            case UpgradeType.LaserInterval:
-                foreach (var sat in _satellites)
-                    sat.GetComponent<LaserBeamController>()?.ModifyInterval(upgrade.Value);
-                break;
-            case UpgradeType.LaserDuration:
-                foreach (var sat in _satellites)
-                    sat.GetComponent<LaserBeamController>()?.ModifyDuration(upgrade.Value);
-                break;
-            case UpgradeType.LaserLength:
-                foreach (var sat in _satellites)
-                    sat.GetComponent<LaserBeamController>()?.ModifyLength(upgrade.Value);
-                break;
-        }
+        if (_satellites == null) return;
+        foreach (var sat in _satellites)
+            sat?.GetComponentInChildren<LaserBeamController>()?.ModifyInterval(delta);
+    }
+
+    public void ModifyLaserDuration(float delta)
+    {
+        if (_satellites == null) return;
+        foreach (var sat in _satellites)
+            sat?.GetComponentInChildren<LaserBeamController>()?.ModifyDuration(delta);
+    }
+
+    public void ModifyLaserLength(float delta)
+    {
+        if (_satellites == null) return;
+        foreach (var sat in _satellites)
+            sat?.GetComponentInChildren<LaserBeamController>()?.ModifyLength(delta);
     }
 
     public override void OnPlayerDeath()
@@ -140,7 +146,6 @@ public class SatelliteWeapon : Weapon
         foreach (var sat in _satellites)
         {
             if (sat == null) continue;
-            sat.GetComponent<LaserBeamController>()?.StopLaser();
             var rb = sat.GetComponent<Rigidbody>();
             if (rb != null) rb.isKinematic = false;
         }
@@ -183,10 +188,10 @@ public class SatelliteWeapon : Weapon
             sat.transform.localPosition = localPos;
             sat.transform.localRotation = Quaternion.Euler(0, -angle, 0) * Quaternion.Euler(90, 90, 0);
 
-            if (_laserUnlocked)
-                sat.GetComponent<LaserBeamController>()?.Unlock();
-
             _satellites[i] = sat;
+
+            if (_laserUnlocked)
+                sat.GetComponentInChildren<LaserBeamController>()?.Unlock();
         }
     }
 }

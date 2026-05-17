@@ -6,6 +6,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    public WeaponManager WeaponManager { get; set; }
+
     [Header("Health & Score")]
     [SerializeField] private int totalScore;
     [SerializeField] private float playerHealth;

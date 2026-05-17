@@ -13,6 +13,7 @@ public class WeaponManager : MonoBehaviour
 
     private void Start()
     {
+        GameManager.Instance.WeaponManager = this;
         GameManager.Instance.OnLevelUp += OnLevelUp;
 
         if (_startingWeapon != null)

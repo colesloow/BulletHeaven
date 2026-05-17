@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class LaserBeamController : MonoBehaviour
@@ -11,42 +12,33 @@ public class LaserBeamController : MonoBehaviour
     [SerializeField] private float _laserDuration = 5f;
     [SerializeField] private float _laserInterval = 5f;
 
-    private Coroutine _laserCoroutine;
+    [Header("Damage")]
+    [SerializeField] private float _damage = 5f;
+    [SerializeField] private float _tickInterval = 0.2f;
+
+    private readonly Dictionary<Health, float> _nextHitTime = new();
     private bool _unlocked = false;
+    private bool _firing = false;
 
     private void Start()
     {
+        _laserLine.useWorldSpace = false;
+        _laserLine.enabled = false;
         _laserCollider.enabled = false;
         StartCoroutine(AutoFireLoop());
     }
 
-    // Called by SatelliteWeapon when the laser upgrade is applied
-    public void Unlock()
-    {
-        _unlocked = true;
-    }
-
-    public void ModifyInterval(float delta)
-    {
-        _laserInterval = Mathf.Max(0.5f, _laserInterval + delta);
-    }
-
-    public void ModifyDuration(float delta)
-    {
-        _laserDuration = Mathf.Max(0.5f, _laserDuration + delta);
-    }
-
-    public void ModifyLength(float delta)
-    {
-        _laserMaxLength = Mathf.Max(1f, _laserMaxLength + delta);
-    }
+    public void Unlock() => _unlocked = true;
+    public void ModifyInterval(float delta) => _laserInterval = Mathf.Max(0.5f, _laserInterval + delta);
+    public void ModifyDuration(float delta) => _laserDuration = Mathf.Max(0.5f, _laserDuration + delta);
+    public void ModifyLength(float delta) => _laserMaxLength = Mathf.Max(0.01f, _laserMaxLength + delta);
 
     public void StopLaser()
     {
-        if (_laserCoroutine != null)
-            StopCoroutine(_laserCoroutine);
-
-        _laserCoroutine = StartCoroutine(RetractLaser());
+        StopAllCoroutines();
+        _laserLine.enabled = false;
+        _laserCollider.enabled = false;
+        _firing = false;
     }
 
     private IEnumerator AutoFireLoop()
@@ -55,71 +47,59 @@ public class LaserBeamController : MonoBehaviour
         {
             yield return new WaitForSeconds(_laserInterval);
 
-            if (_unlocked)
-                StartLaser();
+            if (_unlocked && !_firing)
+                yield return FireCycle();
         }
     }
 
-    private void StartLaser()
+    private IEnumerator FireCycle()
     {
-        if (_laserCoroutine != null)
-            StopCoroutine(_laserCoroutine);
+        _firing = true;
 
-        _laserCoroutine = StartCoroutine(ShootLaser());
-    }
-
-    private IEnumerator ShootLaser()
-    {
+        _laserLine.SetPosition(0, Vector3.zero);
+        _laserLine.SetPosition(1, Vector3.zero);
         _laserLine.enabled = true;
         _laserCollider.enabled = true;
-
-        Vector3[] positions = new Vector3[2];
-        positions[0] = Vector3.zero;
-        positions[1] = Vector3.zero;
-
         SoundManager.PlaySound(SoundType.LASER);
-        _laserLine.SetPositions(positions);
 
-        float currentLength = 0f;
-
-        while (currentLength < _laserMaxLength)
+        float length = 0f;
+        while (length < _laserMaxLength)
         {
-            currentLength += _laserExpandSpeed * Time.deltaTime;
-            positions[1].z = Mathf.Min(currentLength, _laserMaxLength);
-            _laserLine.SetPositions(positions);
-            UpdateCollider(currentLength);
+            length = Mathf.Min(length + _laserExpandSpeed * Time.deltaTime, _laserMaxLength);
+            _laserLine.SetPosition(1, new Vector3(0f, 0f, length));
+            UpdateCollider(length);
             yield return null;
         }
 
         yield return new WaitForSeconds(_laserDuration);
 
-        StopLaser();
-    }
-
-    private IEnumerator RetractLaser()
-    {
-        Vector3[] positions = new Vector3[2];
-        _laserLine.GetPositions(positions);
-
-        float currentStart = positions[0].z;
-        float currentEnd = positions[1].z;
-
-        while (currentStart < currentEnd)
+        float retractStart = 0f;
+        while (retractStart < _laserMaxLength)
         {
-            currentStart += _laserExpandSpeed * Time.deltaTime;
-            positions[0].z = Mathf.Min(currentStart, currentEnd);
-            _laserLine.SetPositions(positions);
-            UpdateCollider(currentEnd - currentStart);
+            retractStart = Mathf.Min(retractStart + _laserExpandSpeed * Time.deltaTime, _laserMaxLength);
+            _laserLine.SetPosition(0, new Vector3(0f, 0f, retractStart));
+            UpdateCollider(_laserMaxLength - retractStart);
             yield return null;
         }
 
         _laserLine.enabled = false;
         _laserCollider.enabled = false;
+        _firing = false;
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (!_laserCollider.enabled) return;
+        if (!other.TryGetComponent<Health>(out var health)) return;
+        if (_nextHitTime.TryGetValue(health, out float next) && Time.time < next) return;
+
+        health.LoseHealth(_damage);
+        _nextHitTime[health] = Time.time + _tickInterval;
     }
 
     private void UpdateCollider(float length)
     {
-        _laserCollider.center = new Vector3(0, 0, length / 2);
-        _laserCollider.size = new Vector3(0.001f, 0.001f, length);
+        _laserCollider.center = new Vector3(0f, 0f, length / 2f);
+        _laserCollider.size = new Vector3(0.3f, 0.3f, length);
     }
 }

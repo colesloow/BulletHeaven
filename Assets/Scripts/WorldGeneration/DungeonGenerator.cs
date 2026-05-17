@@ -10,6 +10,7 @@ public class DungeonGenerator : MonoBehaviour
 {
     [SerializeField] private Room startRoom;
     [SerializeField] private DungeonRules rules;
+    [SerializeField] private GameObject[] treasurePickups;
 
     // All pieces (rooms + corridors) placed so far.
     private readonly List<DungeonPiece> placedPieces = new();
@@ -81,6 +82,7 @@ public class DungeonGenerator : MonoBehaviour
         SealOpenDoors();
         GetComponent<DungeonNavMeshBuilder>().Build(placedPieces, sealingWalls);
         DecorateRooms();
+        SpawnTreasurePickups();
     }
 
     // -------------------------------------------------------------------------
@@ -394,6 +396,20 @@ public class DungeonGenerator : MonoBehaviour
             RoomDecorationRules decorRules = GetDecorationRulesFor(room.Type);
             if (decorRules != null)
                 RoomDecorator.DecorateRoom(room, decorRules, decorParent);
+        }
+    }
+
+    private void SpawnTreasurePickups()
+    {
+        if (treasurePickups == null || treasurePickups.Length == 0) return;
+
+        foreach (DungeonPiece piece in placedPieces)
+        {
+            if (piece is not Room room || room.Type != RoomType.Treasure) continue;
+
+            GameObject prefab = treasurePickups[Random.Range(0, treasurePickups.Length)];
+            if (prefab != null)
+                Instantiate(prefab, room.transform.position, Quaternion.identity, room.transform);
         }
     }
 
