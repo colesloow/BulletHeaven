@@ -5,101 +5,139 @@ using UnityEngine;
 public class LaserBeamController : MonoBehaviour
 {
     [Header("Laser Settings")]
-    [SerializeField] private LineRenderer _laserLine;
-    [SerializeField] private BoxCollider _laserCollider;
-    [SerializeField] private float _laserMaxLength = 5f;
-    [SerializeField] private float _laserExpandSpeed = 5f;
-    [SerializeField] private float _laserDuration = 5f;
-    [SerializeField] private float _laserInterval = 5f;
+    [SerializeField] private LineRenderer laserLine;
+    [SerializeField] private float laserMaxLength = 5f;
+    [SerializeField] private float laserExpandSpeed = 5f;
+    [SerializeField] private float laserDuration = 5f;
+    [SerializeField] private float laserInterval = 5f;
 
     [Header("Damage")]
-    [SerializeField] private float _damage = 5f;
-    [SerializeField] private float _tickInterval = 0.2f;
+    [SerializeField] private float damage = 25f;
+    [SerializeField] private float tickInterval = 0.2f;
+    [SerializeField] private float contactRadius = 0.5f;
 
-    private readonly Dictionary<Health, float> _nextHitTime = new();
-    private bool _unlocked = false;
-    private bool _firing = false;
+    private readonly Dictionary<Health, float> nextHitTime = new();
+    private bool unlocked = false;
+    private bool firing = false;
+    private float currentBeamStart = 0f;
+    private float currentBeamEnd = 0f;
 
     private void Start()
     {
-        _laserLine.useWorldSpace = false;
-        _laserLine.enabled = false;
-        _laserCollider.enabled = false;
+        laserLine.useWorldSpace = false;
+        laserLine.enabled = false;
         StartCoroutine(AutoFireLoop());
     }
 
-    public void Unlock() => _unlocked = true;
-    public void ModifyInterval(float delta) => _laserInterval = Mathf.Max(0.5f, _laserInterval + delta);
-    public void ModifyDuration(float delta) => _laserDuration = Mathf.Max(0.5f, _laserDuration + delta);
-    public void ModifyLength(float delta) => _laserMaxLength = Mathf.Max(0.01f, _laserMaxLength + delta);
+    public void Unlock() => unlocked = true;
+    public void ModifyInterval(float delta) => laserInterval = Mathf.Max(0.5f, laserInterval + delta);
+    public void ModifyDuration(float delta) => laserDuration = Mathf.Max(0.5f, laserDuration + delta);
+    public void ModifyLength(float delta) => laserMaxLength = Mathf.Max(0.01f, laserMaxLength + delta);
 
     public void StopLaser()
     {
         StopAllCoroutines();
-        _laserLine.enabled = false;
-        _laserCollider.enabled = false;
-        _firing = false;
+        laserLine.enabled = false;
+        firing = false;
+    }
+
+    private void Update()
+    {
+        if (!firing) return;
+        CheckHits();
     }
 
     private IEnumerator AutoFireLoop()
     {
         while (true)
         {
-            yield return new WaitForSeconds(_laserInterval);
+            yield return new WaitForSeconds(laserInterval);
 
-            if (_unlocked && !_firing)
+            if (unlocked && !firing)
                 yield return FireCycle();
         }
     }
 
     private IEnumerator FireCycle()
     {
-        _firing = true;
+        firing = true;
 
-        _laserLine.SetPosition(0, Vector3.zero);
-        _laserLine.SetPosition(1, Vector3.zero);
-        _laserLine.enabled = true;
-        _laserCollider.enabled = true;
+        laserLine.SetPosition(0, Vector3.zero);
+        laserLine.SetPosition(1, Vector3.zero);
+        laserLine.enabled = true;
         SoundManager.PlaySound(SoundType.LASER);
 
         float length = 0f;
-        while (length < _laserMaxLength)
+        while (length < laserMaxLength)
         {
-            length = Mathf.Min(length + _laserExpandSpeed * Time.deltaTime, _laserMaxLength);
-            _laserLine.SetPosition(1, new Vector3(0f, 0f, length));
-            UpdateCollider(length);
+            length = Mathf.Min(length + laserExpandSpeed * Time.deltaTime, laserMaxLength);
+            laserLine.SetPosition(1, new Vector3(0f, 0f, length));
+            currentBeamStart = 0f;
+            currentBeamEnd = length;
             yield return null;
         }
 
-        yield return new WaitForSeconds(_laserDuration);
+        yield return new WaitForSeconds(laserDuration);
 
         float retractStart = 0f;
-        while (retractStart < _laserMaxLength)
+        while (retractStart < laserMaxLength)
         {
-            retractStart = Mathf.Min(retractStart + _laserExpandSpeed * Time.deltaTime, _laserMaxLength);
-            _laserLine.SetPosition(0, new Vector3(0f, 0f, retractStart));
-            UpdateCollider(_laserMaxLength - retractStart);
+            retractStart = Mathf.Min(retractStart + laserExpandSpeed * Time.deltaTime, laserMaxLength);
+            laserLine.SetPosition(0, new Vector3(0f, 0f, retractStart));
+            currentBeamStart = retractStart;
+            currentBeamEnd = laserMaxLength;
             yield return null;
         }
 
-        _laserLine.enabled = false;
-        _laserCollider.enabled = false;
-        _firing = false;
+        laserLine.enabled = false;
+        currentBeamStart = 0f;
+        currentBeamEnd = 0f;
+        firing = false;
     }
 
-    private void OnTriggerStay(Collider other)
+    private void CheckHits()
     {
-        if (!_laserCollider.enabled) return;
-        if (!other.TryGetComponent<Health>(out var health)) return;
-        if (_nextHitTime.TryGetValue(health, out float next) && Time.time < next) return;
+        if (currentBeamEnd <= currentBeamStart) return;
 
-        health.LoseHealth(_damage);
-        _nextHitTime[health] = Time.time + _tickInterval;
+        Vector3 worldStart = laserLine.transform.TransformPoint(laserLine.GetPosition(0));
+        Vector3 worldEnd = laserLine.transform.TransformPoint(laserLine.GetPosition(1));
+
+        Vector2 start2D = new(worldStart.x, worldStart.z);
+        Vector2 end2D = new(worldEnd.x, worldEnd.z);
+
+        foreach (Health enemy in Health.ActiveEnemies)
+        {
+            if (nextHitTime.TryGetValue(enemy, out float next) && Time.time < next) continue;
+
+            Vector2 enemy2D = new(enemy.transform.position.x, enemy.transform.position.z);
+            Vector2 closest = ClosestPointOnSegment(start2D, end2D, enemy2D);
+            if (Vector2.Distance(closest, enemy2D) > contactRadius) continue;
+
+            enemy.LoseHealth(damage);
+            nextHitTime[enemy] = Time.time + tickInterval;
+        }
     }
 
-    private void UpdateCollider(float length)
+    private static Vector2 ClosestPointOnSegment(Vector2 a, Vector2 b, Vector2 p)
     {
-        _laserCollider.center = new Vector3(0f, 0f, length / 2f);
-        _laserCollider.size = new Vector3(0.3f, 0.3f, length);
+        Vector2 ab = b - a;
+        float len2 = ab.sqrMagnitude;
+        if (len2 < 1e-6f) return a;
+        float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / len2);
+        return a + t * ab;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying || !firing) return;
+        Vector3 worldStart = laserLine.transform.TransformPoint(laserLine.GetPosition(0));
+        Vector3 worldEnd = laserLine.transform.TransformPoint(laserLine.GetPosition(1));
+        Gizmos.color = new Color(1f, 0f, 0f, 0.5f);
+        for (int i = 0; i <= 12; i++)
+        {
+            Vector3 p = Vector3.Lerp(worldStart, worldEnd, (float)i / 12);
+            p.y = 0f;
+            Gizmos.DrawWireSphere(p, contactRadius);
+        }
     }
 }

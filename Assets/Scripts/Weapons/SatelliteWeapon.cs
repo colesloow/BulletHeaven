@@ -64,11 +64,8 @@ public class SatelliteWeapon : Weapon
                 {
                     enemy.LoseHealth(_damage + _damageBonus);
                     _nextHitTime[enemy] = Time.time + _damageInterval;
-
                     if (_hitVfxPrefab != null && PoolManager.Instance != null)
                         PoolManager.Instance.Get(_hitVfxPrefab).transform.position = enemy.transform.position;
-
-                    // SoundManager.PlaySound(SoundType.HIT);
                 }
             }
         }

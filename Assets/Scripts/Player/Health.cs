@@ -64,19 +64,13 @@ public class Health : MonoBehaviour
 
         _currentHealth -= amount;
         if (_currentHealth < 0)
-        {
             _currentHealth = 0;
-        }
 
         if (gameObject.CompareTag("Player") && GameManager.Instance != null)
-        {
             GameManager.Instance.PlayerHealth = _currentHealth;
-        }
 
         if (_currentHealth <= 0)
-        {
             Die();
-        }
     }
 
     public void GainHealth(float amount)
