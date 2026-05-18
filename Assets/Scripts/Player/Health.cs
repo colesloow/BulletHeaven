@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,8 @@ public class Health : MonoBehaviour
     private Animator _animator;
     private WeaponManager _weaponManager;
     private PooledObject _pooledObject;
+
+    public event Action<float> OnDamaged;
 
     public bool IsDead = false;
 
@@ -65,6 +68,8 @@ public class Health : MonoBehaviour
         _currentHealth -= amount;
         if (_currentHealth < 0)
             _currentHealth = 0;
+
+        OnDamaged?.Invoke(amount);
 
         if (gameObject.CompareTag("Player") && GameManager.Instance != null)
             GameManager.Instance.PlayerHealth = _currentHealth;
