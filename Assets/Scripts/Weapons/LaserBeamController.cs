@@ -61,7 +61,6 @@ public class LaserBeamController : MonoBehaviour
     private IEnumerator FireCycle()
     {
         firing = true;
-
         laserLine.SetPosition(0, Vector3.zero);
         laserLine.SetPosition(1, Vector3.zero);
         laserLine.enabled = true;
@@ -71,7 +70,7 @@ public class LaserBeamController : MonoBehaviour
         while (length < laserMaxLength)
         {
             length = Mathf.Min(length + laserExpandSpeed * Time.deltaTime, laserMaxLength);
-            laserLine.SetPosition(1, new Vector3(0f, 0f, length));
+            laserLine.SetPosition(0, new Vector3(0f, 0f, length));
             currentBeamStart = 0f;
             currentBeamEnd = length;
             yield return null;
@@ -83,7 +82,7 @@ public class LaserBeamController : MonoBehaviour
         while (retractStart < laserMaxLength)
         {
             retractStart = Mathf.Min(retractStart + laserExpandSpeed * Time.deltaTime, laserMaxLength);
-            laserLine.SetPosition(0, new Vector3(0f, 0f, retractStart));
+            laserLine.SetPosition(1, new Vector3(0f, 0f, retractStart));
             currentBeamStart = retractStart;
             currentBeamEnd = laserMaxLength;
             yield return null;

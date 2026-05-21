@@ -4,6 +4,8 @@ using UnityEngine;
 public class SatelliteWeapon : Weapon
 {
     [SerializeField] private GameObject _satellitePrefab;
+    // Euler offset applied after the orbit yaw, to compensate for the model's local orientation.
+    [SerializeField] private Vector3 _modelRotationOffset = Vector3.zero;
     [SerializeField] private float _orbitRadius = 1.5f;
     [SerializeField] private float _orbitSpeed = 100f;
     [SerializeField] private int _satelliteCount = 1;
@@ -21,25 +23,37 @@ public class SatelliteWeapon : Weapon
 
     private float _damageBonus = 0f;
     private bool _laserUnlocked = false;
-    private Transform _orbitParent;
+    private float _angle = 0f;
     private GameObject[] _satellites;
     private readonly Dictionary<Health, float> _nextHitTime = new();
 
     protected override void OnInitialize()
     {
-        _orbitParent = new GameObject("SatelliteOrbit").transform;
-        _orbitParent.SetParent(transform);
-        _orbitParent.localPosition = Vector3.zero;
-
         SpawnSatellites();
     }
 
     private void Update()
     {
-        if (_orbitParent != null)
-            _orbitParent.Rotate(0, _orbitSpeed * Time.deltaTime, 0);
-
+        _angle += _orbitSpeed * Time.deltaTime;
+        UpdateSatellitePositions();
         CheckHits();
+    }
+
+    private void UpdateSatellitePositions()
+    {
+        if (_satellites == null) return;
+        Vector3 center = transform.position;
+
+        for (int i = 0; i < _satelliteCount; i++)
+        {
+            if (_satellites[i] == null) continue;
+            float rad = (_angle + i * 360f / _satelliteCount) * Mathf.Deg2Rad;
+            Vector3 outward = new Vector3(Mathf.Cos(rad), 0f, Mathf.Sin(rad));
+            _satellites[i].transform.position = center + outward * _orbitRadius;
+            // Yaw faces outward; _modelRotationOffset corrects the model's local orientation.
+            _satellites[i].transform.rotation =
+                Quaternion.LookRotation(outward, Vector3.up) * Quaternion.Euler(_modelRotationOffset);
+        }
     }
 
     private void CheckHits()
@@ -49,17 +63,14 @@ public class SatelliteWeapon : Weapon
         foreach (GameObject sat in _satellites)
         {
             if (sat == null) continue;
-            Renderer satRenderer = sat.GetComponentInChildren<Renderer>();
-            Vector3 satCenter = satRenderer != null ? satRenderer.bounds.center : sat.transform.position;
-            Vector2 satXZ = new(satCenter.x, satCenter.z);
+            Vector2 satXZ = new(sat.transform.position.x, sat.transform.position.z);
 
             foreach (Health enemy in Health.ActiveEnemies)
             {
                 if (_nextHitTime.TryGetValue(enemy, out float next) && Time.time < next) continue;
 
                 Vector2 enemyXZ = new(enemy.transform.position.x, enemy.transform.position.z);
-                float dist = Vector2.Distance(satXZ, enemyXZ);
-                if (dist < _contactRadius)
+                if (Vector2.Distance(satXZ, enemyXZ) < _contactRadius)
                 {
                     enemy.LoseHealth(_damage + _damageBonus);
                     _nextHitTime[enemy] = Time.time + _damageInterval;
@@ -76,7 +87,7 @@ public class SatelliteWeapon : Weapon
             UpgradeType.SatelliteRadius => _orbitRadius < _maxOrbitRadius,
             UpgradeType.SatelliteSpeed => _orbitSpeed < _maxOrbitSpeed,
             UpgradeType.SatelliteDamage => _damageBonus < _maxDamageBonus,
-            _  => true,
+            _ => true,
         };
     }
 
@@ -135,17 +146,14 @@ public class SatelliteWeapon : Weapon
 
     public override void OnPlayerDeath()
     {
-        if (_orbitParent == null) return;
-
+        if (_satellites == null) return;
         foreach (var sat in _satellites)
         {
             if (sat == null) continue;
+            sat.transform.SetParent(null);
             var rb = sat.GetComponent<Rigidbody>();
             if (rb != null) rb.isKinematic = false;
         }
-
-        // Detach orbit from player so satellites fly off naturally
-        _orbitParent.SetParent(null);
     }
 
     private void OnDrawGizmos()
@@ -155,9 +163,7 @@ public class SatelliteWeapon : Weapon
         foreach (GameObject sat in _satellites)
         {
             if (sat == null) continue;
-            Renderer r = sat.GetComponentInChildren<Renderer>();
-            Vector3 center = r != null ? r.bounds.center : sat.transform.position;
-            Gizmos.DrawSphere(center, _contactRadius);
+            Gizmos.DrawSphere(sat.transform.position, _contactRadius);
         }
     }
 
@@ -168,24 +174,11 @@ public class SatelliteWeapon : Weapon
                 if (sat != null) Destroy(sat);
 
         _satellites = new GameObject[_satelliteCount];
-
         for (int i = 0; i < _satelliteCount; i++)
         {
-            float angle = i * 360f / _satelliteCount;
-            Vector3 localPos = new Vector3(
-                Mathf.Cos(angle * Mathf.Deg2Rad) * _orbitRadius,
-                0f,
-                Mathf.Sin(angle * Mathf.Deg2Rad) * _orbitRadius
-            );
-
-            GameObject sat = Instantiate(_satellitePrefab, _orbitParent);
-            sat.transform.localPosition = localPos;
-            sat.transform.localRotation = Quaternion.Euler(0, -angle, 0) * Quaternion.Euler(90, 90, 0);
-
-            _satellites[i] = sat;
-
+            _satellites[i] = Instantiate(_satellitePrefab, transform);
             if (_laserUnlocked)
-                sat.GetComponentInChildren<LaserBeamController>()?.Unlock();
+                _satellites[i].GetComponentInChildren<LaserBeamController>()?.Unlock();
         }
     }
 }

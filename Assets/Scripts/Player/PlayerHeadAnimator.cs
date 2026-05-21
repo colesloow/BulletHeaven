@@ -70,9 +70,10 @@ public class PlayerHeadAnimator : MonoBehaviour
         Quaternion targetRot = Quaternion.identity;
         if (springXZ.sqrMagnitude > 0.001f)
         {
+            Quaternion yawRot = Quaternion.LookRotation(-springXZ.normalized, Vector3.up);
             Vector3 tiltAxis = Vector3.Cross(Vector3.up, springXZ.normalized);
             float tiltAngle = springXZ.magnitude / maxLagDistance * maxTiltAngle;
-            targetRot = Quaternion.AngleAxis(tiltAngle, tiltAxis);
+            targetRot = Quaternion.AngleAxis(tiltAngle, tiltAxis) * yawRot;
         }
         head.rotation = Quaternion.Slerp(head.rotation, targetRot, Time.deltaTime * tiltSmoothing);
     }
