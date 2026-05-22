@@ -3,29 +3,33 @@ using UnityEngine;
 
 public class SatelliteWeapon : Weapon
 {
-    [SerializeField] private GameObject _satellitePrefab;
+    [SerializeField] private GameObject satellitePrefab;
     // Euler offset applied after the orbit yaw, to compensate for the model's local orientation.
-    [SerializeField] private Vector3 _modelRotationOffset = Vector3.zero;
-    [SerializeField] private float _orbitRadius = 1.5f;
-    [SerializeField] private float _orbitSpeed = 100f;
-    [SerializeField] private int _satelliteCount = 1;
+    [SerializeField] private Vector3 modelRotationOffset = Vector3.zero;
+    [SerializeField] private float orbitRadius = 1.5f;
+    [SerializeField] private float orbitSpeed = 100f;
+    [SerializeField] private int satelliteCount = 1;
 
     [Header("Damage")]
-    [SerializeField] private float _damage = 10f;
-    [SerializeField] private float _contactRadius = 0.3f;
-    [SerializeField] private float _damageInterval = 0.5f;
+    [SerializeField] private float damage = 10f;
+    [SerializeField] private float contactRadius = 0.3f;
+    [SerializeField] private float damageInterval = 0.5f;
 
     [Header("Caps")]
-    [SerializeField] private int _maxSatellites = 10;
-    [SerializeField] private float _maxOrbitRadius = 3f;
-    [SerializeField] private float _maxOrbitSpeed = 300f;
-    [SerializeField] private float _maxDamageBonus = 50f;
+    [SerializeField] private int maxSatellites = 10;
+    [SerializeField] private float maxOrbitRadius = 3f;
+    [SerializeField] private float maxOrbitSpeed = 300f;
+    [SerializeField] private float maxDamageBonus = 50f;
 
-    private float _damageBonus = 0f;
-    private bool _laserUnlocked = false;
-    private float _angle = 0f;
-    private GameObject[] _satellites;
-    private readonly Dictionary<Health, float> _nextHitTime = new();
+    private float damageBonus = 0f;
+    private bool laserUnlocked = false;
+    private float angle = 0f;
+    private GameObject[] satellites;
+    private readonly Dictionary<Health, float> nextHitTime = new();
+
+    private void OnEnable() => Health.OnEnemyDisabled += OnEnemyRemoved;
+    private void OnDisable() => Health.OnEnemyDisabled -= OnEnemyRemoved;
+    private void OnEnemyRemoved(Health enemy) => nextHitTime.Remove(enemy);
 
     protected override void OnInitialize()
     {
@@ -34,46 +38,46 @@ public class SatelliteWeapon : Weapon
 
     private void Update()
     {
-        _angle += _orbitSpeed * Time.deltaTime;
+        angle += orbitSpeed * Time.deltaTime;
         UpdateSatellitePositions();
         CheckHits();
     }
 
     private void UpdateSatellitePositions()
     {
-        if (_satellites == null) return;
+        if (satellites == null) return;
         Vector3 center = transform.position;
 
-        for (int i = 0; i < _satelliteCount; i++)
+        for (int i = 0; i < satelliteCount; i++)
         {
-            if (_satellites[i] == null) continue;
-            float rad = (_angle + i * 360f / _satelliteCount) * Mathf.Deg2Rad;
+            if (satellites[i] == null) continue;
+            float rad = (angle + i * 360f / satelliteCount) * Mathf.Deg2Rad;
             Vector3 outward = new Vector3(Mathf.Cos(rad), 0f, Mathf.Sin(rad));
-            _satellites[i].transform.position = center + outward * _orbitRadius;
-            // Yaw faces outward; _modelRotationOffset corrects the model's local orientation.
-            _satellites[i].transform.rotation =
-                Quaternion.LookRotation(outward, Vector3.up) * Quaternion.Euler(_modelRotationOffset);
+            satellites[i].transform.position = center + outward * orbitRadius;
+            // Yaw faces outward; modelRotationOffset corrects the model's local orientation.
+            satellites[i].transform.rotation =
+                Quaternion.LookRotation(outward, Vector3.up) * Quaternion.Euler(modelRotationOffset);
         }
     }
 
     private void CheckHits()
     {
-        if (_satellites == null) return;
+        if (satellites == null) return;
 
-        foreach (GameObject sat in _satellites)
+        foreach (GameObject sat in satellites)
         {
             if (sat == null) continue;
             Vector2 satXZ = new(sat.transform.position.x, sat.transform.position.z);
 
             foreach (Health enemy in Health.ActiveEnemies)
             {
-                if (_nextHitTime.TryGetValue(enemy, out float next) && Time.time < next) continue;
+                if (nextHitTime.TryGetValue(enemy, out float next) && Time.time < next) continue;
 
                 Vector2 enemyXZ = new(enemy.transform.position.x, enemy.transform.position.z);
-                if (Vector2.Distance(satXZ, enemyXZ) < _contactRadius)
+                if (Vector2.Distance(satXZ, enemyXZ) < contactRadius)
                 {
-                    enemy.LoseHealth(_damage + _damageBonus);
-                    _nextHitTime[enemy] = Time.time + _damageInterval;
+                    enemy.LoseHealth(damage + damageBonus);
+                    nextHitTime[enemy] = Time.time + damageInterval;
                 }
             }
         }
@@ -83,10 +87,10 @@ public class SatelliteWeapon : Weapon
     {
         return upgrade.Type switch
         {
-            UpgradeType.SatelliteCount => _satelliteCount < _maxSatellites,
-            UpgradeType.SatelliteRadius => _orbitRadius < _maxOrbitRadius,
-            UpgradeType.SatelliteSpeed => _orbitSpeed < _maxOrbitSpeed,
-            UpgradeType.SatelliteDamage => _damageBonus < _maxDamageBonus,
+            UpgradeType.SatelliteCount => satelliteCount < maxSatellites,
+            UpgradeType.SatelliteRadius => orbitRadius < maxOrbitRadius,
+            UpgradeType.SatelliteSpeed => orbitSpeed < maxOrbitSpeed,
+            UpgradeType.SatelliteDamage => damageBonus < maxDamageBonus,
             _ => true,
         };
     }
@@ -96,58 +100,47 @@ public class SatelliteWeapon : Weapon
         switch (upgrade.Type)
         {
             case UpgradeType.SatelliteCount:
-                _satelliteCount = Mathf.Clamp(_satelliteCount + (int)upgrade.Value, 1, _maxSatellites);
+                satelliteCount = Mathf.Clamp(satelliteCount + (int)upgrade.Value, 1, maxSatellites);
                 SpawnSatellites();
                 break;
             case UpgradeType.SatelliteRadius:
-                _orbitRadius += upgrade.Value;
+                orbitRadius += upgrade.Value;
                 SpawnSatellites();
                 break;
             case UpgradeType.SatelliteSpeed:
-                _orbitSpeed += upgrade.Value;
+                orbitSpeed += upgrade.Value;
                 break;
             case UpgradeType.SatelliteDamage:
-                _damageBonus = Mathf.Min(_damageBonus + upgrade.Value, _maxDamageBonus);
+                damageBonus = Mathf.Min(damageBonus + upgrade.Value, maxDamageBonus);
                 break;
         }
     }
 
     public void UnlockLasers()
     {
-        _laserUnlocked = true;
-        if (_satellites == null) return;
-        foreach (var sat in _satellites)
+        laserUnlocked = true;
+        ForEachLaser(l => l.Unlock());
+    }
+
+    public void ModifyLaserInterval(float delta) => ForEachLaser(l => l.ModifyInterval(delta));
+    public void ModifyLaserDuration(float delta) => ForEachLaser(l => l.ModifyDuration(delta));
+    public void ModifyLaserLength(float delta) => ForEachLaser(l => l.ModifyLength(delta));
+
+    private void ForEachLaser(System.Action<LaserBeamController> action)
+    {
+        if (satellites == null) return;
+        foreach (var sat in satellites)
         {
             if (sat == null) continue;
-            sat.GetComponentInChildren<LaserBeamController>()?.Unlock();
+            var laser = sat.GetComponentInChildren<LaserBeamController>();
+            if (laser != null) action(laser);
         }
-    }
-
-    public void ModifyLaserInterval(float delta)
-    {
-        if (_satellites == null) return;
-        foreach (var sat in _satellites)
-            sat?.GetComponentInChildren<LaserBeamController>()?.ModifyInterval(delta);
-    }
-
-    public void ModifyLaserDuration(float delta)
-    {
-        if (_satellites == null) return;
-        foreach (var sat in _satellites)
-            sat?.GetComponentInChildren<LaserBeamController>()?.ModifyDuration(delta);
-    }
-
-    public void ModifyLaserLength(float delta)
-    {
-        if (_satellites == null) return;
-        foreach (var sat in _satellites)
-            sat?.GetComponentInChildren<LaserBeamController>()?.ModifyLength(delta);
     }
 
     public override void OnPlayerDeath()
     {
-        if (_satellites == null) return;
-        foreach (var sat in _satellites)
+        if (satellites == null) return;
+        foreach (var sat in satellites)
         {
             if (sat == null) continue;
             sat.transform.SetParent(null);
@@ -158,27 +151,30 @@ public class SatelliteWeapon : Weapon
 
     private void OnDrawGizmos()
     {
-        if (_satellites == null) return;
+        if (satellites == null) return;
         Gizmos.color = new Color(1f, 0.3f, 0f, 0.4f);
-        foreach (GameObject sat in _satellites)
+        foreach (GameObject sat in satellites)
         {
             if (sat == null) continue;
-            Gizmos.DrawSphere(sat.transform.position, _contactRadius);
+            Gizmos.DrawSphere(sat.transform.position, contactRadius);
         }
     }
 
     private void SpawnSatellites()
     {
-        if (_satellites != null)
-            foreach (var sat in _satellites)
+        if (satellites != null)
+            foreach (var sat in satellites)
                 if (sat != null) Destroy(sat);
 
-        _satellites = new GameObject[_satelliteCount];
-        for (int i = 0; i < _satelliteCount; i++)
+        satellites = new GameObject[satelliteCount];
+        for (int i = 0; i < satelliteCount; i++)
         {
-            _satellites[i] = Instantiate(_satellitePrefab, transform);
-            if (_laserUnlocked)
-                _satellites[i].GetComponentInChildren<LaserBeamController>()?.Unlock();
+            satellites[i] = Instantiate(satellitePrefab, transform);
+            if (laserUnlocked)
+            {
+                var laser = satellites[i].GetComponentInChildren<LaserBeamController>();
+                if (laser != null) laser.Unlock();
+            }
         }
     }
 }

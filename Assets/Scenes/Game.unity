@@ -2491,12 +2491,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd223e59631daa443a1a42edb8cb3789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  _enemyDamageEnabled: 0
-  _baseSpawnInterval: 2
-  _initialMaxEnemies: 10
-  _maxEnemiesIncreasePerMinute: 5
+  enemyDamageEnabled: 0
+  baseSpawnInterval: 2
+  initialMaxEnemies: 10
+  maxEnemiesIncreasePerMinute: 5
   defaultEnemyPrefab: {fileID: 5961385405075670556, guid: 649c9fc4ee7766242939b6cd16e71ad8, type: 3}
-  _waves:
+  waves:
   - {fileID: 11400000, guid: 0a0b514caa3928b46a51ca1eb687bfd4, type: 2}
   - {fileID: 11400000, guid: eff764b42a597c243bbeb11a6e0ee327, type: 2}
   - {fileID: 11400000, guid: f4982ff973ee5ee42b922e51c8f951b1, type: 2}
@@ -2507,8 +2507,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b206da9c2bdbb8d4d8e727b7fe3252b4, type: 2}
   - {fileID: 11400000, guid: 0ec622056e7611446ae0676733da914e, type: 2}
   - {fileID: 11400000, guid: 05d01e0d63db3d74397dc4e165c937f6, type: 2}
-  _enemyHealthScalingPerLevel: 0.15
-  _enemyDamageScalingPerLevel: 0.1
+  enemyHealthScalingPerLevel: 0.15
+  enemyDamageScalingPerLevel: 0.1
 --- !u!1 &1154541803
 GameObject:
   m_ObjectHideFlags: 0

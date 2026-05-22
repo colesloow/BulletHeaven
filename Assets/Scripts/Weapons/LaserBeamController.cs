@@ -22,6 +22,10 @@ public class LaserBeamController : MonoBehaviour
     private float currentBeamStart = 0f;
     private float currentBeamEnd = 0f;
 
+    private void OnEnable() => Health.OnEnemyDisabled += OnEnemyRemoved;
+    private void OnDisable() => Health.OnEnemyDisabled -= OnEnemyRemoved;
+    private void OnEnemyRemoved(Health enemy) => nextHitTime.Remove(enemy);
+
     private void Start()
     {
         laserLine.useWorldSpace = false;

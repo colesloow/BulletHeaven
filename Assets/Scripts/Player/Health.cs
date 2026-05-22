@@ -6,22 +6,21 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     public static readonly List<Health> ActiveEnemies = new();
+    public static event Action<Health> OnEnemyDisabled;
 
     [SerializeField]
-    private float _maxHealth = 100f;
+    private float maxHealth = 100f;
     [SerializeField]
-    private float _currentHealth;
-    [SerializeField]
-    private int _level;
+    private float currentHealth;
 
-    private float _baseMaxHealth;
-    private Animator _animator;
-    private WeaponManager _weaponManager;
-    private PooledObject _pooledObject;
+    private float baseMaxHealth;
+    private Animator animator;
+    private WeaponManager weaponManager;
+    private PooledObject pooledObject;
 
     public event Action<float> OnDamaged;
 
-    public bool IsDead = false;
+    public bool IsDead { get; private set; }
 
     private void OnEnable()
     {
@@ -30,21 +29,24 @@ public class Health : MonoBehaviour
 
     private void OnDisable()
     {
-        ActiveEnemies.Remove(this);
+        if (CompareTag("Enemy"))
+        {
+            ActiveEnemies.Remove(this);
+            OnEnemyDisabled?.Invoke(this);
+        }
     }
 
     private void Start()
     {
-        _animator = GetComponent<Animator>();
-        _weaponManager = GetComponent<WeaponManager>();
-        _pooledObject = GetComponent<PooledObject>();
-        _baseMaxHealth = _maxHealth;
-        _currentHealth = _maxHealth;
+        animator = GetComponent<Animator>();
+        weaponManager = GetComponent<WeaponManager>();
+        pooledObject = GetComponent<PooledObject>();
+        baseMaxHealth = maxHealth;
+        currentHealth = maxHealth;
 
-        // if game object is the player, synchronize health
         if (gameObject.CompareTag("Player") && GameManager.Instance != null)
         {
-            GameManager.Instance.PlayerHealth = _currentHealth;
+            GameManager.Instance.PlayerHealth = currentHealth;
         }
         else if (gameObject.CompareTag("Enemy") && WaveManager.Instance != null)
         {
@@ -54,41 +56,34 @@ public class Health : MonoBehaviour
 
     private void ScaleHealth(float healthScalingPerLevel, float damageScalingPerLevel, int level)
     {
-        if (gameObject.CompareTag("Enemy"))
-        {
-            _maxHealth = _baseMaxHealth * (1f + (level - 1) * healthScalingPerLevel);
-            _currentHealth = _maxHealth;
-        }
+        maxHealth = baseMaxHealth * (1f + (level - 1) * healthScalingPerLevel);
+        currentHealth = maxHealth;
     }
 
     public void LoseHealth(float amount)
     {
         if (IsDead) return;
 
-        _currentHealth -= amount;
-        if (_currentHealth < 0)
-            _currentHealth = 0;
+        currentHealth -= amount;
+        if (currentHealth < 0)
+            currentHealth = 0;
 
         OnDamaged?.Invoke(amount);
 
         if (gameObject.CompareTag("Player") && GameManager.Instance != null)
-            GameManager.Instance.PlayerHealth = _currentHealth;
+            GameManager.Instance.PlayerHealth = currentHealth;
 
-        if (_currentHealth <= 0)
+        if (currentHealth <= 0)
             Die();
     }
 
     public void GainHealth(float amount)
     {
-        _currentHealth = Mathf.Clamp(_currentHealth + amount, 0, _maxHealth); // clamp to max health
-        if (_currentHealth > _maxHealth)
-        {
-            _currentHealth = _maxHealth;
-        }
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
 
         if (gameObject.CompareTag("Player") && GameManager.Instance != null)
         {
-            GameManager.Instance.PlayerHealth = _currentHealth;
+            GameManager.Instance.PlayerHealth = currentHealth;
         }
     }
 
@@ -100,38 +95,25 @@ public class Health : MonoBehaviour
         }
 
         if (gameObject.CompareTag("Player"))
-        {
-            // if player is dead
             StartCoroutine(PlayerDeathSequence());
-        }
         else
-        {
-            // if ememy is dead,
             StartCoroutine(EnemyDeathSequence());
-        }
     }
 
     private IEnumerator PlayerDeathSequence()
     {
         IsDead = true;
-        _animator.SetBool("IsDying", IsDead);
-        if (_weaponManager != null) _weaponManager.OnPlayerDeath();
-        SoundManager.PlaySound(SoundType.DEATH); // play death sound
-
-        // CharacterController playerController = GetComponent<CharacterController>();
-        // if (playerController != null)
-        // {
-        //     playerController.DisableMovement();
-        // }
+        animator.SetBool("IsDying", IsDead);
+        if (weaponManager != null) weaponManager.OnPlayerDeath();
+        SoundManager.PlaySound(SoundType.DEATH);
 
         yield return new WaitForSeconds(1.5f);
 
-        // show game over
         UIManager.Instance.ShowGameOver();
         GameManager.Instance.TriggerGameOver();
     }
 
-    private static readonly WaitForSeconds _deathDelay = new(1f);
+    private static readonly WaitForSeconds deathDelay = new(1f);
 
     private IEnumerator EnemyDeathSequence()
     {
@@ -143,16 +125,16 @@ public class Health : MonoBehaviour
         foreach (var mesh in meshes)
             mesh.enabled = false;
 
-        yield return _deathDelay;
+        yield return deathDelay;
 
         IsDead = false;
-        _currentHealth = _maxHealth;
+        currentHealth = maxHealth;
         foreach (var mesh in meshes)
             mesh.enabled = true;
 
-        _pooledObject ??= GetComponent<PooledObject>();
-        if (_pooledObject != null)
-            _pooledObject.Release();
+        pooledObject ??= GetComponent<PooledObject>();
+        if (pooledObject != null)
+            pooledObject.Release();
         else
             gameObject.SetActive(false);
     }
