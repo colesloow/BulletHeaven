@@ -11,28 +11,32 @@ using UnityEngine;
 //   3. Set OccluderMask to the layer(s) used by room/wall meshes.
 public class WallCutoutController : MonoBehaviour
 {
-    [SerializeField] private Transform _maskSphere;
-    [SerializeField] private float _maskRadius   = 3f;
-    [SerializeField] private LayerMask _occluderMask;
+    [SerializeField] private Transform maskSphere;
+    [SerializeField] private float maskRadius = 3f;
+    [SerializeField] private LayerMask occluderMask;
+    [SerializeField] private float checkInterval = 0.05f;
 
-    private Camera _camera;
+    private Camera mainCamera;
+    private float nextCheckTime;
 
     private void Start()
     {
-        _camera = Camera.main;
-        if (_maskSphere != null)
-            _maskSphere.localScale = Vector3.zero;
+        mainCamera = Camera.main;
+        if (maskSphere != null)
+            maskSphere.localScale = Vector3.zero;
     }
 
     private void LateUpdate()
     {
-        if (_maskSphere == null || _camera == null) return;
+        if (maskSphere == null || mainCamera == null) return;
+        if (Time.time < nextCheckTime) return;
+        nextCheckTime = Time.time + checkInterval;
 
-        Vector3 camPos = _camera.transform.position;
+        Vector3 camPos = mainCamera.transform.position;
         Vector3 toPlayer = transform.position - camPos;
         float dist = toPlayer.magnitude;
 
-        bool blocked = Physics.Raycast(camPos, toPlayer.normalized, dist, _occluderMask);
-        _maskSphere.localScale = Vector3.one * (blocked ? _maskRadius : 0f);
+        bool blocked = Physics.Raycast(camPos, toPlayer.normalized, dist, occluderMask);
+        maskSphere.localScale = Vector3.one * (blocked ? maskRadius : 0f);
     }
 }

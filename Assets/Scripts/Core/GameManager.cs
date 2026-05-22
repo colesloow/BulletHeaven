@@ -132,10 +132,13 @@ public class GameManager : MonoBehaviour
         secondsRemaining = -1;
     }
 
+    public void Pause() => Time.timeScale = 0f;
+    public void Resume() => Time.timeScale = 1f;
+
     public void TriggerGameOver()
     {
         timerRunning = false;
-        Time.timeScale = 0;
+        Pause();
         UIManager.Instance.ShowGameOver();
     }
 

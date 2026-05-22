@@ -55,8 +55,7 @@ public class SceneLoader : MonoBehaviour
             yield return null;
         }
 
-        // reset time scale after restart
-        Time.timeScale = 1;
+        GameManager.Instance?.Resume();
 
         // set the new scene as active once loaded
         Scene newScene = SceneManager.GetSceneByName(_gameSceneName);

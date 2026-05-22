@@ -146,7 +146,6 @@ GameObject:
   - component: {fileID: 7944010049476000275}
   - component: {fileID: 6386948041453948834}
   - component: {fileID: 5736690039680169206}
-  - component: {fileID: 7426623516643911961}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -293,11 +292,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f155f2d12bb6664d9b1ba495afb50a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WallCutoutController
-  _maskSphere: {fileID: 8359437041188083637}
-  _maskRadius: 3
-  _occluderMask:
+  maskSphere: {fileID: 8359437041188083637}
+  maskRadius: 3
+  occluderMask:
     serializedVersion: 2
     m_Bits: 256
+  checkInterval: 0.05
 --- !u!114 &5736690039680169206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,22 +320,6 @@ MonoBehaviour:
   tiltSmoothing: 8
   hoverAmplitude: 0.04
   hoverFrequency: 1.3
---- !u!114 &7426623516643911961
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2076768018490587838}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c78b681cc321de4c91e6c23758ddc8b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathAnimation
-  robotRoot: {fileID: 2373213458293667288}
-  explosionForce: 4
-  torqueForce: 5
-  partLifetime: 4
 --- !u!1 &2697912149634416660
 GameObject:
   m_ObjectHideFlags: 0

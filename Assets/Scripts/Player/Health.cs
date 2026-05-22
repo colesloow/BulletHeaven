@@ -24,7 +24,12 @@ public class Health : MonoBehaviour
 
     private void OnEnable()
     {
-        if (CompareTag(Tags.Enemy)) ActiveEnemies.Add(this);
+        if (CompareTag(Tags.Enemy))
+        {
+            ActiveEnemies.Add(this);
+            if (WaveManager.Instance != null)
+                WaveManager.Instance.OnEnemiesLevelUp += ScaleHealth;
+        }
     }
 
     private void OnDisable()
@@ -33,6 +38,8 @@ public class Health : MonoBehaviour
         {
             ActiveEnemies.Remove(this);
             OnEnemyDisabled?.Invoke(this);
+            if (WaveManager.Instance != null)
+                WaveManager.Instance.OnEnemiesLevelUp -= ScaleHealth;
         }
     }
 
@@ -45,13 +52,7 @@ public class Health : MonoBehaviour
         currentHealth = maxHealth;
 
         if (gameObject.CompareTag(Tags.Player) && GameManager.Instance != null)
-        {
             GameManager.Instance.PlayerHealth = currentHealth;
-        }
-        else if (gameObject.CompareTag(Tags.Enemy) && WaveManager.Instance != null)
-        {
-            WaveManager.Instance.OnEnemiesLevelUp += ScaleHealth;
-        }
     }
 
     private void ScaleHealth(float healthScalingPerLevel, float damageScalingPerLevel, int level)
@@ -89,11 +90,6 @@ public class Health : MonoBehaviour
 
     private void Die()
     {
-        if (gameObject.CompareTag(Tags.Enemy) && WaveManager.Instance != null)
-        {
-            WaveManager.Instance.OnEnemiesLevelUp -= ScaleHealth;
-        }
-
         if (gameObject.CompareTag(Tags.Player))
             StartCoroutine(PlayerDeathSequence());
         else

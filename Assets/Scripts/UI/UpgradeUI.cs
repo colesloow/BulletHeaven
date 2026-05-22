@@ -72,7 +72,7 @@ public class UpgradeUI : MonoBehaviour
         }
 
         ShowPanel();
-        Time.timeScale = 0f;
+        GameManager.Instance?.Pause();
     }
 
     private System.Collections.IEnumerator AutoDismiss()
@@ -85,7 +85,7 @@ public class UpgradeUI : MonoBehaviour
     private void Pick(WeaponUpgrade upgrade)
     {
         HidePanel();
-        Time.timeScale = 1f;
+        GameManager.Instance?.Resume();
         if (upgrade.ScrapCost > 0 && GameManager.Instance != null)
             GameManager.Instance.PlayerScrews -= upgrade.ScrapCost;
         _onPicked?.Invoke(upgrade);
