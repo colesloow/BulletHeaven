@@ -145,7 +145,11 @@ public class SatelliteWeapon : Weapon
             if (sat == null) continue;
             sat.transform.SetParent(null);
             var rb = sat.GetComponent<Rigidbody>();
-            if (rb != null) rb.isKinematic = false;
+            if (rb == null) rb = sat.AddComponent<Rigidbody>();
+            rb.isKinematic = false;
+            Vector3 outward = (sat.transform.position - transform.position).normalized;
+            rb.AddForce((outward + Vector3.up * 0.3f) * 3f, ForceMode.Impulse);
+            rb.AddTorque(Random.onUnitSphere * 2f, ForceMode.Impulse);
         }
     }
 

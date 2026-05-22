@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform bodyMesh;
 
     private Rigidbody rb;
-    private Vector3 _moveDirection;
+    private Vector3 moveDirection;
     private Camera mainCamera;
 
     public void AddSpeed(float amount) => speed += amount;
@@ -39,7 +39,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 camForward = Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up).normalized;
         Vector3 camRight = Vector3.ProjectOnPlane(mainCamera.transform.right, Vector3.up).normalized;
-        _moveDirection = (camForward * input.y + camRight * input.x).normalized;
+        moveDirection = (camForward * input.y + camRight * input.x).normalized;
 
         // Drive rolling from actual Rigidbody velocity so it reflects real movement
         Vector3 velocity = rb.linearVelocity;
@@ -55,7 +55,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector3 targetVelocity = _moveDirection * speed;
+        Vector3 targetVelocity = moveDirection * speed;
         rb.linearVelocity = Vector3.MoveTowards(rb.linearVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
     }
 }

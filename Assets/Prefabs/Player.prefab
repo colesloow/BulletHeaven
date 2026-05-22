@@ -146,6 +146,7 @@ GameObject:
   - component: {fileID: 7944010049476000275}
   - component: {fileID: 6386948041453948834}
   - component: {fileID: 5736690039680169206}
+  - component: {fileID: 7426623516643911961}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -231,11 +232,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d22e33f8b45143b46acf9fba85f76351, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  _speed: 6
-  _acceleration: 8
-  _radius: 0.5
-  _moveAction: {fileID: 6800092525090821347, guid: b60ed40318ad0bb41b96b9609ca0ed14, type: 3}
-  _bodyMesh: {fileID: 8018372653011163648}
+  speed: 6
+  acceleration: 8
+  radius: 0.5
+  moveAction: {fileID: 6800092525090821347, guid: b60ed40318ad0bb41b96b9609ca0ed14, type: 3}
+  bodyMesh: {fileID: 8018372653011163648}
 --- !u!114 &7529071528004732840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -262,10 +263,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4352de81fcf73e4439e6e4f6eb9cd9fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  _maxHealth: 100
-  _currentHealth: 100
-  _level: 1
-  IsDead: 0
+  maxHealth: 100
+  currentHealth: 0
 --- !u!208 &7944010049476000275
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -321,6 +320,22 @@ MonoBehaviour:
   tiltSmoothing: 8
   hoverAmplitude: 0.04
   hoverFrequency: 1.3
+--- !u!114 &7426623516643911961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076768018490587838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c78b681cc321de4c91e6c23758ddc8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathAnimation
+  robotRoot: {fileID: 2373213458293667288}
+  explosionForce: 4
+  torqueForce: 5
+  partLifetime: 4
 --- !u!1 &2697912149634416660
 GameObject:
   m_ObjectHideFlags: 0

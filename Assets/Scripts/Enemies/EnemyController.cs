@@ -24,24 +24,23 @@ public class EnemyController : MonoBehaviour
     {
         _agent = GetComponent<NavMeshAgent>();
         _agent.speed = _speed;
-    }
-
-    private void Start()
-    {
         _baseDamage = _damage;
 
-        GameObject playerObj = GameObject.FindWithTag("Player");
+        GameObject playerObj = GameObject.FindWithTag(Tags.Player);
         if (playerObj != null)
         {
             _player = playerObj.transform;
             _playerHealth = playerObj.GetComponent<Health>();
         }
+    }
 
+    private void OnEnable()
+    {
         if (WaveManager.Instance != null)
             WaveManager.Instance.OnEnemiesLevelUp += ScaleDamage;
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         if (WaveManager.Instance != null)
             WaveManager.Instance.OnEnemiesLevelUp -= ScaleDamage;
