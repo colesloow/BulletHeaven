@@ -32,23 +32,9 @@ public class WaveConfig : ScriptableObject
     [Tooltip("Enemy types and their relative spawn weights")]
     public EnemySpawnEntry[] EnemyTypes;
 
-    // Picks a random prefab from EnemyTypes using weighted random selection.
     // Returns null if EnemyTypes is empty (WaveManager falls back to default prefab).
     public GameObject PickRandomPrefab()
     {
-        if (EnemyTypes == null || EnemyTypes.Length == 0) return null;
-
-        float total = 0f;
-        foreach (var entry in EnemyTypes) total += entry.Weight;
-
-        float roll = Random.Range(0f, total);
-        float cumulative = 0f;
-        foreach (var entry in EnemyTypes)
-        {
-            cumulative += entry.Weight;
-            if (roll < cumulative) return entry.Prefab;
-        }
-
-        return EnemyTypes[EnemyTypes.Length - 1].Prefab;
+        return WeightedRandom.Pick(EnemyTypes, e => e.Weight).Prefab;
     }
 }

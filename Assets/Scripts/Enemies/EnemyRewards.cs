@@ -5,38 +5,23 @@ using UnityEngine;
 // Called by Health.EnemyDeathSequence when the enemy dies.
 public class EnemyRewards : MonoBehaviour
 {
-    [SerializeField] private int _scoreValue = 10;
-    [SerializeField] private float _dropHeight = 0.3f;
+    [SerializeField] private int scoreValue = 10;
+    [SerializeField] private float dropHeight = 0.3f;
 
-    [SerializeField] private DropEntry[] _drops;
+    [SerializeField] private DropEntry[] drops;
 
     public void GrantRewards(Vector3 position)
     {
         if (GameManager.Instance != null)
-            GameManager.Instance.TotalScore += _scoreValue;
+            GameManager.Instance.TotalScore += scoreValue;
 
-        if (PoolManager.Instance == null || _drops == null || _drops.Length == 0) return;
+        if (PoolManager.Instance == null || drops == null || drops.Length == 0) return;
 
-        float total = 0f;
-        foreach (var drop in _drops)
-            if (drop.Prefab != null && drop.Weight > 0f)
-                total += drop.Weight;
+        var drop = WeightedRandom.Pick(drops, d => d.Prefab != null ? d.Weight : 0f);
+        if (drop.Prefab == null) return;
 
-        if (total <= 0f) return;
-
-        float roll = Random.value * total;
-        float cumulative = 0f;
-        Vector3 dropPosition = new Vector3(position.x, _dropHeight, position.z);
-        foreach (var drop in _drops)
-        {
-            if (drop.Prefab == null || drop.Weight <= 0f) continue;
-            cumulative += drop.Weight;
-            if (roll <= cumulative)
-            {
-                PoolManager.Instance.Get(drop.Prefab).transform.position = dropPosition;
-                return;
-            }
-        }
+        Vector3 dropPosition = new Vector3(position.x, dropHeight, position.z);
+        PoolManager.Instance.Get(drop.Prefab).transform.position = dropPosition;
     }
 }
 

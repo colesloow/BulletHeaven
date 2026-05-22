@@ -21,6 +21,7 @@ public class LaserBeamController : MonoBehaviour
     private bool firing = false;
     private float currentBeamStart = 0f;
     private float currentBeamEnd = 0f;
+    private Coroutine autoFireCoroutine;
 
     private void OnEnable() => Health.OnEnemyDisabled += OnEnemyRemoved;
     private void OnDisable() => Health.OnEnemyDisabled -= OnEnemyRemoved;
@@ -30,7 +31,7 @@ public class LaserBeamController : MonoBehaviour
     {
         laserLine.useWorldSpace = false;
         laserLine.enabled = false;
-        StartCoroutine(AutoFireLoop());
+        autoFireCoroutine = StartCoroutine(AutoFireLoop());
     }
 
     public void Unlock() => unlocked = true;
@@ -40,7 +41,7 @@ public class LaserBeamController : MonoBehaviour
 
     public void StopLaser()
     {
-        StopAllCoroutines();
+        if (autoFireCoroutine != null) StopCoroutine(autoFireCoroutine);
         laserLine.enabled = false;
         firing = false;
     }

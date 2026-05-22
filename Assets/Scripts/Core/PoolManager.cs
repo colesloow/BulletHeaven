@@ -57,12 +57,9 @@ public class PoolManager : MonoBehaviour
             createFunc: () =>
             {
                 GameObject go = Instantiate(prefab, transform);
-                go.GetComponent<PooledObject>()?.Setup(prefab, this);
-                // If the prefab has no PooledObject, add one automatically
-                if (go.GetComponent<PooledObject>() == null)
-                {
-                    go.AddComponent<PooledObject>().Setup(prefab, this);
-                }
+                // Add PooledObject automatically if the prefab doesn't have one.
+                var pooled = go.GetComponent<PooledObject>() ?? go.AddComponent<PooledObject>();
+                pooled.Setup(prefab, this);
                 return go;
             },
             actionOnGet: go => go.SetActive(true),

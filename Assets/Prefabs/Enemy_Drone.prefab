@@ -226,9 +226,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cbe9d4c18bdf1d47bf953963b3e1887, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRewards
-  _scoreValue: 10
-  _dropHeight: 0.3
-  _drops:
+  scoreValue: 10
+  dropHeight: 0.3
+  drops:
   - Prefab: {fileID: 4510951735512833629, guid: 56fb1a41d3f9a5640b6069dd4f021940, type: 3}
     Weight: 30
   - Prefab: {fileID: 4510951735512833629, guid: 1aa73eb4b0616914d9a2f1d5d0063e13, type: 3}

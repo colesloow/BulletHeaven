@@ -5,7 +5,7 @@ public class DestroyAfterDelay : MonoBehaviour
     [SerializeField]
     private float delay = 5f;
 
-    void Update()
+    void Start()
     {
         Destroy(gameObject, delay);
     }
