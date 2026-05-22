@@ -6,7 +6,7 @@ public class WeaponPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag(Tags.Player)) return;
         if (GameManager.Instance?.WeaponManager == null) return;
 
         GameManager.Instance.WeaponManager.AddWeapon(_weaponData);

@@ -24,12 +24,12 @@ public class Health : MonoBehaviour
 
     private void OnEnable()
     {
-        if (CompareTag("Enemy")) ActiveEnemies.Add(this);
+        if (CompareTag(Tags.Enemy)) ActiveEnemies.Add(this);
     }
 
     private void OnDisable()
     {
-        if (CompareTag("Enemy"))
+        if (CompareTag(Tags.Enemy))
         {
             ActiveEnemies.Remove(this);
             OnEnemyDisabled?.Invoke(this);
@@ -44,11 +44,11 @@ public class Health : MonoBehaviour
         baseMaxHealth = maxHealth;
         currentHealth = maxHealth;
 
-        if (gameObject.CompareTag("Player") && GameManager.Instance != null)
+        if (gameObject.CompareTag(Tags.Player) && GameManager.Instance != null)
         {
             GameManager.Instance.PlayerHealth = currentHealth;
         }
-        else if (gameObject.CompareTag("Enemy") && WaveManager.Instance != null)
+        else if (gameObject.CompareTag(Tags.Enemy) && WaveManager.Instance != null)
         {
             WaveManager.Instance.OnEnemiesLevelUp += ScaleHealth;
         }
@@ -70,7 +70,7 @@ public class Health : MonoBehaviour
 
         OnDamaged?.Invoke(amount);
 
-        if (gameObject.CompareTag("Player") && GameManager.Instance != null)
+        if (gameObject.CompareTag(Tags.Player) && GameManager.Instance != null)
             GameManager.Instance.PlayerHealth = currentHealth;
 
         if (currentHealth <= 0)
@@ -81,7 +81,7 @@ public class Health : MonoBehaviour
     {
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
 
-        if (gameObject.CompareTag("Player") && GameManager.Instance != null)
+        if (gameObject.CompareTag(Tags.Player) && GameManager.Instance != null)
         {
             GameManager.Instance.PlayerHealth = currentHealth;
         }
@@ -89,12 +89,12 @@ public class Health : MonoBehaviour
 
     private void Die()
     {
-        if (gameObject.CompareTag("Enemy") && WaveManager.Instance != null)
+        if (gameObject.CompareTag(Tags.Enemy) && WaveManager.Instance != null)
         {
             WaveManager.Instance.OnEnemiesLevelUp -= ScaleHealth;
         }
 
-        if (gameObject.CompareTag("Player"))
+        if (gameObject.CompareTag(Tags.Player))
             StartCoroutine(PlayerDeathSequence());
         else
             StartCoroutine(EnemyDeathSequence());
