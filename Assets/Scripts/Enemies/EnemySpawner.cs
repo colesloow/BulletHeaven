@@ -59,8 +59,15 @@ public class EnemySpawner : MonoBehaviour
             }
             else if (dist > despawnDistance || Time.time - lastCloseTime.GetValueOrDefault(enemy, Time.time) > maxChaseTime)
             {
-                Despawn(enemy);
-                activeEnemies.RemoveAt(i);
+                if (!Relocate(enemy))
+                {
+                    Despawn(enemy);
+                    activeEnemies.RemoveAt(i);
+                }
+                else
+                {
+                    lastCloseTime.Remove(enemy);
+                }
             }
         }
     }
@@ -70,6 +77,24 @@ public class EnemySpawner : MonoBehaviour
         lastCloseTime.Remove(enemy);
         if (enemy.TryGetComponent(out PooledObject pooled)) pooled.Release();
         else enemy.SetActive(false);
+    }
+
+    // Moves an existing enemy to a new off-screen spawn point near the player.
+    // Returns false if no valid room is found (caller should despawn instead).
+    private bool Relocate(GameObject enemy)
+    {
+        Room room = GetEligibleRoom();
+        if (room == null) return false;
+
+        Vector3 spawnPoint = GetSpawnPoint(room);
+        if (spawnPoint == Vector3.zero) return false;
+
+        if (enemy.TryGetComponent(out NavMeshAgent agent))
+            agent.Warp(spawnPoint);
+        else
+            enemy.transform.position = spawnPoint;
+
+        return true;
     }
 
     public void TrySpawnOne(GameObject prefab)

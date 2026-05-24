@@ -38,7 +38,7 @@ public class SatelliteWeapon : Weapon
 
     private void Update()
     {
-        angle += orbitSpeed * Time.deltaTime;
+        angle -= orbitSpeed * Time.deltaTime;
         UpdateSatellitePositions();
         CheckHits();
     }

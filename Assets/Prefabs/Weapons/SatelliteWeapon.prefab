@@ -46,11 +46,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SatelliteWeapon
   satellitePrefab: {fileID: 8118963732262246295, guid: 5a267822f4bdd3345a43681f6d08cafb, type: 3}
   modelRotationOffset: {x: 0, y: 0, z: 0}
-  orbitRadius: 1.5
+  orbitRadius: 2
   orbitSpeed: 100
   satelliteCount: 1
   damage: 10
-  contactRadius: 0.3
+  contactRadius: 0.4
   damageInterval: 0.5
   maxSatellites: 10
   maxOrbitRadius: 3
