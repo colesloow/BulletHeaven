@@ -22,7 +22,7 @@ public class SatelliteWeapon : Weapon
     [SerializeField] private float maxDamageBonus = 50f;
 
     private float damageBonus = 0f;
-    private bool laserUnlocked = false;
+    private int laserCount = 0;
     private float angle = 0f;
     private GameObject[] satellites;
     private readonly Dictionary<Health, float> nextHitTime = new();
@@ -91,6 +91,7 @@ public class SatelliteWeapon : Weapon
             UpgradeType.SatelliteRadius => orbitRadius < maxOrbitRadius,
             UpgradeType.SatelliteSpeed => orbitSpeed < maxOrbitSpeed,
             UpgradeType.SatelliteDamage => damageBonus < maxDamageBonus,
+            UpgradeType.SatelliteLaserCount => laserCount > 0 && laserCount < satelliteCount,
             _ => true,
         };
     }
@@ -113,13 +114,21 @@ public class SatelliteWeapon : Weapon
             case UpgradeType.SatelliteDamage:
                 damageBonus = Mathf.Min(damageBonus + upgrade.Value, maxDamageBonus);
                 break;
+            case UpgradeType.SatelliteLaserCount:
+                if (laserCount < satelliteCount)
+                {
+                    laserCount++;
+                    ApplyLaserState();
+                }
+                break;
         }
     }
 
     public void UnlockLasers()
     {
-        laserUnlocked = true;
-        ForEachLaser(l => l.Unlock());
+        if (laserCount > 0) return;
+        laserCount = 1;
+        ApplyLaserState();
     }
 
     public void ModifyLaserInterval(float delta) => ForEachLaser(l => l.ModifyInterval(delta));
@@ -164,6 +173,26 @@ public class SatelliteWeapon : Weapon
         }
     }
 
+    private void ApplyLaserState()
+    {
+        if (satellites == null || laserCount == 0) return;
+        for (int slot = 0; slot < laserCount; slot++)
+        {
+            int idx = LaserPlacementIndex(slot);
+            if (idx >= satelliteCount || satellites[idx] == null) continue;
+            satellites[idx].GetComponentInChildren<LaserBeamController>()?.Unlock();
+        }
+    }
+
+    // Even count: interleave 0, N/2, 1, N/2+1, ... to maximize angular spread.
+    // Odd count: sequential 0, 1, 2, ... (asymmetry accepted).
+    private int LaserPlacementIndex(int laserSlot)
+    {
+        if (satelliteCount % 2 == 1) return laserSlot;
+        int half = satelliteCount / 2;
+        return laserSlot % 2 == 0 ? laserSlot / 2 : half + laserSlot / 2;
+    }
+
     private void SpawnSatellites()
     {
         if (satellites != null)
@@ -172,13 +201,8 @@ public class SatelliteWeapon : Weapon
 
         satellites = new GameObject[satelliteCount];
         for (int i = 0; i < satelliteCount; i++)
-        {
             satellites[i] = Instantiate(satellitePrefab, transform);
-            if (laserUnlocked)
-            {
-                var laser = satellites[i].GetComponentInChildren<LaserBeamController>();
-                if (laser != null) laser.Unlock();
-            }
-        }
+
+        ApplyLaserState();
     }
 }

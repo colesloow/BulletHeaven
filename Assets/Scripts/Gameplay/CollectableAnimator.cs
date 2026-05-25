@@ -14,7 +14,6 @@ public class CollectableAnimator : MonoBehaviour
     {
         initialized = false;
         timeOffset = Random.Range(0f, Mathf.PI * 2f);
-        Debug.Log($"[CollectableAnimator] OnEnable on: {gameObject.name}, parent: {transform.parent?.name ?? "none"}");
     }
 
     private void Update()
@@ -23,7 +22,6 @@ public class CollectableAnimator : MonoBehaviour
         {
             originY = transform.position.y;
             initialized = true;
-            Debug.Log($"[CollectableAnimator] Initialized at y={originY}, localEuler={transform.localEulerAngles}");
         }
 
         transform.Rotate(0f, rotateSpeed * Time.deltaTime, 0f, Space.Self);

@@ -1,13 +1,13 @@
 using UnityEditor;
 using UnityEngine;
 
-public static class GenerateSatelliteUpgrades
+public static class GenerateWeaponUpgrades
 {
     private const string SatelliteDataPath = "Assets/Data/Weapons/Satellite_WeaponData.asset";
     private const string LaserDataPath = "Assets/Data/Weapons/Laser_WeaponData.asset";
     private const string OutputFolder = "Assets/Data/Weapons";
 
-    [MenuItem("BulletHeaven/Generate Satellite Upgrades")]
+    [MenuItem("BulletHeaven/Generate Weapon Upgrades")]
     public static void Generate()
     {
         WeaponData satelliteData = AssetDatabase.LoadAssetAtPath<WeaponData>(SatelliteDataPath);
@@ -36,24 +36,24 @@ public static class GenerateSatelliteUpgrades
         var definitions = new (string fileName, string displayName, WeaponData target, UpgradeType type, float value, UpgradeRarity rarity, int scrapCost)[]
         {
             // Satellite upgrades
-            ("Upgrade_Satellite_Count_1",  "+1 Satellite",        satelliteData, UpgradeType.SatelliteCount,  1f,   UpgradeRarity.Common,    0),
-            ("Upgrade_Satellite_Count_2",  "+2 Satellites",       satelliteData, UpgradeType.SatelliteCount,  2f,   UpgradeRarity.Uncommon,  15),
-            ("Upgrade_Satellite_Count_3",  "+3 Satellites",       satelliteData, UpgradeType.SatelliteCount,  3f,   UpgradeRarity.Rare,      30),
+            ("Upgrade_Satellite_Count_1",      "+1 Satellite",             satelliteData, UpgradeType.SatelliteCount,      1f,   UpgradeRarity.Uncommon,  2),
+            ("Upgrade_Satellite_Count_2",      "+2 Satellites",            satelliteData, UpgradeType.SatelliteCount,      2f,   UpgradeRarity.Rare,      5),
+            ("Upgrade_Satellite_Laser_Count",  "Wider Laser Coverage",     satelliteData, UpgradeType.SatelliteLaserCount, 0f,   UpgradeRarity.Rare,      5),
             ("Upgrade_Satellite_Radius_S", "+0.3 Orbit Radius",   satelliteData, UpgradeType.SatelliteRadius, 0.3f, UpgradeRarity.Common,    0),
-            ("Upgrade_Satellite_Radius_M", "+0.5 Orbit Radius",   satelliteData, UpgradeType.SatelliteRadius, 0.5f, UpgradeRarity.Uncommon,  15),
+            ("Upgrade_Satellite_Radius_M", "+0.5 Orbit Radius",   satelliteData, UpgradeType.SatelliteRadius, 0.5f, UpgradeRarity.Uncommon,  2),
             ("Upgrade_Satellite_Speed_S",  "+20 Orbit Speed",     satelliteData, UpgradeType.SatelliteSpeed,  20f,  UpgradeRarity.Common,    0),
-            ("Upgrade_Satellite_Speed_M",  "+50 Orbit Speed",     satelliteData, UpgradeType.SatelliteSpeed,  50f,  UpgradeRarity.Uncommon,  15),
+            ("Upgrade_Satellite_Speed_M",  "+50 Orbit Speed",     satelliteData, UpgradeType.SatelliteSpeed,  50f,  UpgradeRarity.Uncommon,  2),
             ("Upgrade_Satellite_Damage_S", "+5 Damage",           satelliteData, UpgradeType.SatelliteDamage, 5f,   UpgradeRarity.Common,    0),
-            ("Upgrade_Satellite_Damage_M", "+15 Damage",          satelliteData, UpgradeType.SatelliteDamage, 15f,  UpgradeRarity.Uncommon,  15),
-            ("Upgrade_Satellite_Damage_L", "+30 Damage",          satelliteData, UpgradeType.SatelliteDamage, 30f,  UpgradeRarity.Rare,      30),
+            ("Upgrade_Satellite_Damage_M", "+2 Damage",           satelliteData, UpgradeType.SatelliteDamage, 15f,  UpgradeRarity.Uncommon,  2),
+            ("Upgrade_Satellite_Damage_L", "+30 Damage",          satelliteData, UpgradeType.SatelliteDamage, 30f,  UpgradeRarity.Rare,      5),
 
             // Laser upgrades (require LaserWeapon to be active)
             ("Upgrade_Laser_Interval_S", "-1s Laser Interval",   laserData, UpgradeType.LaserInterval, -1f,  UpgradeRarity.Common,    0),
-            ("Upgrade_Laser_Interval_M", "-2s Laser Interval",   laserData, UpgradeType.LaserInterval, -2f,  UpgradeRarity.Uncommon,  15),
+            ("Upgrade_Laser_Interval_M", "-2s Laser Interval",   laserData, UpgradeType.LaserInterval, -2f,  UpgradeRarity.Uncommon,  2),
             ("Upgrade_Laser_Duration_S", "+1.5s Laser Duration", laserData, UpgradeType.LaserDuration,  1.5f, UpgradeRarity.Common,    0),
-            ("Upgrade_Laser_Duration_M", "+3s Laser Duration",   laserData, UpgradeType.LaserDuration,  3f,   UpgradeRarity.Uncommon,  15),
+            ("Upgrade_Laser_Duration_M", "+3s Laser Duration",   laserData, UpgradeType.LaserDuration,  3f,   UpgradeRarity.Uncommon,  2),
             ("Upgrade_Laser_Length_S",   "+2 Laser Length",      laserData, UpgradeType.LaserLength,    2f,   UpgradeRarity.Common,    0),
-            ("Upgrade_Laser_Length_M",   "+5 Laser Length",      laserData, UpgradeType.LaserLength,    5f,   UpgradeRarity.Uncommon,  15),
+            ("Upgrade_Laser_Length_M",   "+5 Laser Length",      laserData, UpgradeType.LaserLength,    5f,   UpgradeRarity.Uncommon,  2),
         };
 
         var satelliteUpgrades = new System.Collections.Generic.List<WeaponUpgrade>();

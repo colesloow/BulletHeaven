@@ -9,6 +9,7 @@ public enum UpgradeType
     LaserInterval,
     LaserDuration,
     LaserLength,
+    SatelliteLaserCount,
 }
 
 public enum UpgradeRarity

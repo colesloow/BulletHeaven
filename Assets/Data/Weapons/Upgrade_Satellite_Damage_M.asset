@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6e7e53b12f89d446b6f96b458922bfa, type: 3}
   m_Name: Upgrade_Satellite_Damage_M
   m_EditorClassIdentifier: Assembly-CSharp::WeaponUpgrade
-  UpgradeName: +15 Damage
-  Description: +15 Damage
+  UpgradeName: +2 Damage
+  Description: +2 Damage
   TargetWeapon: {fileID: 11400000, guid: b8799ff0c9ef2044da84ba09d60f0965, type: 2}
   Type: 3
   Value: 15
   Rarity: 1
-  ScrapCost: 15
+  ScrapCost: 2

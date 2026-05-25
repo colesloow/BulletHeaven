@@ -17,5 +17,5 @@ MonoBehaviour:
   TargetWeapon: {fileID: 11400000, guid: b8799ff0c9ef2044da84ba09d60f0965, type: 2}
   Type: 0
   Value: 2
-  Rarity: 1
-  ScrapCost: 15
+  Rarity: 2
+  ScrapCost: 5
