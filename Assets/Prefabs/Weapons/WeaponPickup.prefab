@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8361006301832974328}
   - component: {fileID: 224228615689929660}
-  - component: {fileID: 1399258896981948159}
+  - component: {fileID: 1337574238459375502}
   m_Layer: 0
   m_Name: WeaponPickup
   m_TagString: Untagged
@@ -46,28 +46,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01c38d4fff846314fb7c93365793e0e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponPickup
-  _weaponData: {fileID: 11400000, guid: 096793d08f0f3224ca9e6dd87b588b60, type: 2}
---- !u!135 &1399258896981948159
-SphereCollider:
+  weaponData: {fileID: 11400000, guid: 096793d08f0f3224ca9e6dd87b588b60, type: 2}
+--- !u!114 &1337574238459375502
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3539119812455294262}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.25
-  m_Center: {x: 0, y: 0.5, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c71e26eea33b7a45aa108c09208f141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupAttractor
+  attractRadius: 2
+  collectRadius: 0.4
+  attractSpeed: 5
 --- !u!1 &6666509653051479570
 GameObject:
   m_ObjectHideFlags: 0

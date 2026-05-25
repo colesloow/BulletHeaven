@@ -166,8 +166,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
   startRoom: {fileID: 5093581059593610874, guid: feb4177181e90084fa1ac35f410b2cd9, type: 3}
   rules: {fileID: 11400000, guid: 89aae5bc6e5cf9141b105269b40c3a8f, type: 2}
-  weaponPickupPrefab: {fileID: 3539119812455294262, guid: 4e0f3e47ddd0f48419e614dbb655549e, type: 3}
-  screwPickupPrefab: {fileID: 4401066724296947326, guid: 5f0d38866a09ae54e8709e1c5de4c8c4, type: 3}
 --- !u!114 &51476260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2491,7 +2489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd223e59631daa443a1a42edb8cb3789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  enemyDamageEnabled: 0
+  enemyDamageEnabled: 1
   baseSpawnInterval: 2
   initialMaxEnemies: 10
   maxEnemiesIncreasePerMinute: 5
@@ -2584,6 +2582,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1154541803}
   m_CullTransparentMesh: 1
+--- !u!4 &1400456752 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8018372653011163648, guid: 4e87d93e7ece2a74f8264a480f1e39ec, type: 3}
+  m_PrefabInstance: {fileID: 8457062002825681497}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1403533163
 GameObject:
   m_ObjectHideFlags: 0
@@ -3066,6 +3069,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2565311164202088023, guid: 4e87d93e7ece2a74f8264a480f1e39ec, type: 3}
+      propertyPath: playerBodyMesh
+      value: 
+      objectReference: {fileID: 1400456752}
     - target: {fileID: 7956079774602133984, guid: 4e87d93e7ece2a74f8264a480f1e39ec, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

@@ -6,12 +6,8 @@ public class Collectable : MonoBehaviour
 {
     [SerializeField] private CollectableType type;
     [SerializeField] private float value = 10f;
-    [SerializeField] private float attractRadius = 2.5f;
-    [SerializeField] private float collectRadius = 0.5f;
-    [SerializeField] private float attractSpeed = 8f;
 
     private PooledObject pooledObject;
-    private Transform playerTransform;
     private Health playerHealth;
 
     private void Start()
@@ -21,28 +17,9 @@ public class Collectable : MonoBehaviour
 
     private void OnEnable()
     {
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player == null) return;
-        playerTransform = player.transform;
-        playerHealth = player.GetComponent<Health>();
-    }
-
-    private void Update()
-    {
-        if (playerTransform == null) return;
-
-        float distance = Vector3.Distance(transform.position, playerTransform.position);
-
-        if (distance > attractRadius) return;
-
-        if (distance < collectRadius)
-        {
-            Collect();
-            return;
-        }
-
-        float speed = Mathf.Min(attractSpeed * (attractRadius / distance), attractSpeed * 3f);
-        transform.position = Vector3.MoveTowards(transform.position, playerTransform.position, speed * Time.deltaTime);
+        GameObject player = GameObject.FindWithTag(Tags.Player);
+        if (player != null)
+            playerHealth = player.GetComponent<Health>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -61,7 +38,7 @@ public class Collectable : MonoBehaviour
                 break;
 
             case CollectableType.Health:
-                playerHealth?.GainHealth(value);
+                if (playerHealth != null) playerHealth.GainHealth(value);
                 break;
 
             case CollectableType.Screw:

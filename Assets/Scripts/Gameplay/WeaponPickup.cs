@@ -2,14 +2,18 @@ using UnityEngine;
 
 public class WeaponPickup : MonoBehaviour
 {
-    [SerializeField] private WeaponData _weaponData;
+    [SerializeField] private WeaponData weaponData;
 
-    private void OnTriggerEnter(Collider other)
+    private void Start()
     {
-        if (!other.CompareTag(Tags.Player)) return;
-        if (GameManager.Instance?.WeaponManager == null) return;
+        var attractor = GetComponent<PickupAttractor>();
+        if (attractor != null)
+            attractor.OnCollect += Collect;
+    }
 
-        GameManager.Instance.WeaponManager.AddWeapon(_weaponData);
-        gameObject.SetActive(false);
+    private void Collect()
+    {
+        if (GameManager.Instance?.WeaponManager == null) return;
+        GameManager.Instance.WeaponManager.AddWeapon(weaponData);
     }
 }

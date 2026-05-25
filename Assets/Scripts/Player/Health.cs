@@ -99,7 +99,6 @@ public class Health : MonoBehaviour
     private IEnumerator PlayerDeathSequence()
     {
         IsDead = true;
-        if (animator != null) animator.SetBool("IsDying", IsDead);
         if (weaponManager != null) weaponManager.OnPlayerDeath();
         SoundManager.PlaySound(SoundType.DEATH);
 
