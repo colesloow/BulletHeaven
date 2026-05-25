@@ -11,6 +11,8 @@ public class LaserBeamController : MonoBehaviour
     [SerializeField] private float laserDuration = 5f;
     [SerializeField] private float laserInterval = 5f;
 
+    [SerializeField] private ParticleSystem tipVFX;
+
     [Header("Damage")]
     [SerializeField] private float damage = 25f;
     [SerializeField] private float tickInterval = 0.2f;
@@ -29,6 +31,7 @@ public class LaserBeamController : MonoBehaviour
 
     private void Start()
     {
+        // Local space so the beam follows the satellite's rotation automatically.
         laserLine.useWorldSpace = false;
         laserLine.enabled = false;
         autoFireCoroutine = StartCoroutine(AutoFireLoop());
@@ -66,10 +69,17 @@ public class LaserBeamController : MonoBehaviour
     private IEnumerator FireCycle()
     {
         firing = true;
+        // position 0 = tip (far end), position 1 = base (satellite origin).
+        // Both start at zero so the beam appears to grow outward from the satellite.
         laserLine.SetPosition(0, Vector3.zero);
         laserLine.SetPosition(1, Vector3.zero);
         laserLine.enabled = true;
         SoundManager.PlaySound(SoundType.LASER);
+
+        if (tipVFX != null) { 
+            tipVFX.transform.localPosition = Vector3.zero; 
+            tipVFX.Play(); 
+        }
 
         float length = 0f;
         while (length < laserMaxLength)
@@ -78,11 +88,14 @@ public class LaserBeamController : MonoBehaviour
             laserLine.SetPosition(0, new Vector3(0f, 0f, length));
             currentBeamStart = 0f;
             currentBeamEnd = length;
+            if (tipVFX != null) tipVFX.transform.localPosition = new Vector3(0f, 0f, length);
             yield return null;
         }
 
         yield return new WaitForSeconds(laserDuration);
 
+        // Retract by advancing the base toward the tip; tip stays fixed so the
+        // VFX impact point remains visible until the beam fully disappears.
         float retractStart = 0f;
         while (retractStart < laserMaxLength)
         {
@@ -93,6 +106,7 @@ public class LaserBeamController : MonoBehaviour
             yield return null;
         }
 
+        if (tipVFX != null) tipVFX.Stop();
         laserLine.enabled = false;
         currentBeamStart = 0f;
         currentBeamEnd = 0f;
@@ -103,6 +117,7 @@ public class LaserBeamController : MonoBehaviour
     {
         if (currentBeamEnd <= currentBeamStart) return;
 
+        // LineRenderer is in local space, so convert to world before the 2D proximity test.
         Vector3 worldStart = laserLine.transform.TransformPoint(laserLine.GetPosition(0));
         Vector3 worldEnd = laserLine.transform.TransformPoint(laserLine.GetPosition(1));
 
