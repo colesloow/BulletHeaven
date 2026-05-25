@@ -10,7 +10,6 @@ public class DungeonGenerator : MonoBehaviour
 {
     [SerializeField] private Room startRoom;
     [SerializeField] private DungeonRules rules;
-    [SerializeField] private GameObject[] treasurePickups;
 
     // All pieces (rooms + corridors) placed so far.
     private readonly List<DungeonPiece> placedPieces = new();
@@ -82,7 +81,7 @@ public class DungeonGenerator : MonoBehaviour
         SealOpenDoors();
         GetComponent<DungeonNavMeshBuilder>().Build(placedPieces, sealingWalls);
         DecorateRooms();
-        SpawnTreasurePickups();
+        SpawnPickups();
     }
 
     // -------------------------------------------------------------------------
@@ -399,15 +398,28 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
-    private void SpawnTreasurePickups()
+    private void SpawnPickups()
     {
-        if (treasurePickups == null || treasurePickups.Length == 0) return;
+        var roomIndexByType = new Dictionary<RoomType, int>();
 
         foreach (DungeonPiece piece in placedPieces)
         {
-            if (piece is not Room room || room.Type != RoomType.Treasure) continue;
+            if (piece is not Room room) continue;
 
-            GameObject prefab = treasurePickups[Random.Range(0, treasurePickups.Length)];
+            RoomRule? matchingRule = null;
+            foreach (RoomRule rule in rules.RoomRules)
+            {
+                if (rule.Type == room.Type) { matchingRule = rule; break; }
+            }
+
+            if (matchingRule == null || matchingRule.Value.PickupPrefabs == null
+                || matchingRule.Value.PickupPrefabs.Length == 0) continue;
+
+            roomIndexByType.TryGetValue(room.Type, out int idx);
+            var prefabs = matchingRule.Value.PickupPrefabs;
+            GameObject prefab = prefabs[Mathf.Min(idx, prefabs.Length - 1)];
+            roomIndexByType[room.Type] = idx + 1;
+
             if (prefab != null)
                 Instantiate(prefab, room.transform.position, Quaternion.identity, room.transform);
         }

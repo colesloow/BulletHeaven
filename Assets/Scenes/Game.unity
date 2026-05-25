@@ -166,8 +166,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
   startRoom: {fileID: 5093581059593610874, guid: feb4177181e90084fa1ac35f410b2cd9, type: 3}
   rules: {fileID: 11400000, guid: 89aae5bc6e5cf9141b105269b40c3a8f, type: 2}
-  treasurePickups:
-  - {fileID: 3539119812455294262, guid: 4e0f3e47ddd0f48419e614dbb655549e, type: 3}
+  weaponPickupPrefab: {fileID: 3539119812455294262, guid: 4e0f3e47ddd0f48419e614dbb655549e, type: 3}
+  screwPickupPrefab: {fileID: 4401066724296947326, guid: 5f0d38866a09ae54e8709e1c5de4c8c4, type: 3}
 --- !u!114 &51476260
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -13,6 +13,11 @@ public struct RoomRule
 
     // Decoration rules applied to rooms of this type. Null means no decoration.
     public RoomDecorationRules DecorationRules;
+
+    // Pickups spawned per room of this type, in order.
+    // First room uses index 0, second uses index 1, etc.
+    // If there are more rooms than entries, the last entry repeats.
+    public GameObject[] PickupPrefabs;
 }
 
 // Maps a CorridorType to its set of prefabs. Used by the sequence system to
