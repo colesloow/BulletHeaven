@@ -14,6 +14,13 @@ public class DungeonNavMeshBuilder : MonoBehaviour
     // Handle to the runtime NavMesh, kept so it can be removed when the scene unloads.
     private NavMeshDataInstance navMeshInstance;
 
+
+    public void Cleanup()
+    {
+        NavMesh.RemoveNavMeshData(navMeshInstance);
+        navMeshInstance = default;
+    }
+
     // Builds the NavMesh from all placed pieces and sealing walls.
     //
     // Each NavMeshBuildSource describes one walkable (area=0) or obstacle (area=1) shape.
@@ -22,6 +29,7 @@ public class DungeonNavMeshBuilder : MonoBehaviour
     // for box sources it defines the center and orientation of the box.
     public void Build(IReadOnlyList<DungeonPiece> placedPieces, IReadOnlyList<GameObject> sealingWalls)
     {
+        Cleanup();
         var sources = new List<NavMeshBuildSource>();
 
         // Compute the world-space bounding volume of the entire dungeon.
@@ -118,8 +126,5 @@ public class DungeonNavMeshBuilder : MonoBehaviour
             navMeshInstance = NavMesh.AddNavMeshData(data);
     }
 
-    private void OnDestroy()
-    {
-        NavMesh.RemoveNavMeshData(navMeshInstance);
-    }
+    private void OnDestroy() => Cleanup();
 }

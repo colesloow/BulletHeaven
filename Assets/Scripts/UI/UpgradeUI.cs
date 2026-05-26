@@ -27,6 +27,8 @@ public class UpgradeUI : MonoBehaviour
         _panel.blocksRaycasts = true;
     }
 
+    public void Hide() => HidePanel();
+
     private void HidePanel()
     {
         _panel.alpha = 0f;

@@ -20,7 +20,12 @@ public class PickupAttractor : MonoBehaviour
 
     private void Update()
     {
-        if (playerTransform == null) return;
+        if (playerTransform == null)
+        {
+            GameObject player = GameObject.FindWithTag(Tags.Player);
+            if (player == null) return;
+            playerTransform = player.transform;
+        }
 
         float distance = Vector3.Distance(transform.position, playerTransform.position);
         if (distance > attractRadius) return;

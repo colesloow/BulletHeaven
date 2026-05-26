@@ -14,6 +14,7 @@ public class Health : MonoBehaviour
     private float currentHealth;
 
     private float baseMaxHealth;
+    private bool initialized;
     private Animator animator;
     private WeaponManager weaponManager;
     private PooledObject pooledObject;
@@ -22,10 +23,24 @@ public class Health : MonoBehaviour
 
     public bool IsDead { get; private set; }
 
+    public void Revive()
+    {
+        IsDead = false;
+        currentHealth = maxHealth;
+        if (CompareTag(Tags.Player) && GameManager.Instance != null)
+            GameManager.Instance.PlayerHealth = currentHealth;
+    }
+
     private void OnEnable()
     {
         if (CompareTag(Tags.Enemy))
         {
+            // Reset to base stats on pool reuse; guard skips the first OnEnable (before Start sets baseMaxHealth).
+            if (initialized)
+            {
+                maxHealth = baseMaxHealth;
+                currentHealth = maxHealth;
+            }
             ActiveEnemies.Add(this);
             if (WaveManager.Instance != null)
                 WaveManager.Instance.OnEnemiesLevelUp += ScaleHealth;
@@ -50,6 +65,7 @@ public class Health : MonoBehaviour
         pooledObject = GetComponent<PooledObject>();
         baseMaxHealth = maxHealth;
         currentHealth = maxHealth;
+        initialized = true;
 
         if (gameObject.CompareTag(Tags.Player) && GameManager.Instance != null)
             GameManager.Instance.PlayerHealth = currentHealth;

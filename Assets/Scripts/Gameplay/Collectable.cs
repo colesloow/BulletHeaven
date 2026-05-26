@@ -1,35 +1,55 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum CollectableType { XP, Health, Screw }
 
 public class Collectable : MonoBehaviour
 {
+    public static readonly List<Collectable> Active = new();
+
     [SerializeField] private CollectableType type;
     [SerializeField] private float value = 10f;
 
+    private PickupAttractor attractor;
     private PooledObject pooledObject;
-    private Health playerHealth;
+    private bool collected;
 
     private void Start()
     {
         pooledObject = GetComponent<PooledObject>();
+        attractor = GetComponent<PickupAttractor>();
+        if (attractor != null)
+            attractor.OnCollect += CollectByProximity;
     }
 
     private void OnEnable()
     {
-        GameObject player = GameObject.FindWithTag(Tags.Player);
-        if (player != null)
-            playerHealth = player.GetComponent<Health>();
+        Active.Add(this);
+        collected = false;
+    }
+
+    private void OnDisable()
+    {
+        Active.Remove(this);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag(Tags.Player)) return;
-        Collect();
+        Collect(other.GetComponent<Health>());
     }
 
-    private void Collect()
+    private void CollectByProximity()
     {
+        Health playerHealth = GameObject.FindWithTag(Tags.Player)?.GetComponent<Health>();
+        Collect(playerHealth);
+    }
+
+    private void Collect(Health playerHealth)
+    {
+        if (collected) return;
+        collected = true;
+
         switch (type)
         {
             case CollectableType.XP:
@@ -38,7 +58,7 @@ public class Collectable : MonoBehaviour
                 break;
 
             case CollectableType.Health:
-                if (playerHealth != null) playerHealth.GainHealth(value);
+                playerHealth?.GainHealth(value);
                 break;
 
             case CollectableType.Screw:

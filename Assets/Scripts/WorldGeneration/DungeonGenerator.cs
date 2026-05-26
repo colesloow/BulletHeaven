@@ -1,10 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// Runs before all other scripts so the dungeon exists before anything tries to use it.
-// Requires DungeonNavMeshBuilder on the same GameObject to build the runtime NavMesh
-// once generation is complete.
-[DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(DungeonNavMeshBuilder))]
 public class DungeonGenerator : MonoBehaviour
 {
@@ -32,7 +28,7 @@ public class DungeonGenerator : MonoBehaviour
     // Generation entry point
     // -------------------------------------------------------------------------
 
-    private void Awake()
+    public void Generate()
     {
         dungeonRoot = new GameObject("Dungeon").transform;
         dungeonRoot.SetParent(transform);
@@ -82,6 +78,21 @@ public class DungeonGenerator : MonoBehaviour
         GetComponent<DungeonNavMeshBuilder>().Build(placedPieces, sealingWalls);
         DecorateRooms();
         SpawnPickups();
+    }
+
+    public void Cleanup()
+    {
+        if (dungeonRoot != null)
+        {
+            Destroy(dungeonRoot.gameObject);
+            dungeonRoot = null;
+        }
+
+        placedPieces.Clear();
+        openDoors.Clear();
+        roomCounts.Clear();
+        sealingWalls.Clear();
+        GetComponent<DungeonNavMeshBuilder>().Cleanup();
     }
 
     // -------------------------------------------------------------------------
@@ -350,14 +361,14 @@ public class DungeonGenerator : MonoBehaviour
                 if (exit == null) continue;
 
                 float dist = Vector3.Distance(exit.transform.position, doorB.transform.position);
-                float dot  = Vector3.Dot(exit.transform.forward, -doorB.transform.forward);
+                float dot = Vector3.Dot(exit.transform.forward, -doorB.transform.forward);
 
                 if (dist < 0.1f && dot > 0.99f)
                 {
                     doorA.IsConnected = true;
                     entry.IsConnected = true;
                     doorB.IsConnected = true;
-                    exit.IsConnected  = true;
+                    exit.IsConnected = true;
                     piece.Type = CorridorType.Straight;
                     placedPieces.Add(piece);
                     return true;

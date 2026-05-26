@@ -52,6 +52,17 @@ public class WeaponManager : MonoBehaviour
 
     public bool HasWeapon(WeaponData data) => _activeWeapons.Any(w => w.Data == data);
 
+    public void ResetWeapons()
+    {
+        foreach (var weapon in _activeWeapons)
+            if (weapon != null) Destroy(weapon.gameObject);
+        _activeWeapons.Clear();
+        _upgradeChoices = 2;
+
+        if (_startingWeapon != null)
+            AddWeapon(_startingWeapon);
+    }
+
     public void OnPlayerDeath()
     {
         foreach (var weapon in _activeWeapons)

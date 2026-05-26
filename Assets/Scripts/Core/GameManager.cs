@@ -10,6 +10,10 @@ public class GameManager : MonoBehaviour
     public WeaponManager WeaponManager { get; set; }
     public GameState State { get; private set; } = GameState.MainMenu;
 
+    [Header("References")]
+    [SerializeField] private DungeonGenerator dungeonGenerator;
+    [SerializeField] private GameObject player;
+
     [Header("Health & Score")]
     [SerializeField] private int totalScore;
     [SerializeField] private float playerHealth;
@@ -25,6 +29,7 @@ public class GameManager : MonoBehaviour
     [Header("Timer")]
     [SerializeField] private float gameDuration = 600f;
     private float timeRemaining;
+    private float playerSpawnY;
     private bool timerRunning;
     private int secondsRemaining;
 
@@ -94,6 +99,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public int Level => level;
     public float TimeRemaining => timeRemaining;
 
     private void Awake()
@@ -105,6 +111,12 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
+    }
+
+    private void Start()
+    {
+        playerSpawnY = player.transform.position.y;
+        player.SetActive(false);
     }
 
     private void Update()
@@ -124,6 +136,24 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        WaveManager.Instance?.CleanupEnemies();
+
+        for (int i = Collectable.Active.Count - 1; i >= 0; i--)
+        {
+            Collectable c = Collectable.Active[i];
+            if (c.TryGetComponent(out PooledObject pooled)) pooled.Release();
+            else Destroy(c.gameObject);
+        }
+
+        dungeonGenerator.Cleanup();
+        dungeonGenerator.Generate();
+
+        player.SetActive(true);
+        player.transform.position = new Vector3(0f, playerSpawnY, 0f);
+        if (player.TryGetComponent(out Rigidbody rb)) rb.linearVelocity = Vector3.zero;
+        if (player.TryGetComponent(out Health health)) health.Revive();
+        if (player.TryGetComponent(out WeaponManager wm)) wm.ResetWeapons();
+
         TotalScore = 0;
         PlayerHealth = 100f;
         PlayerXP = 0f;
@@ -140,7 +170,10 @@ public class GameManager : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
+        WaveManager.Instance?.CleanupEnemies();
+        dungeonGenerator.Cleanup();
         timerRunning = false;
+        player.SetActive(false);
         Resume();
         SetState(GameState.MainMenu);
     }

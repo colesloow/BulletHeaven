@@ -59,9 +59,11 @@ public class UIManager : MonoBehaviour
 
     private void RefreshHUD()
     {
+        upgradeUI.Hide();
         UpdateScore(GameManager.Instance.TotalScore);
         UpdateHealth(GameManager.Instance.PlayerHealth);
         UpdateXP(GameManager.Instance.PlayerXP);
+        UpdateLevel(GameManager.Instance.Level);
         UpdateTimer(GameManager.Instance.SecondsRemaining);
         UpdateScrews(GameManager.Instance.PlayerScrews);
     }

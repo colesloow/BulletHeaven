@@ -32,6 +32,20 @@ public class EnemySpawner : MonoBehaviour
         dungeonGenerator = FindFirstObjectByType<DungeonGenerator>();
         mainCamera = Camera.main;
 
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnGameStateChanged += OnGameStateChanged;
+    }
+
+    private void OnDestroy()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnGameStateChanged -= OnGameStateChanged;
+    }
+
+    private void OnGameStateChanged(GameState state)
+    {
+        if (state != GameState.Playing) return;
+
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
             player = playerObj.transform;
@@ -70,6 +84,17 @@ public class EnemySpawner : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void DespawnAll()
+    {
+        for (int i = activeEnemies.Count - 1; i >= 0; i--)
+        {
+            if (activeEnemies[i] != null)
+                Despawn(activeEnemies[i]);
+        }
+        activeEnemies.Clear();
+        lastCloseTime.Clear();
     }
 
     private void Despawn(GameObject enemy)

@@ -68,8 +68,19 @@ public class WaveManager : MonoBehaviour
             GameManager.Instance.OnLevelUp -= OnPlayerLevelUp;
     }
 
+    public void CleanupEnemies()
+    {
+        StopAllCoroutines();
+        enemySpawner?.DespawnAll();
+        elapsedTime = 0f;
+        spawnTimer = 0f;
+        nextWaveIndex = 0;
+    }
+
     private void Update()
     {
+        if (GameManager.Instance == null || GameManager.Instance.State != GameState.Playing) return;
+
         elapsedTime += Time.deltaTime;
 
         // Base continuous spawn: one enemy per interval, capped by MaxEnemies.

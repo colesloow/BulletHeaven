@@ -16,6 +16,7 @@ public class EnemyController : MonoBehaviour
 
     private float _baseDamage;
     private NavMeshAgent _agent;
+    private Health _ownHealth;
     private Transform _player;
     private Health _playerHealth;
     private float _nextHitTime;
@@ -25,6 +26,7 @@ public class EnemyController : MonoBehaviour
         _agent = GetComponent<NavMeshAgent>();
         _agent.speed = _speed;
         _baseDamage = _damage;
+        _ownHealth = GetComponent<Health>();
 
         GameObject playerObj = GameObject.FindWithTag(Tags.Player);
         if (playerObj != null)
@@ -36,6 +38,7 @@ public class EnemyController : MonoBehaviour
 
     private void OnEnable()
     {
+        _damage = _baseDamage;
         if (WaveManager.Instance != null)
             WaveManager.Instance.OnEnemiesLevelUp += ScaleDamage;
     }
@@ -64,6 +67,7 @@ public class EnemyController : MonoBehaviour
     // Gated by _damageInterval to avoid damage every frame.
     private void CheckPlayerHit()
     {
+        if (_ownHealth != null && _ownHealth.IsDead) return;
         if (_playerHealth == null || Time.time < _nextHitTime) return;
         if (WaveManager.Instance != null && !WaveManager.Instance.EnemyDamageEnabled) return;
 
