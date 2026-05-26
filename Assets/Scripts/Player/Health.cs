@@ -104,7 +104,6 @@ public class Health : MonoBehaviour
 
         yield return new WaitForSeconds(1.5f);
 
-        UIManager.Instance.ShowGameOver();
         GameManager.Instance.TriggerGameOver();
     }
 

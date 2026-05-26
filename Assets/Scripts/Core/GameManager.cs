@@ -1,12 +1,14 @@
 using UnityEngine;
 using System;
-using UnityEngine.SceneManagement;
+
+public enum GameState { MainMenu, Playing, GameOver }
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
     public WeaponManager WeaponManager { get; set; }
+    public GameState State { get; private set; } = GameState.MainMenu;
 
     [Header("Health & Score")]
     [SerializeField] private int totalScore;
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public event Action<GameState> OnGameStateChanged;
     public event Action<int> OnScoreChanged;
     public event Action<float> OnHealthChanged;
     public event Action<float> OnXPChanged;
@@ -102,12 +105,6 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
-
-    private void Start()
-    {
-        StartTimer();
     }
 
     private void Update()
@@ -125,33 +122,43 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void StartTimer()
-    {
-        timeRemaining = gameDuration;
-        timerRunning = true;
-        secondsRemaining = -1;
-    }
-
-    public void Pause() => Time.timeScale = 0f;
-    public void Resume() => Time.timeScale = 1f;
-
-    public void TriggerGameOver()
-    {
-        timerRunning = false;
-        Pause();
-        UIManager.Instance.ShowGameOver();
-    }
-
-    public void ResetGame()
+    public void StartGame()
     {
         TotalScore = 0;
         PlayerHealth = 100f;
         PlayerXP = 0f;
         PlayerScrews = 0;
         level = 1;
-        StartTimer();
+        timeRemaining = gameDuration;
+        secondsRemaining = -1;
+        timerRunning = true;
+        Resume();
+        SetState(GameState.Playing);
+    }
 
-        UIManager.Instance.ResetUI();
+    public void RestartGame() => StartGame();
+
+    public void ReturnToMainMenu()
+    {
+        timerRunning = false;
+        Resume();
+        SetState(GameState.MainMenu);
+    }
+
+    public void TriggerGameOver()
+    {
+        timerRunning = false;
+        Pause();
+        SetState(GameState.GameOver);
+    }
+
+    public void Pause() => Time.timeScale = 0f;
+    public void Resume() => Time.timeScale = 1f;
+
+    private void SetState(GameState newState)
+    {
+        State = newState;
+        OnGameStateChanged?.Invoke(newState);
     }
 
     private void LevelUp()

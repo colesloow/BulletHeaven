@@ -7,8 +7,6 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     [Header("Panels")]
-    [SerializeField] private CanvasGroup hudPanel;
-    [SerializeField] private CanvasGroup gameOverPanel;
     [SerializeField] private UpgradeUI upgradeUI;
 
     [Header("HUD Elements")]
@@ -19,9 +17,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timer;
     [SerializeField] private TextMeshProUGUI screws;
 
-    [Header("References")]
-    [SerializeField] private SceneLoader sceneLoader;
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -31,16 +26,11 @@ public class UIManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
-        SetPanel(hudPanel, true);
-        SetPanel(gameOverPanel, false);
     }
 
     private void Start()
     {
-        InitializeUI();
-
-        // subscribe to GameManager events
+        GameManager.Instance.OnGameStateChanged += OnStateChanged;
         GameManager.Instance.OnScoreChanged += UpdateScore;
         GameManager.Instance.OnHealthChanged += UpdateHealth;
         GameManager.Instance.OnXPChanged += UpdateXP;
@@ -51,7 +41,8 @@ public class UIManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        // unsubscribe from GameManager events
+        if (GameManager.Instance == null) return;
+        GameManager.Instance.OnGameStateChanged -= OnStateChanged;
         GameManager.Instance.OnScoreChanged -= UpdateScore;
         GameManager.Instance.OnHealthChanged -= UpdateHealth;
         GameManager.Instance.OnXPChanged -= UpdateXP;
@@ -60,7 +51,13 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.OnScrewsChanged -= UpdateScrews;
     }
 
-    private void InitializeUI()
+    private void OnStateChanged(GameState state)
+    {
+        if (state == GameState.Playing)
+            RefreshHUD();
+    }
+
+    private void RefreshHUD()
     {
         UpdateScore(GameManager.Instance.TotalScore);
         UpdateHealth(GameManager.Instance.PlayerHealth);
@@ -69,61 +66,15 @@ public class UIManager : MonoBehaviour
         UpdateScrews(GameManager.Instance.PlayerScrews);
     }
 
-    private void UpdateScore(int score)
-    {
-        this.score.text = score + " pts";
-    }
-
-    private void UpdateHealth(float health)
-    {
-        healthSlider.fillAmount = health / 100f; // fill between 0 & 1
-    }
-
-    private void UpdateXP(float xp)
-    {
-        xpSlider.fillAmount = xp / 100f;
-    }
-
-    private void UpdateLevel(int level)
-    {
-        this.level.text = "Level " + level;
-    }
-
-    private void UpdateTimer(int seconds)
-    {
-        timer.text = $"{seconds / 60:D2}:{seconds % 60:D2}";
-    }
-
-    private void UpdateScrews(int count)
-    {
-        if (screws != null) screws.text = count.ToString();
-    }
-
     public void ShowUpgradePanel(System.Collections.Generic.List<WeaponUpgrade> choices, System.Action<WeaponUpgrade> onPicked)
     {
         upgradeUI.Show(choices, onPicked);
     }
 
-    public void ShowGameOver()
-    {
-        SetPanel(gameOverPanel, true);
-    }
-
-    public void ResetUI()
-    {
-        UpdateScore(0);
-        UpdateHealth(100f);
-        UpdateXP(0f);
-        UpdateScrews(0);
-        UpdateLevel(1);
-        UpdateTimer(GameManager.Instance.SecondsRemaining);
-        SetPanel(gameOverPanel, false);
-    }
-
-    private void SetPanel(CanvasGroup panel, bool visible)
-    {
-        panel.alpha = visible ? 1f : 0f;
-        panel.interactable = visible;
-        panel.blocksRaycasts = visible;
-    }
+    private void UpdateScore(int value) => score.text = value + " pts";
+    private void UpdateHealth(float value) => healthSlider.fillAmount = value / 100f;
+    private void UpdateXP(float value) => xpSlider.fillAmount = value / 100f;
+    private void UpdateLevel(int value) => level.text = "Level " + value;
+    private void UpdateTimer(int seconds) => timer.text = $"{seconds / 60:D2}:{seconds % 60:D2}";
+    private void UpdateScrews(int value) { if (screws != null) screws.text = value.ToString(); }
 }
