@@ -534,7 +534,7 @@ MonoBehaviour:
   scoreValue: 20
   dropHeight: 0.3
   drops:
-  - Prefab: {fileID: 4510951735512833629, guid: 56fb1a41d3f9a5640b6069dd4f021940, type: 3}
+  - Prefab: {fileID: 5650073714141393936, guid: f73472546db9dae4bbf845f9ecea67e1, type: 3}
     Weight: 10
   - Prefab: {fileID: 5650073714141393936, guid: 54ce42e131252a341bd69f90302a6f83, type: 3}
     Weight: 60
