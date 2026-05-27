@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class UpgradeUI : MonoBehaviour
@@ -72,6 +73,7 @@ public class UpgradeUI : MonoBehaviour
 
         ShowPanel();
         GameManager.Instance?.Pause();
+        EventSystem.current.SetSelectedGameObject(_spawnedButtons[0].gameObject);
     }
 
     private System.Collections.IEnumerator AutoDismiss()
