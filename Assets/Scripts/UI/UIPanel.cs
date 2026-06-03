@@ -1,9 +1,14 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class UIPanel : MonoBehaviour
 {
     [SerializeField] private GameState[] visibleInStates;
+    // If unassigned, falls back to the first Selectable child.
+    [SerializeField] private Selectable defaultSelected;
 
     private CanvasGroup canvasGroup;
 
@@ -27,5 +32,16 @@ public class UIPanel : MonoBehaviour
         canvasGroup.alpha = visible ? 1f : 0f;
         canvasGroup.interactable = visible;
         canvasGroup.blocksRaycasts = visible;
+
+        if (visible)
+            StartCoroutine(SelectDefault());
+    }
+
+    private IEnumerator SelectDefault()
+    {
+        yield return null;
+        Selectable target = defaultSelected != null ? defaultSelected : GetComponentInChildren<Selectable>();
+        if (target != null)
+            EventSystem.current.SetSelectedGameObject(target.gameObject);
     }
 }
