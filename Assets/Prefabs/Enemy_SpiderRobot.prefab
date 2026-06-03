@@ -444,6 +444,7 @@ GameObject:
   - component: {fileID: 989573216450216945}
   - component: {fileID: 4522760584039161973}
   - component: {fileID: 2498518036110794177}
+  - component: {fileID: -6477189455583234345}
   m_Layer: 0
   m_Name: Enemy_SpiderRobot
   m_TagString: Enemy
@@ -586,6 +587,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HitEffect
   vfxPrefab: {fileID: 4878623340987576373, guid: ac2da8e70fa93be4c85a7b01c0e037a6, type: 3}
+--- !u!114 &-6477189455583234345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5961385405075670556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5532ebbe21c56e94cadf93e4a219a80e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HologramEffect
+  hologramMaterial: {fileID: 2100000, guid: 9375c517af185fa47b0286112262f6d1, type: 2}
+  phase1Duration: 1
+  holdDuration: 0
+  phase2Duration: 1
 --- !u!1 &6130112138564573889
 GameObject:
   m_ObjectHideFlags: 0

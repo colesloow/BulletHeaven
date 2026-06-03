@@ -535,6 +535,7 @@ GameObject:
   - component: {fileID: 989573216450216945}
   - component: {fileID: 4522760584039161973}
   - component: {fileID: 2805133671890322663}
+  - component: {fileID: -3577057632368885782}
   m_Layer: 0
   m_Name: Enemy_SpiderRobot_Guns
   m_TagString: Enemy
@@ -622,13 +623,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cbe9d4c18bdf1d47bf953963b3e1887, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRewards
-  _scoreValue: 10
-  _dropHeight: 0.3
-  _drops:
-  - Prefab: {fileID: 4510951735512833629, guid: 56fb1a41d3f9a5640b6069dd4f021940, type: 3}
-    Weight: 0
-  - Prefab: {fileID: 4510951735512833629, guid: 1aa73eb4b0616914d9a2f1d5d0063e13, type: 3}
-    Weight: 0
+  scoreValue: 10
+  dropHeight: 0.3
+  drops: []
 --- !u!114 &4522760584039161973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -675,6 +672,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HitEffect
   vfxPrefab: {fileID: 4878623340987576373, guid: ac2da8e70fa93be4c85a7b01c0e037a6, type: 3}
+--- !u!114 &-3577057632368885782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5961385405075670556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5532ebbe21c56e94cadf93e4a219a80e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HologramEffect
+  hologramMaterial: {fileID: 2100000, guid: 9375c517af185fa47b0286112262f6d1, type: 2}
+  phase1Duration: 1
+  holdDuration: 0
+  phase2Duration: 1
 --- !u!1 &6130112138564573889
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,6 +22,7 @@ public class Health : MonoBehaviour
     public event Action<float> OnDamaged;
 
     public bool IsDead { get; private set; }
+    public bool IsInvincible { get; set; }
 
     public void Revive()
     {
@@ -79,7 +80,7 @@ public class Health : MonoBehaviour
 
     public void LoseHealth(float amount)
     {
-        if (IsDead) return;
+        if (IsDead || IsInvincible) return;
 
         currentHealth -= amount;
         if (currentHealth < 0)
