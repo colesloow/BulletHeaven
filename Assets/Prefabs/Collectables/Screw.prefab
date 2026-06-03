@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1679682434646475487}
   - component: {fileID: 7736957898700122737}
   - component: {fileID: 7292042054630041155}
+  - component: {fileID: 939741649075892416}
   m_Layer: 0
   m_Name: Screw
   m_TagString: Untagged
@@ -77,7 +78,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupAttractor
   attractRadius: 2
+  collectRadius: 0.4
   attractSpeed: 5
+--- !u!114 &939741649075892416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4401066724296947326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afac1e2f965fe8a41bdc4ef830573498, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PrefabSpawner
+  prefab: {fileID: 3133289591570078073, guid: cb79d462e095b064c8b60e1e48efed4e, type: 3}
 --- !u!1 &7817680045328420963
 GameObject:
   m_ObjectHideFlags: 0
