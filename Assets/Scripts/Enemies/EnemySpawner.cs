@@ -4,34 +4,22 @@ using UnityEngine.AI;
 
 // Handles WHERE and HOW enemies spawn.
 // Spawning rhythm (WHEN) is controlled by WaveManager, which calls TrySpawnOne and ForceSpawnOne.
-//
-// Spawn logic:
-//   - Picks a random room within [minSpawnDistance, maxSpawnDistance] from the player,
-//     that is NOT currently visible to the camera.
-//   - Finds a NavMesh-valid point on that room's floor.
-//   - Retrieves an enemy instance from the pool.
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private float minSpawnDistance = 10f;
-    [SerializeField] private float maxSpawnDistance = 30f;
+    [SerializeField] private float spawnRadius = 6f;
     [SerializeField] private float navMeshSampleRadius = 2f;
     [SerializeField] private float despawnDistance = 40f;
     // If an enemy hasn't been within engagementRange for longer than maxChaseTime, it despawns.
     [SerializeField] private float engagementRange = 8f;
     [SerializeField] private float maxChaseTime = 4f;
 
-    private DungeonGenerator dungeonGenerator;
     private Transform player;
-    private Camera mainCamera;
 
     private readonly List<GameObject> activeEnemies = new();
     private readonly Dictionary<GameObject, float> lastCloseTime = new();
 
     private void Start()
     {
-        dungeonGenerator = FindFirstObjectByType<DungeonGenerator>();
-        mainCamera = Camera.main;
-
         if (GameManager.Instance != null)
             GameManager.Instance.OnGameStateChanged += OnGameStateChanged;
     }
@@ -104,14 +92,9 @@ public class EnemySpawner : MonoBehaviour
         else enemy.SetActive(false);
     }
 
-    // Moves an existing enemy to a new off-screen spawn point near the player.
-    // Returns false if no valid room is found (caller should despawn instead).
     private bool Relocate(GameObject enemy)
     {
-        Room room = GetEligibleRoom();
-        if (room == null) return false;
-
-        Vector3 spawnPoint = GetSpawnPoint(room);
+        Vector3 spawnPoint = GetSpawnPoint();
         if (spawnPoint == Vector3.zero) return false;
 
         if (enemy.TryGetComponent(out NavMeshAgent agent))
@@ -125,77 +108,52 @@ public class EnemySpawner : MonoBehaviour
     public void TrySpawnOne(GameObject prefab)
     {
         activeEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
-        if (player == null || dungeonGenerator == null) return;
+        if (player == null) return;
         if (WaveManager.Instance == null) return;
         if (activeEnemies.Count >= WaveManager.Instance.MaxEnemies) return;
 
-        SpawnAtRandomRoom(prefab);
+        SpawnEnemy(prefab);
     }
 
     public void ForceSpawnOne(GameObject prefab)
     {
         activeEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
-        if (player == null || dungeonGenerator == null) return;
+        if (player == null) return;
 
-        SpawnAtRandomRoom(prefab);
+        SpawnEnemy(prefab);
     }
 
-    private void SpawnAtRandomRoom(GameObject prefab)
+    private void SpawnEnemy(GameObject prefab)
     {
-        Room room = GetEligibleRoom();
-        if (room == null) return;
-
-        Vector3 spawnPoint = GetSpawnPoint(room);
+        Vector3 spawnPoint = GetSpawnPoint();
         if (spawnPoint == Vector3.zero) return;
-
         if (PoolManager.Instance == null) return;
 
         GameObject enemy = PoolManager.Instance.Get(prefab);
         enemy.transform.position = spawnPoint;
+        FacePlayer(enemy.transform);
         activeEnemies.Add(enemy);
     }
 
-    // Returns a random room within spawn distance range that is not visible to the camera.
-    // Falls back to any in-range room if all eligible rooms are visible.
-    private Room GetEligibleRoom()
+    private void FacePlayer(Transform t)
     {
-        Plane[] frustumPlanes = GeometryUtility.CalculateFrustumPlanes(mainCamera);
-        var offScreen = new List<Room>();
-        var fallback = new List<Room>();
-
-        foreach (DungeonPiece piece in dungeonGenerator.PlacedPieces)
-        {
-            if (piece is not Room room) continue;
-            float dist = Vector3.Distance(player.position, room.transform.position);
-            if (dist < minSpawnDistance || dist > maxSpawnDistance) continue;
-
-            if (GeometryUtility.TestPlanesAABB(frustumPlanes, room.GetFloorBounds()))
-                fallback.Add(room);
-            else
-                offScreen.Add(room);
-        }
-
-        if (offScreen.Count > 0) return offScreen[Random.Range(0, offScreen.Count)];
-        if (fallback.Count > 0) return fallback[Random.Range(0, fallback.Count)];
-        return null;
+        Vector3 dir = player.position - t.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude > 0.001f)
+            t.rotation = Quaternion.LookRotation(dir.normalized);
     }
 
-    private Vector3 GetSpawnPoint(Room room)
+    private Vector3 GetSpawnPoint()
     {
-        Bounds floor = room.GetFloorBounds();
-
-        for (int attempt = 0; attempt < 10; attempt++)
+        for (int attempt = 0; attempt < 20; attempt++)
         {
-            Vector3 candidate = new(
-                Random.Range(floor.min.x, floor.max.x),
-                0f,
-                Random.Range(floor.min.z, floor.max.z)
-            );
+            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+            float dist = Random.Range(2f, spawnRadius);
+            Vector3 candidate = player.position + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * dist;
 
             if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, navMeshSampleRadius, NavMesh.AllAreas))
                 return hit.position;
         }
-
         return Vector3.zero;
     }
 }

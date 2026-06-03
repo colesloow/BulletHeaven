@@ -3554,8 +3554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27c246ada39eb194597c53cb5f6df694, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  minSpawnDistance: 10
-  maxSpawnDistance: 30
+  spawnRadius: 6
   navMeshSampleRadius: 2
   despawnDistance: 40
   engagementRange: 8
