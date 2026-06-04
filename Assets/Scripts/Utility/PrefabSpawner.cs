@@ -1,22 +1,26 @@
-using System.Collections;
 using UnityEngine;
 
 public class PrefabSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject prefab;
     [SerializeField] private bool destroyWithOwner = true;
+    [SerializeField] private Vector3 spawnOffset;
+
     private GameObject instance;
+    private bool started;
+
+    private void Start()
+    {
+        started = true;
+        if (prefab != null && instance == null)
+            instance = Instantiate(prefab, transform.position + spawnOffset, Quaternion.identity);
+    }
 
     private void OnEnable()
     {
-        StartCoroutine(SpawnNextFrame());
-    }
-
-    private IEnumerator SpawnNextFrame()
-    {
-        yield return null;
-        if (prefab != null && instance == null)
-            instance = Instantiate(prefab, transform.position, Quaternion.identity);
+        // Handles pool reuse: started is true, instance was cleared by the previous OnDisable.
+        if (started && instance == null && prefab != null)
+            instance = Instantiate(prefab, transform.position + spawnOffset, Quaternion.identity);
     }
 
     private void OnDisable()
@@ -31,6 +35,9 @@ public class PrefabSpawner : MonoBehaviour
     private void OnDestroy()
     {
         if (instance != null)
+        {
             Destroy(instance);
+            instance = null;
+        }
     }
 }

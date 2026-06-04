@@ -93,6 +93,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PrefabSpawner
   prefab: {fileID: 3133289591570078073, guid: cb79d462e095b064c8b60e1e48efed4e, type: 3}
+  destroyWithOwner: 1
+  spawnOffset: {x: 0, y: 0.1, z: 0}
 --- !u!1 &7817680045328420963
 GameObject:
   m_ObjectHideFlags: 0

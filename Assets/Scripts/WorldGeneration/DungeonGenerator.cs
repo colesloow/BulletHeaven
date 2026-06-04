@@ -6,6 +6,7 @@ public class DungeonGenerator : MonoBehaviour
 {
     [SerializeField] private Room startRoom;
     [SerializeField] private DungeonRules rules;
+    [SerializeField] private Material wallGhostMaterial;
 
     // All pieces (rooms + corridors) placed so far.
     private readonly List<DungeonPiece> placedPieces = new();
@@ -76,6 +77,7 @@ public class DungeonGenerator : MonoBehaviour
         TryCloseLoops();
         SealOpenDoors();
         GetComponent<DungeonNavMeshBuilder>().Build(placedPieces, sealingWalls);
+        BuildWallGhosts();
         DecorateRooms();
         SpawnPickups();
     }
@@ -379,6 +381,44 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         return false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Wall ghost meshes (cutout effect)
+    // -------------------------------------------------------------------------
+
+    // Adds a ghost child mesh to every wall renderer so the WallGhost shader
+    // can draw a semi-transparent overlay inside the stencil cutout sphere.
+    private void BuildWallGhosts()
+    {
+        if (wallGhostMaterial == null) return;
+
+        foreach (DungeonPiece piece in placedPieces)
+            AddGhostToRenderer(piece.GetComponent<MeshRenderer>());
+
+        foreach (GameObject wall in sealingWalls)
+            AddGhostToRenderer(wall.GetComponent<MeshRenderer>());
+    }
+
+    private void AddGhostToRenderer(MeshRenderer wallRenderer)
+    {
+        if (wallRenderer == null) return;
+        if (!wallRenderer.TryGetComponent(out MeshFilter mf)) return;
+
+        // Ghost mesh is parented directly to the wall renderer's transform
+        // so it follows any runtime movement without per-frame updates.
+        GameObject ghost = new("WallGhost");
+        ghost.transform.SetParent(wallRenderer.transform, false);
+
+        ghost.AddComponent<MeshFilter>().sharedMesh = mf.sharedMesh;
+        MeshRenderer mr = ghost.AddComponent<MeshRenderer>();
+        mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        mr.receiveShadows = false;
+
+        var mats = new Material[wallRenderer.sharedMaterials.Length];
+        for (int i = 0; i < mats.Length; i++)
+            mats[i] = wallGhostMaterial;
+        mr.sharedMaterials = mats;
     }
 
     // -------------------------------------------------------------------------

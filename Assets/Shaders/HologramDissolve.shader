@@ -1,28 +1,28 @@
 // This shader draws an overlay on top of the original mesh (two draw calls per enemy).
 // Monitor overdraw if many enemies spawn simultaneously.
-Shader "Custom/HologramDissolve"
+Shader "BulletHeaven/HologramDissolve"
 {
     Properties
     {
         [Header(Hologram)]
-        _HologramColor("Hologram Color", Color) = (0, 0.8, 1, 1)
-        _ScanlineFreq("Scanline Frequency", Float) = 12
-        _ScanlineThick("Scanline Thickness", Range(0, 1)) = 0.35
-        _FresnelPower("Fresnel Power", Float) = 2
-        _FresnelIntensity("Fresnel Intensity", Float) = 1.5
-        _FlickerSpeed("Flicker Speed", Float) = 4
-        _FlickerAmount("Flicker Amount", Range(0, 1)) = 0.15
+        _HologramColor ("Hologram Color", Color) = (0, 0.8, 1, 1)
+        _ScanlineFreq ("Scanline Frequency", Float) = 12
+        _ScanlineThick ("Scanline Thickness", Range(0, 1)) = 0.35
+        _FresnelPower ("Fresnel Power", Float) = 2
+        _FresnelIntensity ("Fresnel Intensity", Float) = 1.5
+        _FlickerSpeed ("Flicker Speed", Float) = 4
+        _FlickerAmount ("Flicker Amount", Range(0, 1)) = 0.15
 
         [Header(Edge)]
-        _EdgeWidth("Edge Width (normalized)", Range(0, 0.2)) = 0.05
-        _EdgeColor("Edge Color", Color) = (0, 1, 1, 1)
-        _EdgeIntensity("Edge Intensity", Float) = 5
+        _EdgeWidth ("Edge Width (normalized)", Range(0, 0.2)) = 0.05
+        _EdgeColor ("Edge Color", Color) = (0, 1, 1, 1)
+        _EdgeIntensity ("Edge Intensity", Float) = 5
 
         [Header(Animation set by HologramEffect)]
-        _Wave1("Phase1 progress (hologram sweeps up)", Range(0, 1)) = 0
-        _Wave2("Phase2 progress (material reveals up)", Range(0, 1)) = 0
-        _WorldYMin("World Y Min", Float) = -0.5
-        _WorldYMax("World Y Max", Float) = 0.5
+        _Wave1 ("Phase1 progress (hologram sweeps up)", Range(0, 1)) = 0
+        _Wave2 ("Phase2 progress (material reveals up)", Range(0, 1)) = 0
+        _WorldYMin ("World Y Min", Float) = -0.5
+        _WorldYMax ("World Y Max", Float) = 0.5
     }
 
     SubShader

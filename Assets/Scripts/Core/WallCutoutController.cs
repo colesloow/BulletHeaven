@@ -1,9 +1,10 @@
 using UnityEngine;
 
 // Scales the stencil mask sphere based on whether a wall occludes the camera's view of the player.
-// When occluded, the sphere becomes visible (in stencil only) and punches a circular hole
-// through wall renderers that use the WallCutout shader (Stencil Comp NotEqual).
-// The floor child on each room uses a standard material and is unaffected by the stencil.
+// When occluded, the sphere is placed ON the wall at the raycast hit point (not on the player),
+// so the cutout only punches through the specific wall blocking the view rather than cutting
+// all walls within radius of the player.
+//
 //
 // Setup:
 //   1. Attach to the Player root GameObject.
@@ -13,11 +14,11 @@ public class WallCutoutController : MonoBehaviour
 {
     [SerializeField] private Transform maskSphere;
     [SerializeField] private float maskRadius = 3f;
+    [SerializeField] private float lerpSpeed = 8f;
     [SerializeField] private LayerMask occluderMask;
-    [SerializeField] private float checkInterval = 0.05f;
 
     private Camera mainCamera;
-    private float nextCheckTime;
+    private float currentRadius = 0f;
 
     private void Start()
     {
@@ -29,14 +30,19 @@ public class WallCutoutController : MonoBehaviour
     private void LateUpdate()
     {
         if (maskSphere == null || mainCamera == null) return;
-        if (Time.time < nextCheckTime) return;
-        nextCheckTime = Time.time + checkInterval;
 
         Vector3 camPos = mainCamera.transform.position;
         Vector3 toPlayer = transform.position - camPos;
         float dist = toPlayer.magnitude;
 
-        bool blocked = Physics.Raycast(camPos, toPlayer.normalized, dist, occluderMask);
-        maskSphere.localScale = Vector3.one * (blocked ? maskRadius : 0f);
+        float targetRadius = 0f;
+        if (Physics.Raycast(camPos, toPlayer.normalized, out RaycastHit hit, dist, occluderMask))
+        {
+            maskSphere.position = hit.point;
+            targetRadius = maskRadius;
+        }
+
+        currentRadius = Mathf.Lerp(currentRadius, targetRadius, Time.deltaTime * lerpSpeed);
+        maskSphere.localScale = Vector3.one * currentRadius;
     }
 }
