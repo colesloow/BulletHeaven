@@ -60,17 +60,29 @@ public class PlayerDeathExplosion : MonoBehaviour
 
     private IEnumerator DoExplosion()
     {
-        MeshFilter[] meshFilters = robotRoot.GetComponentsInChildren<MeshFilter>();
+        var meshFilters = new List<MeshFilter>(robotRoot.GetComponentsInChildren<MeshFilter>());
+
+        // Include satellite meshes; OnPlayerDeath() already stopped their orbit and lasers.
+        SatelliteWeapon satWeapon = GetComponentInChildren<SatelliteWeapon>();
+        if (satWeapon != null)
+        {
+            GameObject[] sats = satWeapon.GetSatellites();
+            if (sats != null)
+                foreach (GameObject sat in sats)
+                    if (sat != null)
+                        meshFilters.AddRange(sat.GetComponentsInChildren<MeshFilter>());
+        }
+
         Vector3 center = robotRoot.position;
 
         // Floor at y=0 matches the dungeon floor level; prevents parts from falling through.
         tempFloor = CreateTempFloor();
 
-        var rigidbodies = new Rigidbody[meshFilters.Length];
+        var rigidbodies = new List<Rigidbody>(meshFilters.Count);
 
-        for (int i = 0; i < meshFilters.Length; i++)
+        foreach (MeshFilter mf in meshFilters)
         {
-            Transform t = meshFilters[i].transform;
+            Transform t = mf.transform;
 
             parts.Add(new PartState
             {
@@ -89,7 +101,7 @@ public class PlayerDeathExplosion : MonoBehaviour
 
             Rigidbody rb = t.gameObject.AddComponent<Rigidbody>();
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-            rigidbodies[i] = rb;
+            rigidbodies.Add(rb);
         }
 
         // One physics step so all colliders are registered before the impulse.

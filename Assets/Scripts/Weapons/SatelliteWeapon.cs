@@ -148,10 +148,14 @@ public class SatelliteWeapon : Weapon
 
     public override void OnPlayerDeath()
     {
-        if (satellites == null) return;
-        foreach (var sat in satellites)
-            if (sat != null) sat.SetActive(false);
+        // Stop laser beams first; StopLaser() handles coroutine and LineRenderer cleanup.
+        ForEachLaser(l => l.StopLaser());
+        // Disabling the component stops Update() so satellites freeze in place.
+        // Satellites remain active GameObjects so PlayerDeathExplosion can include them.
+        enabled = false;
     }
+
+    public GameObject[] GetSatellites() => satellites;
 
     private void OnDrawGizmos()
     {

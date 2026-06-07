@@ -4,6 +4,7 @@ public class PrefabSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject prefab;
     [SerializeField] private bool destroyWithOwner = true;
+    [SerializeField] private bool parentToOwner;
     [SerializeField] private Vector3 spawnOffset;
 
     private GameObject instance;
@@ -13,14 +14,14 @@ public class PrefabSpawner : MonoBehaviour
     {
         started = true;
         if (prefab != null && instance == null)
-            instance = Instantiate(prefab, transform.position + spawnOffset, Quaternion.identity);
+            instance = Instantiate(prefab, transform.position + spawnOffset, Quaternion.identity, parentToOwner ? transform : null);
     }
 
     private void OnEnable()
     {
         // Handles pool reuse: started is true, instance was cleared by the previous OnDisable.
         if (started && instance == null && prefab != null)
-            instance = Instantiate(prefab, transform.position + spawnOffset, Quaternion.identity);
+            instance = Instantiate(prefab, transform.position + spawnOffset, Quaternion.identity, parentToOwner ? transform : null);
     }
 
     private void OnDisable()

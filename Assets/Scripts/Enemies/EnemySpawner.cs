@@ -102,6 +102,9 @@ public class EnemySpawner : MonoBehaviour
         else
             enemy.transform.position = spawnPoint;
 
+        if (enemy.TryGetComponent(out HologramEffect hologram))
+            hologram.StartEffect();
+
         return true;
     }
 

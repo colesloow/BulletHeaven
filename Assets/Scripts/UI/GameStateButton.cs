@@ -70,6 +70,7 @@ public class GameStateButton : MonoBehaviour
         // One frame for Cinemachine to process the repositioned player before revealing the scene.
         yield return null;
         loadingOverlay.SetActive(false);
+        GetComponent<Button>().interactable = true;
     }
 
     private bool NeedsLoading() =>

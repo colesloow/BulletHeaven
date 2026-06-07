@@ -45,9 +45,13 @@ public class HologramEffect : MonoBehaviour
         if (health != null) { health.IsInvincible = false; health = null; }
     }
 
-    private void OnEnable()
+    private void OnEnable() => StartEffect();
+
+    public void StartEffect()
     {
-        // Freeze immediately on enable, before any Update runs on other components.
+        StopAllCoroutines();
+        Cleanup();
+        // Freeze immediately, before any Update runs on other components.
         BeginSpawning();
         StartCoroutine(BeginNextFrame());
     }
