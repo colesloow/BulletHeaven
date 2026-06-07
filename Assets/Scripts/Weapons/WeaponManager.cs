@@ -44,6 +44,9 @@ public class WeaponManager : MonoBehaviour
         _activeWeapons.Add(weapon);
     }
 
+    public SatelliteWeapon SatelliteWeapon =>
+        _activeWeapons.OfType<SatelliteWeapon>().FirstOrDefault();
+
     public void ApplyUpgrade(WeaponUpgrade upgrade)
     {
         Weapon target = _activeWeapons.FirstOrDefault(w => w.Data == upgrade.TargetWeapon);

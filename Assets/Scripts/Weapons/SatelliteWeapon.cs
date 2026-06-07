@@ -157,6 +157,27 @@ public class SatelliteWeapon : Weapon
 
     public GameObject[] GetSatellites() => satellites;
 
+    public void DebugUnlockLaser() => UnlockLasers();
+
+    public void DebugSetSatelliteCount(int count)
+    {
+        satelliteCount = Mathf.Clamp(count, 1, maxSatellites);
+        SpawnSatellites();
+    }
+
+    public void DebugAddLaser(int delta)
+    {
+        int target = Mathf.Clamp(laserCount + delta, 0, satelliteCount);
+        if (target == laserCount) return;
+        laserCount = target;
+        if (laserCount == 0)
+        {
+            ForEachLaser(l => l.StopLaser());
+            return;
+        }
+        ApplyLaserState();
+    }
+
     private void OnDrawGizmos()
     {
         if (satellites == null) return;
@@ -171,11 +192,30 @@ public class SatelliteWeapon : Weapon
     private void ApplyLaserState()
     {
         if (satellites == null || laserCount == 0) return;
+
+        // Find the reference laser already firing to sync new ones to its cycle.
+        LaserBeamController reference = null;
+        for (int slot = 0; slot < laserCount - 1; slot++)
+        {
+            int idx = LaserPlacementIndex(slot);
+            if (idx >= satelliteCount || satellites[idx] == null) continue;
+            var laser = satellites[idx].GetComponentInChildren<LaserBeamController>();
+            if (laser != null) { reference = laser; break; }
+        }
+
+        float syncDelay = -1f;
+        if (reference != null)
+            syncDelay = reference.TimeUntilNextFire;
+
         for (int slot = 0; slot < laserCount; slot++)
         {
             int idx = LaserPlacementIndex(slot);
             if (idx >= satelliteCount || satellites[idx] == null) continue;
-            satellites[idx].GetComponentInChildren<LaserBeamController>()?.Unlock();
+            var laser = satellites[idx].GetComponentInChildren<LaserBeamController>();
+            if (laser == null) continue;
+            // Only pass syncDelay to newly added lasers (last slot); existing ones are already running.
+            bool isNew = slot == laserCount - 1 && reference != null;
+            laser.Unlock(isNew ? syncDelay : -1f);
         }
     }
 

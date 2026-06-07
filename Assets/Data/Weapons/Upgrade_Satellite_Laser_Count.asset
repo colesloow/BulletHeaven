@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6e7e53b12f89d446b6f96b458922bfa, type: 3}
   m_Name: Upgrade_Satellite_Laser_Count
   m_EditorClassIdentifier: Assembly-CSharp::WeaponUpgrade
-  UpgradeName: Wider Laser Coverage
-  Description: Wider Laser Coverage
+  UpgradeName: +1 Laser
+  Description: +1 Laser
   TargetWeapon: {fileID: 11400000, guid: b8799ff0c9ef2044da84ba09d60f0965, type: 2}
   Type: 7
   Value: 0
-  Rarity: 2
-  ScrapCost: 5
+  Rarity: 1
+  ScrapCost: 6
