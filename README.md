@@ -19,7 +19,7 @@ On top of that foundation, the project became an opportunity to go further and e
 - Wall cutout system: stencil sphere follows the player, walls fade out when occluding the camera
 
 ### Data-driven architecture
-- `WeaponData` and `WeaponUpgrade` ScriptableObjects — all weapon stats and upgrade trees defined in assets, not in code
+- `WeaponData` and `WeaponUpgrade` ScriptableObjects -- all weapon stats and upgrade trees defined in assets, not in code
 - `WaveConfig` ScriptableObjects for enemy wave parameters
 - `DungeonRules` / `RoomDecorationProfile` ScriptableObjects for generation and decoration rules
 - Object pooling (`PoolManager`) for enemies and collectables
@@ -36,13 +36,13 @@ On top of that foundation, the project became an opportunity to go further and e
 - HitEffect system: decoupled hit flash from weapon logic via `Health.OnDamaged` event
 
 ### Game loop
-- Main menu → game → game over with score / kills / damage taken / level reached
+- Main menu -> game -> game over with score / kills / damage taken / level reached
 - Pause (P key), restart, return to main menu
 - XP / level-up, scrap currency, countdown timer
 
 ## How to run
 
-1. Open the project in Unity (2022.3 LTS or later recommended).
+1. Open the project in Unity **6000.3.10f1** (other versions untested).
 2. Make sure both scenes are added to the Build Settings: `Assets/Scenes/MainMenu` and `Assets/Scenes/Game`.
 3. Open the `MainMenu` scene and press **Play**.
 
@@ -54,7 +54,7 @@ Alternatively, open the `Game` scene directly and press **Play** to skip the mai
 |-----|--------|
 | `Tab` | +50 XP (triggers level-up) |
 | `P` | Pause / resume |
-| `1` – `5` | Set satellite count (1 to 5) |
+| `1` - `5` | Set satellite count (1 to 5) |
 | `L` | Unlock laser on satellites |
 | `+` / `=` | Add one laser |
 | `-` | Remove one laser |
