@@ -146,6 +146,7 @@ GameObject:
   - component: {fileID: 7944010049476000275}
   - component: {fileID: 6386948041453948834}
   - component: {fileID: 5736690039680169206}
+  - component: {fileID: 7484459856399152085}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -294,10 +295,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WallCutoutController
   maskSphere: {fileID: 8359437041188083637}
   maskRadius: 3
+  lerpSpeed: 8
   occluderMask:
     serializedVersion: 2
     m_Bits: 256
-  checkInterval: 0.05
 --- !u!114 &5736690039680169206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,6 +321,23 @@ MonoBehaviour:
   tiltSmoothing: 8
   hoverAmplitude: 0.04
   hoverFrequency: 1.3
+--- !u!114 &7484459856399152085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076768018490587838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58c11b3b6e7a6484eafcf358a85d4108, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathExplosion
+  robotRoot: {fileID: 2373213458293667288}
+  explosionVFX: {fileID: 2300140489762399115, guid: a2be44976c36f33448757580c0bc5432, type: 3}
+  explosionForce: 3
+  explosionRadius: 1.5
+  upwardModifier: 0.4
 --- !u!1 &2697912149634416660
 GameObject:
   m_ObjectHideFlags: 0

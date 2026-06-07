@@ -2783,7 +2783,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd223e59631daa443a1a42edb8cb3789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  enemyDamageEnabled: 0
+  enemyDamageEnabled: 1
   baseSpawnInterval: 2
   initialMaxEnemies: 10
   maxEnemiesIncreasePerMinute: 5
@@ -3781,10 +3781,6 @@ PrefabInstance:
     - target: {fileID: 2076768018490587838, guid: 4e87d93e7ece2a74f8264a480f1e39ec, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 6386948041453948834, guid: 4e87d93e7ece2a74f8264a480f1e39ec, type: 3}
-      propertyPath: anticipationRadius
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7956079774602133984, guid: 4e87d93e7ece2a74f8264a480f1e39ec, type: 3}
       propertyPath: m_LocalPosition.x

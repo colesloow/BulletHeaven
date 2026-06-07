@@ -28,6 +28,7 @@ public class Health : MonoBehaviour
     {
         IsDead = false;
         currentHealth = maxHealth;
+        GetComponent<PlayerDeathExplosion>()?.Cleanup();
         if (CompareTag(Tags.Player) && GameManager.Instance != null)
             GameManager.Instance.PlayerHealth = currentHealth;
     }
@@ -118,6 +119,7 @@ public class Health : MonoBehaviour
         IsDead = true;
         if (weaponManager != null) weaponManager.OnPlayerDeath();
         SoundManager.PlaySound(SoundType.DEATH);
+        GetComponent<PlayerDeathExplosion>()?.Explode();
 
         yield return new WaitForSeconds(1.5f);
 
