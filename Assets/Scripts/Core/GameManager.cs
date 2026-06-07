@@ -2,7 +2,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using System;
 
-public enum GameState { MainMenu, Playing, GameOver }
+public enum GameState { MainMenu, Playing, Paused, GameOver }
 
 public class GameManager : MonoBehaviour
 {
@@ -27,6 +27,10 @@ public class GameManager : MonoBehaviour
 
     [Header("Currency")]
     [SerializeField] private int playerScrews;
+
+    [Header("Stats")]
+    [SerializeField] private int enemiesKilled;
+    [SerializeField] private int damageTaken;
 
     [Header("Timer")]
     [SerializeField] private float gameDuration = 600f;
@@ -103,6 +107,8 @@ public class GameManager : MonoBehaviour
 
     public int Level => level;
     public float TimeRemaining => timeRemaining;
+    public int EnemiesKilled => enemiesKilled;
+    public int DamageTaken => damageTaken;
 
     private void Awake()
     {
@@ -169,6 +175,8 @@ public class GameManager : MonoBehaviour
         PlayerXP = 0f;
         PlayerScrews = 0;
         level = 1;
+        enemiesKilled = 0;
+        damageTaken = 0;
         timeRemaining = gameDuration;
         secondsRemaining = -1;
         timerRunning = true;
@@ -192,6 +200,23 @@ public class GameManager : MonoBehaviour
         player.SetActive(false);
         Resume();
         SetState(GameState.MainMenu);
+    }
+
+    public void RegisterKill() => enemiesKilled++;
+    public void RegisterDamage(float amount) => damageTaken += Mathf.RoundToInt(amount);
+
+    public void PauseGame()
+    {
+        if (State != GameState.Playing) return;
+        Pause();
+        SetState(GameState.Paused);
+    }
+
+    public void ResumeGame()
+    {
+        if (State != GameState.Paused) return;
+        Resume();
+        SetState(GameState.Playing);
     }
 
     public void TriggerGameOver()

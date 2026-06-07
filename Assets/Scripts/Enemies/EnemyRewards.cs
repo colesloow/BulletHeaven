@@ -13,7 +13,10 @@ public class EnemyRewards : MonoBehaviour
     public void GrantRewards(Vector3 position)
     {
         if (GameManager.Instance != null)
+        {
             GameManager.Instance.TotalScore += scoreValue;
+            GameManager.Instance.RegisterKill();
+        }
 
         if (PoolManager.Instance == null || drops == null || drops.Length == 0) return;
 

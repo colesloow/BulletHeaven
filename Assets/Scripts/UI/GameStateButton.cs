@@ -5,7 +5,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Button))]
 public class GameStateButton : MonoBehaviour
 {
-    public enum Action { StartGame, RestartGame, ReturnToMainMenu }
+    public enum Action { StartGame, RestartGame, ReturnToMainMenu, ResumeGame }
 
     [SerializeField] private Action action;
     [SerializeField] private GameObject loadingOverlay;
@@ -83,6 +83,7 @@ public class GameStateButton : MonoBehaviour
             case Action.StartGame: GameManager.Instance.StartGame(); break;
             case Action.RestartGame: GameManager.Instance.RestartGame(); break;
             case Action.ReturnToMainMenu: GameManager.Instance.ReturnToMainMenu(); break;
+            case Action.ResumeGame: GameManager.Instance.ResumeGame(); break;
         }
     }
 }

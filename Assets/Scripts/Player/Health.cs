@@ -90,7 +90,10 @@ public class Health : MonoBehaviour
         OnDamaged?.Invoke(amount);
 
         if (gameObject.CompareTag(Tags.Player) && GameManager.Instance != null)
+        {
             GameManager.Instance.PlayerHealth = currentHealth;
+            GameManager.Instance.RegisterDamage(amount);
+        }
 
         if (currentHealth <= 0)
             Die();
