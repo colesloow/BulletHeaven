@@ -34,13 +34,13 @@ public class HologramEffect : MonoBehaviour
         if (enemyController != null) enemyController.enabled = false;
         // Disabling EnemyController stops new SetDestination calls, but the NavMeshAgent
         // keeps following its current path — stop it explicitly.
-        if (navAgent != null) navAgent.isStopped = true;
+        if (navAgent != null && navAgent.isOnNavMesh) navAgent.isStopped = true;
         if (health != null) health.IsInvincible = true;
     }
 
     private void EndSpawning()
     {
-        if (navAgent != null) { navAgent.isStopped = false; navAgent = null; }
+        if (navAgent != null) { if (navAgent.isOnNavMesh) navAgent.isStopped = false; navAgent = null; }
         if (enemyController != null) { enemyController.enabled = true; enemyController = null; }
         if (health != null) { health.IsInvincible = false; health = null; }
     }

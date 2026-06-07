@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEngine;
 using System;
 
@@ -13,6 +14,7 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private DungeonGenerator dungeonGenerator;
     [SerializeField] private GameObject player;
+    [SerializeField] private Transform cameraTarget;
 
     [Header("Health & Score")]
     [SerializeField] private int totalScore;
@@ -134,7 +136,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void StartGame()
+    public void PrepareGame()
     {
         WaveManager.Instance?.CleanupEnemies();
 
@@ -147,10 +149,18 @@ public class GameManager : MonoBehaviour
 
         dungeonGenerator.Cleanup();
         dungeonGenerator.Generate();
+    }
 
+    public void FinalizeStartGame()
+    {
+        Vector3 spawnPos = new Vector3(0f, playerSpawnY, 0f);
+        Vector3 warpDelta = spawnPos - player.transform.position;
+        player.transform.position = spawnPos;
         player.SetActive(true);
-        player.transform.position = new Vector3(0f, playerSpawnY, 0f);
         if (player.TryGetComponent(out Rigidbody rb)) rb.linearVelocity = Vector3.zero;
+        // Tell Cinemachine the target teleported so it snaps instead of smoothly following.
+        if (cameraTarget != null)
+            CinemachineCore.OnTargetObjectWarped(cameraTarget, warpDelta);
         if (player.TryGetComponent(out Health health)) health.Revive();
         if (player.TryGetComponent(out WeaponManager wm)) wm.ResetWeapons();
 
@@ -164,6 +174,12 @@ public class GameManager : MonoBehaviour
         timerRunning = true;
         Resume();
         SetState(GameState.Playing);
+    }
+
+    public void StartGame()
+    {
+        PrepareGame();
+        FinalizeStartGame();
     }
 
     public void RestartGame() => StartGame();
