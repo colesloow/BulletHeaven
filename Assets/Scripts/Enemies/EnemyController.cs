@@ -87,4 +87,36 @@ public class EnemyController : MonoBehaviour
         _agent.ResetPath();
         _nextHitTime = 0f;
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        // Damage range disc (XZ)
+        UnityEditor.Handles.color = new Color(1f, 0.3f, 0.3f, 0.4f);
+        UnityEditor.Handles.DrawSolidDisc(transform.position, Vector3.up, _damageRange);
+        UnityEditor.Handles.color = Color.red;
+        UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, _damageRange);
+
+        if (_player == null) return;
+
+        // Line to player with current XZ distance label
+        Vector3 playerFlat = new(_player.position.x, transform.position.y, _player.position.z);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, playerFlat);
+
+        float xzDist = Vector2.Distance(
+            new Vector2(transform.position.x, transform.position.z),
+            new Vector2(_player.position.x, _player.position.z));
+        UnityEditor.Handles.Label(
+            Vector3.Lerp(transform.position, playerFlat, 0.5f) + Vector3.up * 0.3f,
+            $"XZ: {xzDist:F2}");
+
+        // NavMesh status
+        if (!_agent.isOnNavMesh)
+        {
+            UnityEditor.Handles.color = Color.magenta;
+            UnityEditor.Handles.Label(transform.position + Vector3.up * 1.5f, "NOT ON NAVMESH");
+        }
+    }
+#endif
 }
