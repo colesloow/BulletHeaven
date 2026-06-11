@@ -13,10 +13,8 @@ On top of that foundation, the project became an opportunity to go further and e
 ## How to run
 
 1. Open the project in Unity, ideally version **6000.3.10f1** (other versions untested).
-2. Make sure both scenes are added to the Build Settings: `Assets/Scenes/MainMenu` and `Assets/Scenes/Game`.
-3. Open the `MainMenu` scene and press **Play**.
-
-Alternatively, open the `Game` scene directly and press **Play** to skip the main menu.
+2. Make sure the `Game` scene is added to the Build Settings: `Assets/Scenes/Game`.
+3. Open the `Game` scene and press **Play**.
 
 ## Debug controls (Play mode only)
 
