@@ -477,7 +477,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 5961385405075670556}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 1
+  m_Radius: 0.8
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -504,7 +504,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   _speed: 3
   _damage: 10
-  _damageRange: 0.9
+  _damageRange: 1.1
   _damageInterval: 1
 --- !u!114 &4375205348110235087
 MonoBehaviour:
