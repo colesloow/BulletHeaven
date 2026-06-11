@@ -40,8 +40,7 @@ public class SoundManager : MonoBehaviour
     //Play sound - by default the volume is 100%
     public static void PlaySound(SoundType sound, float volume = 1)
     {
-        //Play a given sound type once, at specified volume
-        //We look for the corresponding audioclip in soundList
+        if (instance == null || instance.soundList == null || instance.soundList.Length == 0) return;
         instance.audioSource.PlayOneShot(instance.soundList[(int)sound], volume);
     }
 }
