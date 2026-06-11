@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 03644a387b6480e45a2fadf2b2022b8e
+guid: 6491e774a6b70c944a8bd012eebad1fe
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Droid 1997
+  - Supercharge Halftone
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
