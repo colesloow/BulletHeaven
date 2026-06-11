@@ -1,6 +1,6 @@
 # Still Running
 
-A Unity 3D roguelike developed as a school project with two overlapping goals.
+A Unity 3D roguelike developed as a school project.
 
 ## Context
 
