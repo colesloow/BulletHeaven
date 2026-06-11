@@ -504,7 +504,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   _speed: 3
   _damage: 10
-  _damageRange: 1.1
+  _damageRange: 1.3
   _damageInterval: 1
 --- !u!114 &4375205348110235087
 MonoBehaviour:
